@@ -1,5 +1,25 @@
 body {
+    margin-top: 70px;
     margin-bottom: 70px;
+}
+
+#user-create-form {
+    display: none;
+}
+
+#switch-to-create,
+#switch-to-login {
+    float: right;
+}
+
+.wrapper {
+    padding: 30px;
+    background-color: #eee;
+    border-radius: 8px;
+    -webkit-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+    box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+    margin-bottom: 50px;
 }
 
 /*settings for the footer*/

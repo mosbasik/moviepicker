@@ -1,3 +1,6 @@
 from django.contrib import admin
+from main.models import Movie, WatchEvent, WatchRoom
 
-# Register your models here.
+admin.site.register(Movie)
+admin.site.register(WatchEvent)
+admin.site.register(WatchRoom)

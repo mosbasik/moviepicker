@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from main.models import Movie, WatchEvent, WatchRoom
+
+import user_auth
 
 
 def front(request):
