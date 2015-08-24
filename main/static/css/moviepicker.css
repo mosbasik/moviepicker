@@ -2,6 +2,7 @@ body {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     margin-top: 70px;
     margin-bottom: 70px;
+    background-color: #B1B1B1;
 }
 
 #user-create-form {
