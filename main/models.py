@@ -3,9 +3,10 @@ from django.contrib.auth import User
 
 
 class Movie(models.Model):
+    imdb_id = models.CharField(max_length=12, unique=True)
     title = models.CharField(max_length=255)
     year = models.IntegerField(null=True, blank=True)
-    rating = models.FloatField(null=True, blank=True)
+    imdb_ rating = models.FloatField(null=True, blank=True)
     runtime = models.CharField(max_length=40, null=True, blank=True)
     genre = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
