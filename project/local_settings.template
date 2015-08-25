@@ -1,0 +1,16 @@
+Copy this file and change it to a .py file
+
+
+http://www.miniwebtool.com/django-secret-key-generator/
+SECRET_KEY = ''
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'moviepicker',
+        'HOST': '127.0.0.1',
+        'USER': 'root',
+        'PASSWORD': 'Sin@tra2',
+        'PORT': '',
+    }
+}

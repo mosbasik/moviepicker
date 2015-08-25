@@ -19,7 +19,9 @@ import django.contrib.auth.views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', 'main.views.front', name='front'),
+    url(r'^$', 'main.views.front', name='front'),
+    url(r'^login/$', 'main.user_auth.login', name='login'),
+    url(r'^logout/$', 'main.user_auth.logout', name='logout'),
 
 
     url(r'^password/reset/$',
