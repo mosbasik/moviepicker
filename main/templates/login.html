@@ -32,7 +32,7 @@
 
             <div class='row '>
             
-                <form  id='user-create-form' class='col-sm-offset-3 col-sm-6' method='POST' action='{% url "login" %}#user-create-form' style='{% if error_on_create %}display:block{% endif %}'>
+                <form  id='user-create-form' class='col-sm-offset-3 col-sm-6' method='POST' action='{% url "login" %}' style='{% if error_on_create %}display:block{% endif %}'>
                     {%csrf_token%}
 
                     <p class='text-danger'>{{user_create_form.nonfield_errors}}</p>

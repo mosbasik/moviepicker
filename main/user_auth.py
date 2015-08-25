@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 
+from main.models import WatchRoom
+
 
 def login(request):
     if request.user.is_authenticated():
@@ -42,6 +44,9 @@ def login(request):
                 user = full_user_create_form.save()
                 user.email = request.POST['email']
                 user.save()
+
+                room = WatchRoom.objects.get(name='Universal')
+                room.users.add(user)
 
                 # group = Group.objects.get(name='users')
                 # group.user_set.add(user)
