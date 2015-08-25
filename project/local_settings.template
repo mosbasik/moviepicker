@@ -1,5 +1,9 @@
 Copy this file and change it to a .py file
 
+
+http://www.miniwebtool.com/django-secret-key-generator/
+SECRET_KEY = ''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
