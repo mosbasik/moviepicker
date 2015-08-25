@@ -6,28 +6,34 @@ import user_auth
 
 
 def global_context(request):
-    return {
-        'user_rooms': request.user.watchroom_set.all(),
-    }
+    '''
+    This is the function to add context variables to all views
+    '''
+    if request.user.is_authenticated():
+        return {
+            'user_rooms': request.user.watchroom_set.all(),
+        }
+    else:
+        return {}
 
 
 def front(request):
     context = {}
 
     context['rooms'] = WatchRoom.objects.all()
-    if request.user.is_authenticated():
-        c = RequestContext(request, {'rooms': WatchRoom.objects.all()},
-            processors=[global_context])
 
-    return render(request, 'index.html', c)
+    return render(request, 'index.html', context,
+        context_instance=RequestContext(request, processors=[global_context]))
 
 
 def all_movies(request):
     context = {}
 
-    return render(request, 'all_movies.html', context)
+    return render(request, 'all_movies.html', context,
+        context_instance=RequestContext(request, processors=[global_context]))
 
 def add_movie(request):
     context = {}
 
-    return render(request, 'add_movie.html', context)
+    return render(request, 'add_movie.html', context,
+        context_instance=RequestContext(request, processors=[global_context]))
