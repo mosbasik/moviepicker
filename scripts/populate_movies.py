@@ -42,9 +42,13 @@ class MovieToPick():
     def _get_movie_json(movie_id_final):
         omdb_api_url = requests.get('http://www.omdbapi.com/?i=%s&plot=full&r=json'
                             % movie_id_final)
+
         response_dict = omdb_api_url.json()
 
-        return response_dict
+        if response_dict['Type'] != 'series':
+            return response_dict
+        else:
+            print "Ugh. A TV show."
 
     # import pprint
     # pprint.pprint(response_dict)
@@ -81,22 +85,28 @@ class MovieToPick():
 
         # print response_dict['imdbID']
 
-        movie, created = Movie.objects.get_or_create(imdb_id=response_dict['imdbID'])
+        if response_dict:
 
-        movie.title = response_dict['Title']
-        movie.year = response_dict['Year']
-        movie.imdb_rating = response_dict['imdbRating']
-        movie.runtime = response_dict['Runtime']
-        movie.genre = response_dict['Genre']
-        movie.description = response_dict['Plot']
-        movie.starring = response_dict['Actors']
-        movie.written_by = response_dict['Writer']
-        movie.directed_by = response_dict['Director']
+            movie, created = Movie.objects.get_or_create(imdb_id=response_dict['imdbID'])
 
-        if movie_image is not None:
-            movie.poster.save('%s.jpg' % movie.title, File(movie_image))
+            movie.title = response_dict['Title']
+            movie.year = response_dict['Year']
+            movie.imdb_rating = response_dict['imdbRating']
+            movie.runtime = response_dict['Runtime']
+            movie.genre = response_dict['Genre']
+            movie.description = response_dict['Plot']
+            movie.starring = response_dict['Actors']
+            movie.written_by = response_dict['Writer']
+            movie.directed_by = response_dict['Director']
 
-        movie.save()
+            if movie_image is not None:
+                movie.poster.save('%s.jpg' % movie.title, File(movie_image))
+
+            movie.save()
+
+        else:
+            print "A TV show? Really?"
+
 # print movie
 
-MovieToPick.make_movie('http://www.imdb.com/title/tt0062622/')
+MovieToPick.make_movie('http://www.imdb.com/title/tt1475582/?ref_=nv_sr_1')
