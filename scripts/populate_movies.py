@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import sys, os
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 import requests
 import json
 import StringIO
@@ -12,24 +14,24 @@ sys.path.append('..')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 
 from main.models import Movie
-# from django.conf import settings
-
-from django.core.files import File
-from django.core.files.temp import NamedTemporaryFile
-
-
-# pattern = '(t{2}[0-9]+)'
-
-# movie_id = 'tt0092991'
 
 
 class MovieToPick():
+    """ Takes a user-input url for an IMDB title and extracts the id for
+    use with an api and a scraper. Parses the api's json response and adds
+    the poster from the scraper to get or create a movie object
+    and store it in a database.
+    """
+
+    # runs the methods, gets the data, populates the database
     @staticmethod
     def make_movie(url):
         movie_id_final = MovieToPick._movie_id_from_url(url)
         response_dict = MovieToPick._get_movie_json(movie_id_final)
-        movie = MovieToPick._movie_info(response_dict, movie_id_final)
+        if response_dict['Type'] != 'series':
+            movie = MovieToPick._movie_info(response_dict, movie_id_final)
 
+    # runs regex on user input to extract the unique IMDB movie id
     @staticmethod
     def _movie_id_from_url(url):
         movie_id_pattern = '(t{2}[0-9]+)'
@@ -38,6 +40,8 @@ class MovieToPick():
 
         return movie_id_final
 
+    # uses the movie id to hit the omdb api
+    # excludes TV shows
     @staticmethod
     def _get_movie_json(movie_id_final):
         omdb_api_url = requests.get('http://www.omdbapi.com/?i=%s&plot=full&r=json'
@@ -54,6 +58,8 @@ class MovieToPick():
     # pprint.pprint(response_dict)
     # print response_dict['Plot']
 
+    # the api doesn't include the movie poster, so we get that one ourselves
+    # with a quick scrape.
     @staticmethod
     def _get_poster(movie_id_final):
         result = urllib.urlopen("http://www.imdb.com/title/%s/" % movie_id_final)
@@ -66,6 +72,7 @@ class MovieToPick():
         poster_xpath = '//*[@id="img_primary"]/div[1]/a/img/@src'
         poster = tree.xpath(poster_xpath)
 
+        # there's only ever one poster -- unless there isn't one.
         if len(poster) == 1:
             poster = poster[0]
             poster_response = urllib.urlopen(poster).read()
@@ -76,6 +83,8 @@ class MovieToPick():
         else:
             return None
 
+    # pulls in the poster tempfile for unpacking and inclusion
+    # in the creation of the movie object
     @staticmethod
     def _movie_info(response_dict, movie_id_final):
 
@@ -107,6 +116,5 @@ class MovieToPick():
         else:
             print "A TV show? Really?"
 
-# print movie
 
-MovieToPick.make_movie('http://www.imdb.com/title/tt1475582/?ref_=nv_sr_1')
+# MovieToPick.make_movie('http://www.imdb.com/title/tt1475582/?ref_=nv_sr_1')
