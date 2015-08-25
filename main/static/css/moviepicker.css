@@ -1,5 +1,70 @@
 body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    margin-top: 70px;
     margin-bottom: 70px;
+    background-color: #B1B1B1;
+}
+
+#user-create-form {
+    display: none;
+}
+
+#switch-to-create,
+#switch-to-login {
+    float: right;
+}
+
+.wrapper {
+    padding: 30px;
+    background-color: #eee;
+    border-radius: 8px;
+    -webkit-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+    box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+    margin-bottom: 50px;
+}
+
+/*Settings for nav bar*/
+.navbar-default {
+    background-color: #787878;
+    border-color: #787878;
+    border-radius: 0px;
+}
+
+.navbar-default .navbar-brand,
+.navbar-default .navbar-brand:hover {
+    color: #333;
+}
+
+.navbar-default .navbar-brand:focus,
+.navbar-default .navbar-brand:hover {
+    color: #333;
+    background-color: #787878;
+}
+
+.navbar-default .navbar-nav>li>a,
+.navbar-default .navbar-nav>li>a:focus,
+.navbar-default .navbar-nav>li>a:hover {
+    color: #333;
+}
+
+.dropdown-menu {
+    background-color: #787878;
+
+}
+
+.dropdown-menu>li>a,
+.dropdown-menu>li>a:focus,
+.dropdown-menu>li>a:hover {
+    background-color: #787878;
+    color: #333;
+}
+
+.navbar-default .navbar-nav>.open>a,
+.navbar-default .navbar-nav>.open>a:focus,
+.navbar-default .navbar-nav>.open>a:hover {
+    background-color: #787878;
+    color: #f5f5f5;
 }
 
 /*settings for the footer*/
@@ -14,7 +79,11 @@ body {
     width: 100%;
     /* Set the fixed height of the footer here */
     height: 46px;
-    background-color: #ddd;
+    background-color: #787878;
+}
+
+.footer a {
+    color: #333;
 }
 
 html {
