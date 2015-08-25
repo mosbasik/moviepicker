@@ -1,0 +1,12 @@
+Copy this file and change it to a .py file
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'moviepicker',
+        'HOST': '127.0.0.1',
+        'USER': 'root',
+        'PASSWORD': 'Sin@tra2',
+        'PORT': '',
+    }
+}
