@@ -1,7 +1,14 @@
 from django.shortcuts import render
 from main.models import Movie, WatchEvent, WatchRoom
+from django.template import loader, RequestContext
 
 import user_auth
+
+
+def global_context(request):
+    return {
+        'user_rooms': request.user.watchroom_set.all(),
+    }
 
 
 def front(request):
@@ -9,9 +16,10 @@ def front(request):
 
     context['rooms'] = WatchRoom.objects.all()
     if request.user.is_authenticated():
-        context['user_rooms'] = request.user.watchroom_set.all()
+        c = RequestContext(request, {'rooms': WatchRoom.objects.all()},
+            processors=[global_context])
 
-    return render(request, 'index.html', context)
+    return render(request, 'index.html', c)
 
 
 def all_movies(request):
