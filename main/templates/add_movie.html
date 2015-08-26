@@ -27,8 +27,14 @@
 
     </div>
     <div class="row">
-        {{movie.title}}
-        {{movie.description}}
+        {% if is_movie == 'yes' %}
+            
+            {{movie.title}}
+            {{movie.description}}
+            <img src="{{ movie.poster.url }}" alt="">
+        {% elif is_movie == 'no' %}
+            {{ message }}
+        {% endif %}
     </div>
 </div>
 
