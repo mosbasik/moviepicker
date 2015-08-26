@@ -30,6 +30,8 @@ def front(request):
 def all_movies(request):
     context = {}
 
+    context['movies'] = Movie.objects.all().order_by('title')
+
     return render(request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
@@ -47,6 +49,7 @@ def add_movie(request):
                 context['message'] = 'Not a Movie'
             else:
                 context['is_movie'] = 'yes'
+                context['message'] = 'Movie Entered'
                 context['movie'] = Movie.objects.get(imdb_id=result)
 
         else:
