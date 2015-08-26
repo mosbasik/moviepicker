@@ -35,5 +35,15 @@ def all_movies(request):
 def add_movie(request):
     context = {}
 
+    if request.method == 'POST':
+        url = request.POST.get('url')
+
+        if url:
+            context['url_response'] = url
+        else:
+            context['url_response'] = 'No url was entered'
+
+        
+
     return render(request, 'add_movie.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
