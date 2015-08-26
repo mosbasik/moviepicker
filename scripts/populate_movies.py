@@ -24,13 +24,13 @@ class MovieToPick():
 
     # calls the methods, creates the Movie object, populates the database
     @staticmethod
-    def make_movie(url):
+    def make_movie(url, user=None):
         movie_id_final = MovieToPick._movie_id_from_url(url)
         response_dict = MovieToPick._get_movie_json(movie_id_final)
         # if the user happened to input a TV show and triggers json response,
         # makes sure we don't bother with the poster even on a tempfile basis
         if response_dict is not None:
-            movie = MovieToPick._movie_info(response_dict, movie_id_final)
+            movie = MovieToPick._movie_info(response_dict, movie_id_final, user)
             return movie_id_final
         else:
             return 'not a movie'
@@ -95,7 +95,7 @@ class MovieToPick():
     # pulls in the poster tempfile for unpacking and inclusion
     # in the creation of the movie object
     @staticmethod
-    def _movie_info(response_dict, movie_id_final):
+    def _movie_info(response_dict, movie_id_final, user=None):
         movie_image = MovieToPick._get_poster(movie_id_final)
         # import ipdb; ipdb.set_trace()
 
@@ -123,6 +123,9 @@ class MovieToPick():
 
                 if movie_image is not None:
                     movie.poster.save('%s.jpg' % movie.title, File(movie_image))
+
+                # if user is not None:
+                #     movie.created_by = user
 
                 movie.save()
                 return movie
