@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from main.models import Movie, WatchEvent, WatchRoom
 from django.template import loader, RequestContext
+from scripts import populate_movies as mov_in
 
 import user_auth
 
@@ -39,11 +40,13 @@ def add_movie(request):
         url = request.POST.get('url')
 
         if url:
-            context['url_response'] = url
+            result = mov_in.MovieToPick.make_movie(url)
+            context['movie'] = Movie.objects.get(imdb_id=result)
+
         else:
             context['url_response'] = 'No url was entered'
 
-        
+
 
     return render(request, 'add_movie.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
