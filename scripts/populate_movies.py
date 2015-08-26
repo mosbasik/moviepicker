@@ -96,20 +96,21 @@ class MovieToPick():
 
             movie, created = Movie.objects.get_or_create(imdb_id=response_dict['imdbID'])
 
-            movie.title = response_dict['Title']
-            movie.year = response_dict['Year']
-            movie.imdb_rating = response_dict['imdbRating']
-            movie.runtime = response_dict['Runtime']
-            movie.genre = response_dict['Genre']
-            movie.description = response_dict['Plot']
-            movie.starring = response_dict['Actors']
-            movie.written_by = response_dict['Writer']
-            movie.directed_by = response_dict['Director']
+            if created:
+                movie.title = response_dict['Title']
+                movie.year = response_dict['Year']
+                movie.imdb_rating = response_dict['imdbRating']
+                movie.runtime = response_dict['Runtime']
+                movie.genre = response_dict['Genre']
+                movie.description = response_dict['Plot']
+                movie.starring = response_dict['Actors']
+                movie.written_by = response_dict['Writer']
+                movie.directed_by = response_dict['Director']
 
-            if movie_image is not None:
-                movie.poster.save('%s.jpg' % movie.title, File(movie_image))
+                if movie_image is not None:
+                    movie.poster.save('%s.jpg' % movie.title, File(movie_image))
 
-            movie.save()
+                movie.save()
 
         else:
             print "A TV show? Really?"
