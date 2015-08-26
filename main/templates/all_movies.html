@@ -1,5 +1,7 @@
 {% extends  'base.html' %}
 
+{% load staticfiles %}
+
 {% block css %}
 
 {% endblock css %}
@@ -10,14 +12,82 @@
 <div class="container">
     <div class="row">
         
-        <h1>list of all movies</h1>
+        <h3>list of all movies</h3>
+        <h5>Click to Vote</h5>
 
     </div>
+
+    {% for movie in movies %}
+        {% if user.is_authenticated %}
+            {% if movie in votes %}
+                <div id='{{ movie.imdb_id }}' class="col-md-2 movie-summary liked">
+
+            {% else %}
+                <div id='{{ movie.imdb_id }}' class="col-md-2 movie-summary">
+            {% endif %}
+        {% else %}
+
+            <div id='{{ movie.imdb_id }}' class="col-md-2 movie-summary">
+        {% endif %}
+    
+        <div class="row">
+            <div class="col-xs-12">
+
+                <h5 style='overflow:hidden' title='{{ movie.title }}' data-toggle="tooltip">{{ movie.title|truncatechars:17 }}</h5>
+
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-4 col-md-12">
+                
+                {% if movie.poster %}
+                    
+                    <a class='movie-image' href="#"><img src="{{ movie.poster.url }}"></a>
+
+                {% else %}
+
+                    <a href="#"><img src="{% static 'img/default_image.jpg' %}"></a>
+
+                {% endif %}
+
+            </div>
+            <!--<div class="col-sm-8 col-md-5">
+                
+                <h4>Description</h4>
+                {{movie.description}}
+                
+            </div>
+            <div class="col-sm-12 col-md-4">
+                <h4>Details</h4>
+                <span class='title-format'>Released: </span><span>{{ movie.year }}</span>
+                <br>
+                <span class='title-format'>IMDB Rating: </span><span>{{ movie.imdb_rating }}</span>
+                <br>
+                <span class='title-format'>Runtime: </span><span>{{ movie.runtime }}</span>
+                <br>
+                <span class='title-format'>Genre: </span><span>{{ movie.genre }}</span>
+                <br>
+                <span class='title-format'>Starring: </span><span>{{ movie.starring }}</span>
+                <br>
+                <span class='title-format'>Writers: </span><span>{{ movie.written_by }}</span>
+                <br>
+                <span class='title-format'>Director: </span><span>{{ movie.directed_by }}</span>
+            </div>-->
+        </div>
+    </div>
+    {% endfor %}
 </div>
 
 {% endblock content %}
 
 
 {% block js %}
+
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 
 {% endblock js %}

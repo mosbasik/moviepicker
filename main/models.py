@@ -18,7 +18,7 @@ class Movie(models.Model):
     user = models.ManyToManyField(User)
 
     def __unicode__(self):
-        return self.title, self.description
+        return self.title
 
 
 class WatchEvent(models.Model):
