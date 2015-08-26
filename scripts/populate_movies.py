@@ -17,18 +17,19 @@ from main.models import Movie
 
 
 class MovieToPick():
-    """ Takes a user-input url for an IMDB title and extracts the id for
-    use with an api and a scraper. Parses the api's json response and adds
-    the poster from the scraper to get or create a movie object
-    and store it in a database.
-    """
+    """ Takes a user-input url for an IMDB title and extracts the unique id for
+    use with an api and a scraper. Parses the api's json response, along the
+    way making sure it's for a movie, and adds the poster from the scraper
+    to get or create a movie object and store it in a database. """
 
-    # runs the methods, gets the data, populates the database
+    # calls the methods, creates the Movie object, populates the database
     @staticmethod
     def make_movie(url):
         movie_id_final = MovieToPick._movie_id_from_url(url)
         response_dict = MovieToPick._get_movie_json(movie_id_final)
-        if response_dict['Type'] != 'series':
+        # if the user happened to input a TV show and triggers json response,
+        # makes sure we don't bother with the poster even on a tempfile basis
+        if response_dict['Type'] == 'movie':
             movie = MovieToPick._movie_info(response_dict, movie_id_final)
 
     # runs regex on user input to extract the unique IMDB movie id
@@ -49,7 +50,7 @@ class MovieToPick():
 
         response_dict = omdb_api_url.json()
 
-        if response_dict['Type'] != 'series':
+        if response_dict['Type'] == 'movie':
             return response_dict
         else:
             print "Ugh. A TV show."
@@ -58,8 +59,8 @@ class MovieToPick():
     # pprint.pprint(response_dict)
     # print response_dict['Plot']
 
-    # the api doesn't include the movie poster, so we get that one ourselves
-    # with a quick scrape.
+    # the api doesn't include the movie poster, so we get that one
+    # ourselves with a quick scrape.
     @staticmethod
     def _get_poster(movie_id_final):
         result = urllib.urlopen("http://www.imdb.com/title/%s/" % movie_id_final)
@@ -87,12 +88,8 @@ class MovieToPick():
     # in the creation of the movie object
     @staticmethod
     def _movie_info(response_dict, movie_id_final):
-
         movie_image = MovieToPick._get_poster(movie_id_final)
         # import ipdb; ipdb.set_trace()
-        print movie_image
-
-        # print response_dict['imdbID']
 
         if response_dict:
 
