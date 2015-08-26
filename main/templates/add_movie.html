@@ -12,6 +12,23 @@
         
         <h1>add a movie</h1>
 
+        <form action="{% url 'add_movie' %}" method='POST'>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="url-box"></label>
+                <input class="form-control" id="url-box" name='url' placeholder=""></input>
+                <p class="help-block">Enter the IMDB url for a movie</p>
+            </div>
+
+            <button type="submit" id='submit-button' class="btn btn-default"><span class='glyphicon glyphicon-plus'></span> Add Movie</button>
+            
+        </form>
+
+    </div>
+    <div class="row">
+        {{movie.title}}
+        {{movie.description}}
     </div>
 </div>
 
