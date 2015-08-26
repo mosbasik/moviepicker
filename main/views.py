@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from main.models import Movie, WatchEvent, WatchRoom
 from django.template import loader, RequestContext
 from scripts import populate_movies as mov_in
@@ -13,6 +14,7 @@ def global_context(request):
     if request.user.is_authenticated():
         return {
             'user_rooms': request.user.watchroom_set.all(),
+            'votes': request.user.votes.all()
         }
     else:
         return {}
@@ -64,17 +66,17 @@ def add_movie(request):
 
 def create_vote(request):
     user = request.user
-    movie = Movie.objects.get(imdb_id=int(request.POST['imdb_id']))
+    movie = Movie.objects.get(imdb_id=str(request.POST['id']))
 
     user.votes.add(movie)
     user.save()
 
-    return HTTPResponse(status=200)
+    return HttpResponse(status=200)
 
 
 def delete_vote(request):
     user = request.user
-    movie = Movie.objects.get(imdb_id=int(request.POST['imdb_id']))
+    movie = Movie.objects.get(imdb_id=request.POST['id'])
 
     user.votes.remove(movie)
     user.save()
@@ -82,18 +84,18 @@ def delete_vote(request):
     return HttpResponse(status=200)
 
 
-# def get_votes(request):
-#     context = {}
+def get_votes(request):
+    context = {}
 
-#     if request.user.is_authenticated():
-#         votes = request.user.votes.all()
-#         context['votes'] = votes
+    if request.user.is_authenticated():
+        votes = request.user.votes.all()
+        context['votes'] = votes
 
-#     movies = User.votes.all().order_by('title')
+    movies = User.votes.all().order_by('title')
 
-#     if len(movies) > 0:
-#         context['movies'] = movies
-#         return render(request, 'template tk.html', context)
+    if len(movies) > 0:
+        context['movies'] = movies
+        return render(request, 'template tk.html', context)
 
 
 # def user_votes(request, username=None):

@@ -17,11 +17,23 @@ $('#switch-to-login').click(function(e){
     
 })
 
+$('.movie-image').click(function(e){
+    e.preventDefault();
 
-function vote(button) {
-    var movie = button.closest('.movie')
-    var id = $(movie).attr('data-movie-id')
+    var movie_id = $(this).parents('.movie-summary').attr('id')
 
+    if ($('#' + movie_id).hasClass('liked')) {
+        // unvote
+        unvote(movie_id);
+    } else {
+        // vote
+        vote(movie_id);
+    }
+
+})
+
+
+function vote(id) {
     $.ajax({
         url: '/create-vote/',
         method: 'POST',
@@ -32,21 +44,17 @@ function vote(button) {
             xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
         },
         success: function() {
-            $(button).removeClass('fa fa-star')
-            $(button).removeClass('favorite-button')
-            $(button).addClass('fa fa-star-o')
-            $(button).addClass('unfavorite-button')
+            console.log('voted')
+            $('#'+id).addClass('liked')
         },
     })
 }
 
 
-function unvote(button) {
-    var movie = button.closest('.movie')
-    var id = $(movie).attr('data-movie-id')
+function unvote(id) {
 
     $.ajax({
-        url: '/create-vote/',
+        url: '/delete-vote/',
         method: 'POST',
         data: {
             id: id
@@ -55,10 +63,8 @@ function unvote(button) {
             xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
         },
         success: function() {
-            $(button).removeClass('fa fa-star-o')
-            $(button).removeClass('unfavorite-button')
-            $(button).addClass('fa fa-star')
-            $(button).addClass('favorite-button')
+            console.log('unvoted')
+            $('#'+id).removeClass('liked')
         },
     })
 }
