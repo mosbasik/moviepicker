@@ -35,6 +35,7 @@ def all_movies(request):
     return render(request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
+
 def add_movie(request):
     context = {}
 
@@ -59,3 +60,43 @@ def add_movie(request):
 
     return render(request, 'add_movie.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
+
+
+def create_vote(request):
+    user = request.user
+    movie = Movie.objects.get(imdb_id=int(request.POST['imdb_id']))
+
+    user.votes.add(movie)
+    user.save()
+
+    return HTTPResponse(status=200)
+
+
+def delete_vote(request):
+    user = request.user
+    movie = Movie.objects.get(imdb_id=int(request.POST['imdb_id']))
+
+    user.votes.remove(movie)
+    user.save()
+
+    return HttpResponse(status=200)
+
+
+# def get_votes(request):
+#     context = {}
+
+#     if request.user.is_authenticated():
+#         votes = request.user.votes.all()
+#         context['votes'] = votes
+
+#     movies = User.votes.all().order_by('title')
+
+#     if len(movies) > 0:
+#         context['movies'] = movies
+#         return render(request, 'template tk.html', context)
+
+
+# def user_votes(request, username=None):
+#     viewing_user = User.objects.get(username=username)
+
+#     return render(request, 'votes.html', {'viewing_user': viewing_user})
