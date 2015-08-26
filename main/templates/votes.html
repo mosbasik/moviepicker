@@ -1,0 +1,20 @@
+
+{% for movie in movies  %}
+    
+
+{% if user.is_authenticated %}
+{% if movie in votes %}
+
+
+{% if  %}
+<span class="favorite-button fa fa-star"></span>
+{% else %}
+<span class="unfavorite-button fa fa-star-o"></span>
+{% endif %}
+
+
+{% endif %}
+{% endif %}
+
+
+{% endfor %}

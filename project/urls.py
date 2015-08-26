@@ -26,6 +26,10 @@ urlpatterns = [
     url(r'^logout/$', 'main.user_auth.logout', name='logout'),
     url(r'^movie/$', 'main.views.all_movies', name='all_movies'),
     url(r'^movie/new/$', 'main.views.add_movie', name='add_movie'),
+    # url(r'^create-vote/$', 'main.views.create_vote', name='vote'),
+    # url(r'^delete-vote/$', 'main.views.delete_vote', name='unvote'),
+    # url(r'^get-votes/$', 'main.views.get_votes', name='get_votes'),
+    # url(r'^(?P<username>\w+)/votes/$', 'main.views.user_votes', name='user_votes'),
 
 
     url(r'^password/reset/$',

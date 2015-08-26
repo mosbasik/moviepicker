@@ -109,7 +109,7 @@ class MovieToPick():
                 movie.title = response_dict['Title']
                 movie.year = response_dict['Year']
 
-                try: 
+                try:
                     movie.imdb_rating = float(response_dict['imdbRating'])
                 except ValueError:
                     pass
