@@ -1,7 +1,7 @@
 body {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     margin-top: 70px;
-    margin-bottom: 70px;
+    margin-bottom: 70px; /* this is distance from the footer */
     background-color: #B1B1B1;
 }
 
@@ -67,11 +67,10 @@ body {
     color: #f5f5f5;
 }
 
-/*settings for the footer*/
+/*Start footer styles*/
 .footer {
     text-align: center;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    text-rendering: optimizelegibility;
     font-weight: bold;
     /* settings for the position of the footer */
     position: absolute;
@@ -86,12 +85,12 @@ body {
     color: #333;
 }
 
-html {
+html { /* sticks the footer to the bottom */
   position: relative;
   min-height: 100%;
 }
 
-/*settings for aligning text inside the footer*/
+    /*settings for aligning text inside the footer*/
 .footer > .container {
   padding-right: 15px;
   padding-left: 15px;
@@ -101,3 +100,4 @@ html {
 .footer li {
     display: inline;
 }
+/*End footer styles*/

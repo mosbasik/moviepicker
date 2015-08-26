@@ -7,7 +7,25 @@
 
 {% block content %}
 
-<h1>The Front Page</h1>
+<div class="container">
+    <div class="row">
+        
+        <h1>The Front Page</h1>
+        {% for room in rooms %}
+
+            <h3>{{ room.name }}</h3>
+            <ul>
+                <li>{{ room.description }}</li>
+                {% for user in room.users.all %}
+                    <li>{{ user }}</li>
+                {% endfor %}
+            </ul>
+            
+        {% endfor %}
+        <p>{{  user.WatchRoom_set }}</p>
+        
+    </div>
+</div>
     
 {% endblock content %}
 

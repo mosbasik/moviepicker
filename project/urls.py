@@ -16,12 +16,16 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 import django.contrib.auth.views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', 'main.views.front', name='front'),
     url(r'^login/$', 'main.user_auth.login', name='login'),
     url(r'^logout/$', 'main.user_auth.logout', name='logout'),
+    url(r'^movie/$', 'main.views.all_movies', name='all_movies'),
+    url(r'^movie/new/$', 'main.views.add_movie', name='add_movie'),
 
 
     url(r'^password/reset/$',
@@ -41,4 +45,5 @@ urlpatterns = [
         django.contrib.auth.views.password_reset_complete,
         {"template_name": "password_reset/password_reset_complete.html"},
         name="password_reset_complete"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

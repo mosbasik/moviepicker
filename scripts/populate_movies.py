@@ -31,6 +31,7 @@ class MovieToPick():
         # makes sure we don't bother with the poster even on a tempfile basis
         if response_dict['Type'] == 'movie':
             movie = MovieToPick._movie_info(response_dict, movie_id_final)
+            return movie_id_final
 
     # runs regex on user input to extract the unique IMDB movie id
     @staticmethod
