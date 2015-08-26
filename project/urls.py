@@ -45,5 +45,5 @@ urlpatterns = [
         django.contrib.auth.views.password_reset_complete,
         {"template_name": "password_reset/password_reset_complete.html"},
         name="password_reset_complete"),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

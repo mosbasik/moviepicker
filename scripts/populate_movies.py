@@ -29,32 +29,39 @@ class MovieToPick():
         response_dict = MovieToPick._get_movie_json(movie_id_final)
         # if the user happened to input a TV show and triggers json response,
         # makes sure we don't bother with the poster even on a tempfile basis
-        if response_dict['Type'] == 'movie':
+        if response_dict is not None:
             movie = MovieToPick._movie_info(response_dict, movie_id_final)
             return movie_id_final
+        else:
+            return 'not a movie'
 
     # runs regex on user input to extract the unique IMDB movie id
     @staticmethod
     def _movie_id_from_url(url):
         movie_id_pattern = '(t{2}[0-9]+)'
         movie_id_match = re.search(movie_id_pattern, '%s' % url)
-        movie_id_final = movie_id_match.group()
+        if movie_id_match is not None:
+            movie_id_final = movie_id_match.group()
+        else:
+            movie_id_final = None
 
+        # returns an id or None
         return movie_id_final
 
     # uses the movie id to hit the omdb api
     # excludes TV shows
     @staticmethod
     def _get_movie_json(movie_id_final):
-        omdb_api_url = requests.get('http://www.omdbapi.com/?i=%s&plot=full&r=json'
+        if movie_id_final is not None:
+            omdb_api_url = requests.get('http://www.omdbapi.com/?i=%s&plot=full&r=json'
                             % movie_id_final)
 
-        response_dict = omdb_api_url.json()
+            response_dict = omdb_api_url.json()
 
-        if response_dict['Type'] == 'movie':
-            return response_dict
+            if response_dict['Type'] == 'movie':
+                return response_dict
         else:
-            print "Ugh. A TV show."
+            return None
 
     # import pprint
     # pprint.pprint(response_dict)
@@ -94,12 +101,19 @@ class MovieToPick():
 
         if response_dict:
 
-            movie, created = Movie.objects.get_or_create(imdb_id=response_dict['imdbID'])
+            movie_exists = Movie.objects.filter(imdb_id=response_dict['imdbID']).exists()
 
-            if created:
+            if not movie_exists:
+                movie = Movie()
+                movie.imdb_id = response_dict['imdbID']
                 movie.title = response_dict['Title']
                 movie.year = response_dict['Year']
-                movie.imdb_rating = response_dict['imdbRating']
+
+                try: 
+                    movie.imdb_rating = float(response_dict['imdbRating'])
+                except ValueError:
+                    pass
+
                 movie.runtime = response_dict['Runtime']
                 movie.genre = response_dict['Genre']
                 movie.description = response_dict['Plot']
@@ -111,9 +125,12 @@ class MovieToPick():
                     movie.poster.save('%s.jpg' % movie.title, File(movie_image))
 
                 movie.save()
+                return movie
+            else:
+                return Movie.objects.get(imdb_id=movie_id_final)
 
         else:
-            print "A TV show? Really?"
+            return 'failed'
 
 
 # MovieToPick.make_movie('http://www.imdb.com/title/tt1475582/?ref_=nv_sr_1')

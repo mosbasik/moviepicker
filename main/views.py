@@ -40,8 +40,14 @@ def add_movie(request):
         url = request.POST.get('url')
 
         if url:
+            # either imdb id or 'failed' or 'not a movie'
             result = mov_in.MovieToPick.make_movie(url)
-            context['movie'] = Movie.objects.get(imdb_id=result)
+            if result == 'failed' or result == 'not a movie':
+                context['is_movie'] = 'no'
+                context['message'] = 'Not a Movie'
+            else:
+                context['is_movie'] = 'yes'
+                context['movie'] = Movie.objects.get(imdb_id=result)
 
         else:
             context['url_response'] = 'No url was entered'
