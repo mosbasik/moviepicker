@@ -21,6 +21,11 @@ $('.dropdown-menu').on('click', function (e) {
 e.stopPropagation() 
 })
 
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+
 
 
 /***** VOTE FUNCTIONALITY *****/
