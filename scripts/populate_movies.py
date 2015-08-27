@@ -31,7 +31,7 @@ class MovieToPick():
         # if the user happened to input a TV show and triggers json response,
         # makes sure we don't store with the poster even as a local tempfile
         if response_dict is not None:
-            movie = MovieToPick._movie_info(response_dict, movie_id_final, user)
+            movie = MovieToPick._movie_info(response_dict, movie_id_final, user=False)
             return movie_id_final
         else:
             return 'not a movie'
@@ -128,8 +128,8 @@ class MovieToPick():
                     movie.poster.save('%s.jpg' % movie.title, File(movie_image))
 
                 # this doesn't work yet to assign a creator to each movie:
-                # if user is not None:
-                #     movie.created_by = user
+                if user is not None:
+                    movie.created_by = user
 
                 movie.save()
                 return movie
