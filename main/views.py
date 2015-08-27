@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
+from django.template import RequestContext
 from main.models import Movie, WatchEvent, WatchRoom
 from django.template import loader, RequestContext
+from main.forms import SearchMovieForm
 from scripts import populate_movies as mov_in
 
 import user_auth
@@ -58,8 +60,6 @@ def add_movie(request):
         else:
             context['url_response'] = 'No url was entered'
 
-
-
     return render(request, 'add_movie.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
@@ -102,3 +102,29 @@ def get_votes(request):
 #     viewing_user = User.objects.get(username=username)
 
 #     return render(request, 'votes.html', {'viewing_user': viewing_user})
+
+def movie_search(request):
+    context = {}
+    request_context = RequestContext(request)
+
+    if request.method == 'POST':
+        form = SearchMovieForm(request.POST)
+        context['form'] = form
+
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            context['movies'] = Movie.objects.filter(title__icontains=title)
+
+            context['valid'] = "Here's what we have that matches your request."
+
+            return render_to_response('movie_search.html', context, context_instance=request_context)
+
+        else:
+            context['valid'] = form.errors
+
+    else:
+        form = SearchMovieForm()
+        context['form'] = form
+
+        return render_to_response('movie_search.html', context, context_instance=request_context)
+

@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^delete-vote/$', 'main.views.delete_vote', name='unvote'),
     # url(r'^get-votes/$', 'main.views.get_votes', name='get_votes'),
     # url(r'^(?P<username>\w+)/votes/$', 'main.views.user_votes', name='user_votes'),
+    url(r'^movie-search/$', 'main.views.movie_search', name='movie_search'),
 
 
     url(r'^password/reset/$',

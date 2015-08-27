@@ -17,6 +17,8 @@ $('#switch-to-login').click(function(e){
     
 })
 
+
+/***** VOTE FUNCTIONALITY *****/
 $('.movie-image').click(function(e){
     e.preventDefault();
 
