@@ -23,12 +23,13 @@ class Command(BaseCommand):
     def _import_movies(self, data):
         for movie in data['movie']:
             print 'Importing: ' + movie['title']
+
             result = mov_in.MovieToPick.make_movie(movie['url'])
+
             if result == 'failed' or result == 'not a movie':
                 print 'FAILED'
             else:
                 print 'Success!'
 
-
-
-        # mov_in.MovieToPick.make_movie('http://www.imdb.com/title/tt2401807/?ref_=nm_flmg_act_14')
+        print '( ͡° ͜ʖ ͡°)'
+        print 'TROLOLOLOLOLOLOLOLOL!!!!11!!111!1'

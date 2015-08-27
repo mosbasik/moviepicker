@@ -33,6 +33,7 @@ def all_movies(request):
     context = {}
 
     context['movies'] = Movie.objects.all().order_by('title')
+    context['page_title'] = 'List of all Movies'
 
     return render(request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
@@ -61,6 +62,19 @@ def add_movie(request):
 
 
     return render(request, 'add_movie.html', context,
+        context_instance=RequestContext(request, processors=[global_context]))
+
+
+def user_movies(request):
+    context = {}
+
+    # makes the first letter uppercase
+    username = request.user.username.title()
+
+    context['movies'] = Movie.objects.filter(voters=request.user).order_by('title')
+    context['page_title'] = username + '\'s Liked Movies'
+
+    return render(request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
