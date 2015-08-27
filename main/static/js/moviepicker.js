@@ -17,6 +17,10 @@ $('#switch-to-login').click(function(e){
     
 })
 
+$('.dropdown-menu').on('click', function (e) {
+e.stopPropagation() 
+})
+
 
 
 /***** VOTE FUNCTIONALITY *****/

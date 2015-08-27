@@ -64,6 +64,15 @@ def add_movie(request):
     return render(request, 'add_movie.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
+def all_rooms(request):
+    context = {}
+
+    context['rooms'] = WatchRoom.objects.all()
+    context['page_title'] = 'List of all Rooms'
+
+    return render(request, 'all_rooms.html', context,
+        context_instance=RequestContext(request, processors=[global_context]))
+
 
 def user_movies(request):
     context = {}
