@@ -15,10 +15,18 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
           
-            <li><a href="{% url 'movie_search' %}">Search Movies</a></li>
-            <li><a href="{% url 'add_movie' %}">Add Movie</a></li>
-            <li><a href="{% url 'all_movies' %}">All Movies</a></li>
-            <li><a href="{% url 'all_rooms' %}">All Rooms</a></li>
+            <li {% if request.path == '/movies/search/' %}
+                    class='active'
+                {% endif %} ><a href="{% url 'movie_search' %}">Search Movies</a></li>
+            <li{% if request.path == '/movies/add/' %}
+                    class='active'
+                {% endif %}><a href="{% url 'add_movie' %}">Add Movie</a></li>
+            <li{% if request.path == '/movies/' %}
+                    class='active'
+                {% endif %}><a href="{% url 'all_movies' %}">All Movies</a></li>
+            <li{% if request.path == '/rooms/' %}
+                    class='active'
+                {% endif %}><a href="{% url 'all_rooms' %}">All Rooms</a></li>
 
             {% if user.is_authenticated %}
                 <li class="dropdown">
