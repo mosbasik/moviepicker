@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^movies/liked/$', 'main.views.user_movies', name='user_movies'),
     url(r'^create-vote/$', 'main.views.create_vote', name='vote'),
     url(r'^delete-vote/$', 'main.views.delete_vote', name='unvote'),
+    url(r'^rooms/$', 'main.views.all_rooms', name='all_rooms'),
     # url(r'^get-votes/$', 'main.views.get_votes', name='get_votes'),
     # url(r'^(?P<username>\w+)/votes/$', 'main.views.user_votes', name='user_votes'),
 

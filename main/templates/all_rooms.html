@@ -1,0 +1,35 @@
+{% extends  'base.html' %}
+
+{% block css %}
+
+{% endblock css %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        
+        <h1>{{ page_title }}</h1>
+        {% for room in rooms %}
+
+            <h3>{{ room.name }}</h3>
+            <ul>
+                <li>{{ room.description }}</li>
+                {% for user in room.users.all %}
+                    <li>{{ user }}</li>
+                {% endfor %}
+            </ul>
+            
+        {% endfor %}
+        <p>{{  user.WatchRoom_set }}</p>
+        
+    </div>
+</div>
+    
+{% endblock content %}
+
+
+{% block js %}
+
+{% endblock js %}

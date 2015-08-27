@@ -17,6 +17,10 @@ $('#switch-to-login').click(function(e){
     
 })
 
+$('.dropdown-menu').on('click', function (e) {
+e.stopPropagation() 
+})
+
 
 // triggers when clicking on a movie poster
 // a parent div of the movie poster needs the imdb_id and
