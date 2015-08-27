@@ -38,15 +38,29 @@
     <br>
     <div class="row">
         {% if is_movie == 'yes' %}
-            <div class="col-sm-4 col-md-3">
+            {# <div id='{{ movie.imdb_id }}' class="col-sm-4 col-md-3"> #}
+
+            
+            {% if user.is_authenticated %}
+                {% if movie in votes %}
+                    <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote liked">
+
+                {% else %}
+                    <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote">
+                {% endif %}
+            {% else %}
+
+                <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote">
+            {% endif %}
+
                 
                 {% if movie.poster %}
                     
-                    <img src="{{ movie.poster.url }}">
+                    <a class='movie-image' href="#"><img src="{{ movie.poster.url }}"></a>
 
                 {% else %}
 
-                    <img src="{% static 'img/default_image.jpg' %}" style='width: 100%'>
+                    <a class='movie-image' href=""><img src="{% static 'img/default_image.jpg' %}" style='width: 100%'></a>
 
                 {% endif %}
 

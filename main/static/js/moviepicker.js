@@ -18,11 +18,15 @@ $('#switch-to-login').click(function(e){
 })
 
 
+
 /***** VOTE FUNCTIONALITY *****/
+// triggers when clicking on a movie poster
+// a parent div of the movie poster needs the imdb_id and
+// it needs the class movie-vote
 $('.movie-image').click(function(e){
     e.preventDefault();
 
-    var movie_id = $(this).parents('.movie-summary').attr('id')
+    var movie_id = $(this).parents('.movie-vote').attr('id')
 
     if ($('#' + movie_id).hasClass('liked')) {
         // unvote
