@@ -124,6 +124,7 @@ class MovieToPick():
                 if movie_image is not None:
                     movie.poster.save('%s.jpg' % movie.title, File(movie_image))
 
+                # this doesn't work yet to assign a creator to each movie:
                 # if user is not None:
                 #     movie.created_by = user
 
