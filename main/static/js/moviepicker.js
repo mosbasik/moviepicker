@@ -18,20 +18,12 @@ $('#switch-to-login').click(function(e){
 })
 
 $('.dropdown-menu').on('click', function (e) {
-e.stopPropagation() 
+e.stopPropagation()
 })
 
 $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip;
 });
-
-// focus on text box on page load
-$(function() {
-  $("input").focus();
-});
-
-
-
 
 /***** VOTE FUNCTIONALITY *****/
 // triggers when clicking on a movie poster

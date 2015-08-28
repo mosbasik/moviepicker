@@ -55,10 +55,10 @@ class EventCreationForm(forms.Form):
     date_and_time = forms.DateTimeField(
         required=True,
         widget=DateTimeWidget(
-                    attrs={'class': 'form-control'},
-                    # usel10n=True,
-                    bootstrap_version=3
-                )
+            options={'showMeridian': True},
+            attrs={'class': 'form-control'},
+            bootstrap_version=3,
+            )
         )
 
     description = forms.CharField(

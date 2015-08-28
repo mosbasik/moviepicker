@@ -5,6 +5,10 @@ body {
     background-color: #B1B1B1;
 }
 
+.datetimepicker.dropdown-menu {
+  margin-top: 70px;
+}
+
 #user-create-form {
     display: none;
 }
@@ -60,7 +64,7 @@ body {
     color: #9C3100;
 }
 
-.dropdown-menu {
+.dropdown .dropdown-menu {
     background-color: #787878;
 
 }

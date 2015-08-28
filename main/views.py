@@ -225,5 +225,3 @@ def create_event(request):
         context['form'] = form
 
         return render_to_response('add_event.html', context, context_instance=request_context)
-
->>>>>>> thejqs-dev
