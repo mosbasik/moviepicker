@@ -52,7 +52,8 @@ class WatchRoom(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     users = models.ManyToManyField(User)
-    created = models.DateTimeField(auto_now_add=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, unique=False, related_name='creator')
 
     def __unicode__(self):
         return self.name
