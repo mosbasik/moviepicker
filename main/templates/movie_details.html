@@ -10,9 +10,6 @@
 <br>
 <div class="row">
     {% if is_movie == 'yes' %}
-        {# <div id='{{ movie.imdb_id }}' class="col-sm-4 col-md-3"> #}
-
-        
         {% if user.is_authenticated %}
             {% if movie in votes %}
                 <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote liked">
