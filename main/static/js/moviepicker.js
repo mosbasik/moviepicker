@@ -25,6 +25,11 @@ $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
 });
 
+// focus on text box on page load
+$(function() {
+  $("input").focus();
+});
+
 
 
 

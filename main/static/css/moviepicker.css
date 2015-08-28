@@ -37,6 +37,7 @@ body {
 /*Settings for nav bar*/
 .navbar-default {
     background-color: #787878;
+    background-color: rgba(120,120,120,.93);
     border-color: #787878;
     border-radius: 0px;
     font-weight: bold;
@@ -81,7 +82,7 @@ body {
 
 .navbar-default .navbar-nav>.active>a,
 .navbar-default .navbar-nav>.active>a:hover {
-    background-image: linear-gradient(to right, rgba(100,100,100,.5), rgba(150,150,150,.5), rgba(100,100,100,.5));
+    background: linear-gradient(to right, rgba(120,120,120,.1), rgba(135,135,135,.95), rgba(150,150,150,1), rgba(135,135,135,.95), rgba(120,120,120,.1));
     color: #9C3100;
 }
 
@@ -115,6 +116,37 @@ h1, h2, h3, h4, h5, h6, .title-format {
     height: 1px;
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
 }
+
+/*fade border*/
+.fade-border {
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.fade-border:before, .fade-border:after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: -3px;
+}
+.fade-border:before {
+  top: -3px;
+  width: 3px;
+  background-image: -webkit-gradient(linear, 0 100%, 0 0, from(#666), to(transparent));
+  background-image: -webkit-linear-gradient(transparent, #666);
+  background-image: -moz-linear-gradient(transparent, #666);
+  background-image: -o-linear-gradient(transparent, #666);
+}
+.fade-border:after {
+  right: -3px;
+  height: 3px;
+  background-image: -webkit-gradient(linear, 0 0, 100% 0, from(#666), to(transparent));
+  background-image: -webkit-linear-gradient(left, #666, transparent);
+  background-image: -moz-linear-gradient(left, #666, transparent);
+  background-image: -o-linear-gradient(left, #666, transparent);
+}
+/*end fade border*/
+
 
 /*Start footer styles*/
 .footer {
