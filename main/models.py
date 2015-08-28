@@ -17,7 +17,7 @@ class Movie(models.Model):
     directed_by = models.CharField(max_length=255, null=True, blank=True)
     poster = models.ImageField(upload_to='posters', null=True, blank=True)
     voters = models.ManyToManyField(User, related_name='votes', blank=True)
-    created_by = models.ManyToManyField(User)
+    created_by = models.ForeignKey(User, unique=False, blank=True, null=True)
 
     def __unicode__(self):
         return self.title
