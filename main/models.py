@@ -43,6 +43,8 @@ class WatchEvent(models.Model):
     movie_watched = models.ForeignKey('Movie')
     user_present = models.ForeignKey(User)
     group_organizing = models.OneToOneField('WatchRoom')
+    created_by = models.ForeignKey(User, unique=False, related_name='event_creator')
+
 
     def __unicode__(self):
         return self.event_name

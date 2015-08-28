@@ -179,7 +179,7 @@ def create_group(request):
                 return render_to_response('add_group.html', context, context_instance=request_context)
 
             else:
-                context['message'] = "Sorry, you must be a registered user to create a group."
+                context['valid'] = "Sorry, you must be a registered user to create a group."
                 return render_to_response('add_group.html', context, context_instance=request_context)
 
         else:
