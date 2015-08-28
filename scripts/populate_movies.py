@@ -31,7 +31,7 @@ class MovieToPick():
         # if the user happened to input a TV show and triggers json response,
         # makes sure we don't store with the poster even as a local tempfile
         if response_dict is not None:
-            movie = MovieToPick._movie_info(response_dict, movie_id_final, user=False)
+            movie = MovieToPick._movie_info(response_dict, movie_id_final, user=None)
             return movie_id_final
         else:
             return 'not a movie'
