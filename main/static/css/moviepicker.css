@@ -36,9 +36,9 @@ body {
 
 /*Settings for nav bar*/
 .navbar-default {
-    background-color: #787878;
     background-color: rgba(120,120,120,.93);
-    border-color: #787878;
+    border-width: 0;
+    border-color: transparent;
     border-radius: 0px;
     font-weight: bold;
 }
@@ -52,7 +52,6 @@ body {
 .navbar-default .navbar-brand:focus,
 .navbar-default .navbar-brand:hover {
     color: #9C3100;
-    background-color: #787878;
 }
 
 .navbar-default .navbar-nav>li>a,

@@ -10,11 +10,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print 'Creating Global Room'
-        room, created = WatchRoom.objects.get_or_create(name='Universal')
+        user = User.objects.get(id='1')
+        room, created = WatchRoom.objects.get_or_create(created_by=user)
+        room.name = 'World'
         room.description = 'Welcome to the World'
-
         room.save()
         print 'Success!'
+
+        users = User.objects.all()
+
+        print 'Adding Users'
+        for user in users:
+            world = WatchRoom.objects.get(name='World')
+            world.users.add(user)
+        print 'Done'
 
         self._import_movies()
 

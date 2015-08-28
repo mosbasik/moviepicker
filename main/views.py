@@ -155,7 +155,7 @@ def movie_search(request):
         return render_to_response('movie_search.html', context, context_instance=request_context)
 
 
-def create_group(request):
+def create_room(request):
 
     context = {}
     request_context = RequestContext(request, processors=[global_context])
@@ -165,7 +165,7 @@ def create_group(request):
         context['form'] = form
 
         if form.is_valid():
-            group_exists = WatchRoom.objects.filter(name=form.cleaned_data['name']).exists()
+            group_exists = WatchRoom.objects.filter(name__iexact=form.cleaned_data['name']).exists()
 
             if not group_exists:
                 group = WatchRoom()
@@ -176,19 +176,19 @@ def create_group(request):
                 group.save()
                 context['group'] = group
 
-                context['valid'] = "Group created successfully."
-                return render_to_response('add_group.html', context, context_instance=request_context)
+                context['message'] = "Group created successfully."
+                return render_to_response('add_room.html', context, context_instance=request_context)
 
-            else:
-                context['message'] = "Sorry, you must be a registered user to create a group."
-                return render_to_response('add_group.html', context, context_instance=request_context)
+            else: # group exists
+                context['message'] = 'Room name already exists'
+                return render_to_response('add_room.html', context, context_instance=request_context)
 
         else:
-            context['valid'] = "Group not created. Either you're the idiot or we are."
-            return render_to_response('add_group.html', context, context_instance=request_context)
+            context['message'] = "Room name cannot be blank"
+            return render_to_response('add_room.html', context, context_instance=request_context)
 
     else:
         form = GroupCreationForm()
         context['form'] = form
 
-        return render_to_response('add_group.html', context, context_instance=request_context)
+        return render_to_response('add_room.html', context, context_instance=request_context)
