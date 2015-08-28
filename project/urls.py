@@ -34,6 +34,7 @@ urlpatterns = [
     # url(r'^(?P<username>\w+)/votes/$', 'main.views.user_votes', name='user_votes'),
     url(r'^movies/search/$', 'main.views.movie_search', name='movie_search'),
     url(r'^rooms/add/$', 'main.views.create_room', name='create_room'),
+    url(r'^events/add/$', 'main.views.create_event', name='create_event'),
 
     url(r'^password/reset/$',
         django.contrib.auth.views.password_reset,

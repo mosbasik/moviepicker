@@ -34,15 +34,16 @@ def movie_post_delete_handler(sender, **kwargs):
 
 
 class WatchEvent(models.Model):
-    event_name = models.CharField(max_length=255)
+    event_name = models.CharField(max_length=255, unique=False)
     date_and_time = models.DateTimeField()
-    url_slug = models.SlugField(unique=True)
+    url_slug = models.SlugField(unique=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     description = models.TextField(null=True, blank=True)
-    movie_watched = models.ForeignKey('Movie')
-    user_present = models.ForeignKey(User)
-    group_organizing = models.OneToOneField('WatchRoom')
+    movie_watched = models.ForeignKey('Movie', null=True, blank=True)
+    user_present = models.ForeignKey(User, null=True, blank=True)
+    group_organizing = models.OneToOneField('WatchRoom', null=True, blank=True)
+    created_by = models.ForeignKey(User, unique=False, related_name='event_creator')
 
     def __unicode__(self):
         return self.event_name

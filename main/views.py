@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from main.models import Movie, WatchEvent, WatchRoom
 from django.template import loader, RequestContext
-from main.forms import SearchMovieForm, GroupCreationForm
+from main.forms import SearchMovieForm, GroupCreationForm, EventCreationForm
 from scripts import populate_movies as mov_in
 
 import user_auth
@@ -192,3 +192,38 @@ def create_room(request):
         context['form'] = form
 
         return render_to_response('add_room.html', context, context_instance=request_context)
+
+
+def create_event(request):
+
+    context = {}
+    request_context = RequestContext(request, processors=[global_context])
+
+    if request.method == 'POST' and request.user.is_authenticated():
+        form = EventCreationForm(request.POST)
+        context['form'] = form
+
+        if form.is_valid():
+            event = WatchEvent()
+            event.event_name = form.cleaned_data['event_name']
+            event.date_and_time = form.cleaned_data['date_and_time']
+            event.description = form.cleaned_data['description']
+            event.created_by = request.user
+
+            event.save()
+            context['event'] = event
+
+            context['message'] = "Event created successfully."
+            return render_to_response('add_event.html', context, context_instance=request_context)
+
+        else:
+            context['message'] = "Sorry, you must be a registered user to create an event."
+            return render_to_response('add_event.html', context, context_instance=request_context)
+
+    else:
+        form = EventCreationForm()
+        context['form'] = form
+
+        return render_to_response('add_event.html', context, context_instance=request_context)
+
+>>>>>>> thejqs-dev
