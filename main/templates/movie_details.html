@@ -1,5 +1,7 @@
 {% load staticfiles %}
 
+{# used in the add movie page #}
+
 <div class="row">
     <div class="col-xs-12">
 
@@ -34,13 +36,13 @@
             {% endif %}
 
         </div>
-        <div class="col-sm-8 col-md-5">
+        <div class="col-sm-8 col-md-5 fade-border">
             
             <h4>Description</h4>
             {{movie.description}}
             
         </div>
-        <div class="col-sm-12 col-md-4">
+        <div class="col-sm-12 col-md-4 fade-border">
             <h4>Details</h4>
             <span class='title-format'>Released: </span><span>{{ movie.year }}</span>
             <br>

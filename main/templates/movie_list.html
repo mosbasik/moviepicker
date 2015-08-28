@@ -1,18 +1,21 @@
 {% load staticfiles %}
 
+{# used to display list of movies #}
+{# include in the desired file #}
+
 <hr class='movie-hr'>
 <div class="row">
 {% for movie in movies %}
     {% if user.is_authenticated %}
         {% if movie in votes %}
-            <div id='{{ movie.imdb_id }}' class="col-sm-3 col-md-2 movie-summary movie-vote liked">
+            <div id='{{ movie.imdb_id }}' class="col-xs-4 col-sm-3 col-md-2 movie-summary movie-vote liked">
 
         {% else %}
-            <div id='{{ movie.imdb_id }}' class="col-sm-3 col-md-2 movie-summary movie-vote">
+            <div id='{{ movie.imdb_id }}' class="col-xs-4 col-sm-3 col-md-2 movie-summary movie-vote">
         {% endif %}
     {% else %}
 
-        <div id='{{ movie.imdb_id }}' class="col-sm-3 col-md-2 movie-summary movie-vote">
+        <div id='{{ movie.imdb_id }}' class="col-xs-4 col-sm-3 col-md-2 movie-summary movie-vote">
     {% endif %}
 
     <div class="row">

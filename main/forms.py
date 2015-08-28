@@ -23,7 +23,7 @@ class GroupCreationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Name your group'
+                'placeholder': 'Name your room'
             }
         )
     )
@@ -33,7 +33,7 @@ class GroupCreationForm(forms.Form):
         widget=forms.Textarea(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Describe your group. Answer me!'
+                'placeholder': 'Describe your room'
             }
         )
     )

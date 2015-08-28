@@ -17,7 +17,7 @@
           
             <li {% if request.path == '/movies/search/' %}
                     class='active'
-                {% endif %} ><a href="{% url 'movie_search' %}">Search Movies</a></li>
+                {% endif %} ><a href="{% url 'movie_search' %}">Search</a></li>
             <li{% if request.path == '/movies/add/' %}
                     class='active'
                 {% endif %}><a href="{% url 'add_movie' %}">Add Movie</a></li>
@@ -27,6 +27,9 @@
             <li{% if request.path == '/rooms/' %}
                     class='active'
                 {% endif %}><a href="{% url 'all_rooms' %}">All Rooms</a></li>
+            <li{% if request.path == '/rooms/add/' %}
+                class='active'
+            {% endif %}><a href="{% url 'create_room' %}">Add Room</a></li>
 
             {% if user.is_authenticated %}
                 <li class="dropdown">
