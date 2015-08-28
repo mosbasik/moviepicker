@@ -49,9 +49,9 @@ class WatchEvent(models.Model):
 
 
 class WatchRoom(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     description = models.TextField(null=True, blank=True)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, blank=True)
     created_time = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, unique=False, related_name='creator')
 

@@ -12,3 +12,27 @@ class SearchMovieForm(forms.Form):
             }
         )
     )
+
+
+class GroupCreationForm(forms.Form):
+    name = forms.CharField(
+        required=True,
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Name your group'
+            }
+        )
+    )
+
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Describe your group. Answer me!'
+            }
+        )
+    )
+

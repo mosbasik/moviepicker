@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from main.models import Movie, WatchEvent, WatchRoom
 from django.template import loader, RequestContext
-from main.forms import SearchMovieForm
+from main.forms import SearchMovieForm, GroupCreationForm
 from scripts import populate_movies as mov_in
 
 import user_auth
@@ -152,3 +152,42 @@ def movie_search(request):
         context['form'] = form
 
         return render_to_response('movie_search.html', context, context_instance=request_context)
+
+
+def create_group(request):
+
+    context = {}
+    request_context = RequestContext(request, processors=[global_context])
+
+    if request.method == 'POST' and request.user.is_authenticated():
+        form = GroupCreationForm(request.POST)
+        context['form'] = form
+
+        if form.is_valid():
+            group_exists = WatchRoom.objects.filter(name=form.cleaned_data['name']).exists()
+
+            if not group_exists:
+                group = WatchRoom()
+                group.name = form.cleaned_data['name']
+                group.description = form.cleaned_data['description']
+                group.created_by = request.user
+
+                group.save()
+                context['group'] = group
+
+                context['valid'] = "Group created successfully."
+                return render_to_response('add_group.html', context, context_instance=request_context)
+
+            else:
+                context['message'] = "Sorry, you must be a registered user to create a group."
+                return render_to_response('add_group.html', context, context_instance=request_context)
+
+        else:
+            context['valid'] = "Group not created. Either you're the idiot or we are."
+            return render_to_response('add_group.html', context, context_instance=request_context)
+
+    else:
+        form = GroupCreationForm()
+        context['form'] = form
+
+        return render_to_response('add_group.html', context, context_instance=request_context)
