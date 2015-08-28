@@ -16,7 +16,8 @@ def global_context(request):
     if request.user.is_authenticated():
         return {
             'user_rooms': request.user.watchroom_set.all(),
-            'votes': request.user.votes.all()
+            'votes': request.user.votes.all(),
+            'search_form': SearchMovieForm(),
         }
     else:
         return {}
