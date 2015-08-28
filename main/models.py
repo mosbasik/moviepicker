@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 
 class Movie(models.Model):
@@ -22,6 +24,13 @@ class Movie(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+@receiver(post_delete, sender=Movie)
+def movie_post_delete_handler(sender, **kwargs):
+    movie = kwargs['instance']
+    storage, path = movie.poster.storage, movie.poster.path
+    storage.delete(path)
 
 
 class WatchEvent(models.Model):

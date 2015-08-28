@@ -9,18 +9,20 @@ import json
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        print 'Creating Global Room'
         room, created = WatchRoom.objects.get_or_create(name='Universal')
         room.description = 'Welcome to the World'
 
         room.save()
+        print 'Success!'
 
+        self._import_movies()
+
+
+    def _import_movies(self):
         with open('main/static/movie_data.json', 'r') as f:
             data = json.load(f)
-            self._import_movies(data)
 
-
-
-    def _import_movies(self, data):
         for movie in data['movie']:
             print 'Importing: ' + movie['title']
 
@@ -31,5 +33,4 @@ class Command(BaseCommand):
             else:
                 print 'Success!'
 
-        print '( ͡° ͜ʖ ͡°)'
         print 'TROLOLOLOLOLOLOLOLOL!!!!11!!111!1'

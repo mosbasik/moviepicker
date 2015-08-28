@@ -32,7 +32,7 @@ urlpatterns = [
     url(r'^rooms/$', 'main.views.all_rooms', name='all_rooms'),
     # url(r'^get-votes/$', 'main.views.get_votes', name='get_votes'),
     # url(r'^(?P<username>\w+)/votes/$', 'main.views.user_votes', name='user_votes'),
-    url(r'^movie-search/$', 'main.views.movie_search', name='movie_search'),
+    url(r'^movies/search/$', 'main.views.movie_search', name='movie_search'),
 
 
     url(r'^password/reset/$',

@@ -4,35 +4,31 @@
 {% block content %}
 
 <div class='container'>
-<div class='row'>
-<div class='col-sm-offset-4'>
+    <div class='row'>
+        <div class='col-sm-offset-2 col-sm-8'>
+        
+            <div class="row">
+                <form method='POST' action='{% url "movie_search" %}'>
 
-<form method='POST' action='/movie-search/'>
+                    {% csrf_token %}
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            {{ form.title }}
+                            <p class="help-block"> {{ message }}</p>
+                        </div>
+                    </div>
 
-    {% csrf_token %}
+                    <div class="col-sm-4">
+                        <input class='btn btn-default' type="submit" value='Get me my movies'>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
 
-    {{ form.as_p }}
-
-<input type="submit" method='post' value='get me my movies.'>
+    {% include "movie_list.html" %}
     
-</form>
-
-</br>
-</br>
-
-<em>{{ valid }}</em>
-</br>
-</br>
-
-{% for movie in movies %}
-<a href="MOVIE DETAIL PAGE">
-{{ movie.title }}
-</a>
-{% endfor %}
-
-</div>
-
-</div>
 </div>
     
 {% endblock %}

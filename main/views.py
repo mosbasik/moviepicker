@@ -128,7 +128,7 @@ def get_votes(request):
 
 def movie_search(request):
     context = {}
-    request_context = RequestContext(request)
+    request_context = RequestContext(request, processors=[global_context])
 
     if request.method == 'POST':
         form = SearchMovieForm(request.POST)
@@ -136,18 +136,19 @@ def movie_search(request):
 
         if form.is_valid():
             title = form.cleaned_data['title']
-            context['movies'] = Movie.objects.filter(title__icontains=title)
 
-            context['valid'] = "Here's what we have that matches your request."
+            context['movies'] = Movie.objects.filter(title__icontains=title).order_by('title')
+
+            context['message'] = "Here's Your Movies"
 
             return render_to_response('movie_search.html', context, context_instance=request_context)
 
         else:
-            context['valid'] = form.errors
+            context['message'] = 'Cannot search for Nothing'
+            return render_to_response('movie_search.html', context, context_instance=request_context)
 
     else:
         form = SearchMovieForm()
         context['form'] = form
 
         return render_to_response('movie_search.html', context, context_instance=request_context)
-
