@@ -9,16 +9,21 @@ import json
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        print 'Creating Global Room'
-        user = User.objects.get(id='1')
-        room, created = WatchRoom.objects.get_or_create(created_by=user)
-        room.name = 'World'
-        room.description = 'Welcome to the World'
-        room.save()
-        print 'Success!'
+        username = raw_input('Enter name of your SuperUser: ')
+        user = User.objects.get(username=username)
+        room_exists = WatchRoom.objects.filter(name='World').exists()
+
+        if room_exists:
+            print "World Room Exists"
+        else:
+            print 'Creating Global Room'
+            room, created = WatchRoom.objects.get_or_create(created_by=user)
+            room.name = 'World'
+            room.description = 'Welcome to the World'
+            room.save()
+            print 'Success!'
 
         users = User.objects.all()
-
         print 'Adding Users'
         for user in users:
             world = WatchRoom.objects.get(name='World')

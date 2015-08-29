@@ -29,8 +29,9 @@ class Movie(models.Model):
 @receiver(post_delete, sender=Movie)
 def movie_post_delete_handler(sender, **kwargs):
     movie = kwargs['instance']
-    storage, path = movie.poster.storage, movie.poster.path
-    storage.delete(path)
+    if movie.poster:
+        storage, path = movie.poster.storage, movie.poster.path
+        storage.delete(path)
 
 
 class WatchEvent(models.Model):

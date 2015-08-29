@@ -50,7 +50,7 @@ def add_movie(request):
 
         if url:
             # either imdb id or 'failed' or 'not a movie'
-            result = mov_in.MovieToPick.make_movie(url, request.user)
+            result = mov_in.MovieToPick.make_movie(url)
             if result == 'failed' or result == 'not a movie':
                 context['is_movie'] = 'no'
                 context['message'] = 'Not a Movie'
