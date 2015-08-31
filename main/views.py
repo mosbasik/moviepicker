@@ -53,10 +53,10 @@ def add_movie(request):
             result = mov_in.MovieToPick.make_movie(url)
             if result == 'failed' or result == 'not a movie':
                 context['is_movie'] = 'no'
-                context['message'] = 'Not a Movie'
+                context['message'] = 'Not a movie'
             else:
                 context['is_movie'] = 'yes'
-                context['message'] = 'Movie Entered'
+                context['message'] = 'Movie entered'
                 context['movie'] = Movie.objects.get(imdb_id=result)
 
         else:
@@ -64,6 +64,7 @@ def add_movie(request):
 
     return render(request, 'add_movie.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
+
 
 def all_rooms(request):
     context = {}

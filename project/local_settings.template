@@ -1,23 +1,23 @@
-Copy this file and change it to a .py file
+import os
+from settings import BASE_DIR
 
-
-http://www.miniwebtool.com/django-secret-key-generator/
-SECRET_KEY = ''
+# http://www.miniwebtool.com/django-secret-key-generator/
+SECRET_KEY = '2s&)rlm3k5^6^*279n*qv#kf03p$l$%x-bsg(o0umf!nnxupj='
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'moviepicker',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'database.sqlite3'),
         'HOST': '127.0.0.1',
-        'USER': 'root',
-        'PASSWORD': 'Sin@tra2',
-        'PORT': '',
+        'USER': '',
+        'PASSWORD': '',
+        'PORT': ''
     }
 }
 
-# email settings for gmail
+# email settings if you are using gmail
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'YOUR.ACCOUNT@gmail.com'
-EMAIL_HOST_PASSWORD = 'YOUR PASSWORD'
+EMAIL_HOST_USER = ''    # full email address
+EMAIL_HOST_PASSWORD = ''    # password of account
 EMAIL_USE_TLS = True
