@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 
-from main.models import WatchRoom
+from main.models import Group
 
 
 def login(request):
@@ -45,7 +45,7 @@ def login(request):
                 user.email = request.POST['email']
                 user.save()
 
-                room = WatchRoom.objects.get(name='Universal')
+                room = Group.objects.get(name='Universal')
                 room.users.add(user)
 
                 # group = Group.objects.get(name='users')

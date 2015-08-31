@@ -1,6 +1,6 @@
 from django.contrib import admin
-from main.models import Movie, WatchEvent, WatchRoom
+from main.models import Movie, Event, Group
 
 admin.site.register(Movie)
-admin.site.register(WatchEvent)
-admin.site.register(WatchRoom)
+admin.site.register(Event)
+admin.site.register(Group)
