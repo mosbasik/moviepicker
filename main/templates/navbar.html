@@ -26,10 +26,12 @@
                 {% endif %}><a href="{% url 'all_movies' %}">All Movies</a></li>
             <li{% if request.path == '/rooms/' %}
                     class='active'
-                {% endif %}><a href="{% url 'all_rooms' %}">All Rooms</a></li>
+                {% endif %}><a href="{% url 'all_groups' %}">All Groups</a></li>
             <li{% if request.path == '/rooms/add/' %}
                 class='active'
-            {% endif %}><a href="{% url 'create_room' %}">Add Room</a></li>
+            {% endif %}><a href="{% url 'create_group' %}">Add Group</a></li>
+            <!-- Putting this here for now, we can change it later -->
+            <li><a href="{% url 'create_event' %}">Create an Event</a></li>
 
             {% if user.is_authenticated %}
                 <li id='' class="dropdown">
@@ -37,8 +39,8 @@
                     <ul class="dropdown-menu">
                         <li><a href="{% url 'user_movies' %}">My Movies</a></li>
                         <hr class='movie-hr'>
-                        {% for room in user_rooms %}
-                            <li><a href="#">{{ room.name }}</a></li>
+                        {% for group in user_groups %}
+                            <li><a href="#">{{ group.name }}</a></li>
                         {% endfor %}
                         <hr class='movie-hr'>
                         <li><a href="{% url 'password_reset' %}">Reset Password</a></li>

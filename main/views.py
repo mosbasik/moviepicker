@@ -1,9 +1,9 @@
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from django.template import RequestContext
-from main.models import Movie, WatchEvent, WatchRoom
+from main.models import Movie, Event, Group
 from django.template import loader, RequestContext
-from main.forms import SearchMovieForm, GroupCreationForm, EventCreationForm
+from main.forms import MovieSearchForm, GroupCreationForm, EventCreationForm
 from scripts import populate_movies as mov_in
 
 import user_auth
@@ -15,7 +15,7 @@ def global_context(request):
     '''
     if request.user.is_authenticated():
         return {
-            'user_rooms': request.user.watchroom_set.all(),
+            'user_rooms': request.user.group_set.all(),
             'votes': request.user.votes.all(),
             'search_form': SearchMovieForm(),
         }
@@ -26,7 +26,7 @@ def global_context(request):
 def front(request):
     context = {}
 
-    context['rooms'] = WatchRoom.objects.all()
+    context['rooms'] = Group.objects.all()
 
     return render(request, 'index.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
