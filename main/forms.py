@@ -1,10 +1,10 @@
 from django import forms
 from django.forms import ModelForm
 from datetimewidget.widgets import DateTimeWidget
-from main.models import Movie, WatchEvent, WatchRoom
+from main.models import Movie, Event, Group
 
 
-class SearchMovieForm(forms.Form):
+class MovieSearchForm(forms.Form):
     title = forms.CharField(
         required=True,
         widget=forms.TextInput(
@@ -23,7 +23,7 @@ class GroupCreationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Name your room'
+                'placeholder': 'Name your group'
             }
         )
     )
@@ -33,7 +33,7 @@ class GroupCreationForm(forms.Form):
         widget=forms.Textarea(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Describe your room'
+                'placeholder': 'Describe your group'
             }
         )
     )
@@ -41,7 +41,7 @@ class GroupCreationForm(forms.Form):
 
 class EventCreationForm(forms.Form):
 
-    event_name = forms.CharField(
+    name = forms.CharField(
         required=True,
         max_length=100,
         widget=forms.TextInput(

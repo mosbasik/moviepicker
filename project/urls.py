@@ -32,8 +32,8 @@ urlpatterns = [
     url(r'^movies/liked/$', 'main.views.user_movies', name='user_movies'),
     url(r'^movies/search/$', 'main.views.movie_search', name='movie_search'),
 
-    url(r'^rooms/$', 'main.views.all_rooms', name='all_rooms'),
-    url(r'^rooms/add/$', 'main.views.create_room', name='create_room'),
+    url(r'^groups/$', 'main.views.all_groups', name='all_groups'),
+    url(r'^groups/add/$', 'main.views.create_group', name='create_group'),
 
     url(r'^events/add/$', 'main.views.create_event', name='create_event'),
 

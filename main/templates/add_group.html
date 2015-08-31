@@ -13,12 +13,12 @@
         
         <div class="row">
             <div class="col-xs-12">
-                <h1>Create a Room</h1>
+                <h1>Create a Group</h1>
             </div>
         </div>
         
         <div class="row">
-            <form class='col-xs-11 col-sm-10 col-md-8' action="{% url 'create_room' %}" method='POST'>
+            <form class='col-xs-11 col-sm-10 col-md-8' action="{% url 'create_group' %}" method='POST'>
                 {% csrf_token %}
                 
                 <div class="col-xs-9">
@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="col-xs-3">
-                    <button type="submit" id='submit-button' class="btn btn-default"><span class='glyphicon glyphicon-plus'></span> Add Room</button>
+                    <button type="submit" id='submit-button' class="btn btn-default"><span class='glyphicon glyphicon-plus'></span> Add Group</button>
                 </div>
                 
             </form>
