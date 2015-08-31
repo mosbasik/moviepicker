@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from main.models import Movie, WatchEvent, WatchRoom
+from main.models import Movie, Event, Group
 
 from scripts import populate_movies as mov_in
 import json
@@ -11,13 +11,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         username = raw_input('Enter name of your SuperUser: ')
         user = User.objects.get(username=username)
-        room_exists = WatchRoom.objects.filter(name='World').exists()
+        room_exists = Group.objects.filter(name='World').exists()
 
         if room_exists:
             print "World Room Exists"
         else:
             print 'Creating Global Room'
-            room, created = WatchRoom.objects.get_or_create(created_by=user)
+            room, created = Group.objects.get_or_create(creator=user)
             room.name = 'World'
             room.description = 'Welcome to the World'
             room.save()
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         users = User.objects.all()
         print 'Adding Users'
         for user in users:
-            world = WatchRoom.objects.get(name='World')
+            world = Group.objects.get(name='World')
             world.users.add(user)
         print 'Done'
 
