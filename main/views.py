@@ -15,7 +15,7 @@ def global_context(request):
     '''
     if request.user.is_authenticated():
         return {
-            'user_rooms': request.user.group_set.all(),
+            'user_rooms': request.user.movie_groups.all(),
             'votes': request.user.votes.all(),
             'search_form': MovieSearchForm(),
         }
@@ -183,7 +183,7 @@ def create_group(request):
                 group = Group()
                 group.name = form.cleaned_data['name']
                 group.description = form.cleaned_data['description']
-                group.created_by = request.user
+                group.creator = request.user
 
                 group.save()
                 context['group'] = group

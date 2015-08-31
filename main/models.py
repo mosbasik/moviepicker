@@ -52,7 +52,7 @@ class Event(models.Model):
     name = models.CharField(max_length=255)
     date_and_time = models.DateTimeField()
     description = models.TextField(null=True, blank=True)
-    movies = models.ManyToManyField('Movie', through='Lockin', related_name='events')
+    movies = models.ManyToManyField('Movie', through='LockIn', related_name='events')
     users = models.ManyToManyField(User, related_name='events')
     group = models.ForeignKey('Group', related_name='events')
     created_by = models.ForeignKey(User, related_name='events_created')
