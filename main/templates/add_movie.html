@@ -20,10 +20,10 @@
         <div class="row">
             <form class='col-xs-11 col-sm-10 col-md-8' action="{% url 'add_movie' %}" method='POST'>
                 {% csrf_token %}
-                
+
                 <div class="col-xs-9">
                     <div class="form-group">
-                        <input class="form-control" id="url-box" name='url' placeholder="Enter the IMDB url for a movie"></input>
+                        <input class="form-control" id="url-box" name='url' placeholder="Enter the IMDB url for a movie">
                         <p class="help-block"> {{ message }}</p>
                     </div>
                 </div>
@@ -31,7 +31,6 @@
                 <div class="col-xs-3">
                     <button type="submit" id='submit-button' class="btn btn-default"><span class='glyphicon glyphicon-plus'></span> Add Movie</button>
                 </div>
-                
             </form>
         </div>
 

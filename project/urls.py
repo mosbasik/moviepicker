@@ -21,20 +21,27 @@ from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+
     url(r'^$', 'main.views.front', name='front'),
+
     url(r'^login/$', 'main.user_auth.login', name='login'),
     url(r'^logout/$', 'main.user_auth.logout', name='logout'),
+
     url(r'^movies/$', 'main.views.all_movies', name='all_movies'),
     url(r'^movies/add/$', 'main.views.add_movie', name='add_movie'),
     url(r'^movies/liked/$', 'main.views.user_movies', name='user_movies'),
+    url(r'^movies/search/$', 'main.views.movie_search', name='movie_search'),
+
+    url(r'^rooms/$', 'main.views.all_rooms', name='all_rooms'),
+    url(r'^rooms/add/$', 'main.views.create_room', name='create_room'),
+
+    url(r'^events/add/$', 'main.views.create_event', name='create_event'),
+
     url(r'^create-vote/$', 'main.views.create_vote', name='vote'),
     url(r'^delete-vote/$', 'main.views.delete_vote', name='unvote'),
-    url(r'^rooms/$', 'main.views.all_rooms', name='all_rooms'),
+
     # url(r'^get-votes/$', 'main.views.get_votes', name='get_votes'),
     # url(r'^(?P<username>\w+)/votes/$', 'main.views.user_votes', name='user_votes'),
-    url(r'^movies/search/$', 'main.views.movie_search', name='movie_search'),
-    url(r'^rooms/add/$', 'main.views.create_room', name='create_room'),
-    url(r'^events/add/$', 'main.views.create_event', name='create_event'),
 
     url(r'^password/reset/$',
         django.contrib.auth.views.password_reset,
@@ -53,5 +60,5 @@ urlpatterns = [
         django.contrib.auth.views.password_reset_complete,
         {"template_name": "password_reset/password_reset_complete.html"},
         name="password_reset_complete"),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
