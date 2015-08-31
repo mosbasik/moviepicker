@@ -17,7 +17,7 @@ def global_context(request):
         return {
             'user_rooms': request.user.group_set.all(),
             'votes': request.user.votes.all(),
-            'search_form': SearchMovieForm(),
+            'search_form': MovieSearchForm(),
         }
     else:
         return {}
@@ -28,7 +28,8 @@ def front(request):
 
     context['rooms'] = Group.objects.all()
 
-    return render(request, 'index.html', context,
+    return render(
+        request, 'index.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
@@ -38,7 +39,8 @@ def all_movies(request):
     context['movies'] = Movie.objects.all().order_by('title')
     context['page_title'] = 'List of all Movies'
 
-    return render(request, 'all_movies.html', context,
+    return render(
+        request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
@@ -62,17 +64,19 @@ def add_movie(request):
         else:
             context['url_response'] = 'No url was entered'
 
-    return render(request, 'add_movie.html', context,
+    return render(
+        request, 'add_movie.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
-def all_rooms(request):
+def all_groups(request):
     context = {}
 
-    context['rooms'] = WatchRoom.objects.all()
-    context['page_title'] = 'List of all Rooms'
+    context['groups'] = Group.objects.all()
+    context['page_title'] = 'List of all groups'
 
-    return render(request, 'all_rooms.html', context,
+    return render(
+        request, 'all_groups.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
@@ -82,10 +86,12 @@ def user_movies(request):
     # makes the first letter uppercase
     username = request.user.username.title()
 
-    context['movies'] = Movie.objects.filter(voters=request.user).order_by('title')
+    context['movies'] = Movie.objects.filter(
+        voters=request.user).order_by('title')
     context['page_title'] = username + '\'s Liked Movies'
 
-    return render(request, 'all_movies.html', context,
+    return render(
+        request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
@@ -133,30 +139,34 @@ def movie_search(request):
     request_context = RequestContext(request, processors=[global_context])
 
     if request.method == 'POST':
-        form = SearchMovieForm(request.POST)
+        form = MovieSearchForm(request.POST)
         context['form'] = form
 
         if form.is_valid():
             title = form.cleaned_data['title']
 
-            context['movies'] = Movie.objects.filter(title__icontains=title).order_by('title')
+            context['movies'] = Movie.objects.filter(
+                title__icontains=title).order_by('title')
 
             context['message'] = "Here's Your Movies"
 
-            return render_to_response('movie_search.html', context, context_instance=request_context)
+            return render_to_response(
+                'movie_search.html', context, context_instance=request_context)
 
         else:
             context['message'] = 'Cannot search for Nothing'
-            return render_to_response('movie_search.html', context, context_instance=request_context)
+            return render_to_response(
+                'movie_search.html', context, context_instance=request_context)
 
     else:
-        form = SearchMovieForm()
+        form = MovieSearchForm()
         context['form'] = form
 
-        return render_to_response('movie_search.html', context, context_instance=request_context)
+        return render_to_response(
+            'movie_search.html', context, context_instance=request_context)
 
 
-def create_room(request):
+def create_group(request):
 
     context = {}
     request_context = RequestContext(request, processors=[global_context])
@@ -166,10 +176,11 @@ def create_room(request):
         context['form'] = form
 
         if form.is_valid():
-            group_exists = WatchRoom.objects.filter(name__iexact=form.cleaned_data['name']).exists()
+            group_exists = Group.objects.filter(
+                name__iexact=form.cleaned_data['name']).exists()
 
             if not group_exists:
-                group = WatchRoom()
+                group = Group()
                 group.name = form.cleaned_data['name']
                 group.description = form.cleaned_data['description']
                 group.created_by = request.user
@@ -178,21 +189,27 @@ def create_room(request):
                 context['group'] = group
 
                 context['message'] = "Group created successfully."
-                return render_to_response('add_room.html', context, context_instance=request_context)
+                return render_to_response(
+                    'add_group.html', context,
+                    context_instance=request_context)
 
-            else: # group exists
-                context['message'] = 'Room name already exists'
-                return render_to_response('add_room.html', context, context_instance=request_context)
+            else:   # group exists
+                context['message'] = 'Group name already exists'
+                return render_to_response(
+                    'add_group.html', context,
+                    context_instance=request_context)
 
         else:
-            context['message'] = "Room name cannot be blank"
-            return render_to_response('add_room.html', context, context_instance=request_context)
+            context['message'] = "Group name cannot be blank"
+            return render_to_response(
+                'add_group.html', context, context_instance=request_context)
 
     else:
         form = GroupCreationForm()
         context['form'] = form
 
-        return render_to_response('add_room.html', context, context_instance=request_context)
+        return render_to_response(
+            'add_group.html', context, context_instance=request_context)
 
 
 def create_event(request):
@@ -215,14 +232,17 @@ def create_event(request):
             context['event'] = event
 
             context['message'] = "Event created successfully."
-            return render_to_response('add_event.html', context, context_instance=request_context)
+            return render_to_response(
+                'add_event.html', context, context_instance=request_context)
 
         else:
             context['message'] = "Sorry, you must be a registered user to create an event."
-            return render_to_response('add_event.html', context, context_instance=request_context)
+            return render_to_response(
+                'add_event.html', context, context_instance=request_context)
 
     else:
         form = EventCreationForm()
         context['form'] = form
 
-        return render_to_response('add_event.html', context, context_instance=request_context)
+        return render_to_response(
+            'add_event.html', context, context_instance=request_context)

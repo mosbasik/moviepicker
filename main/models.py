@@ -39,7 +39,7 @@ class Group(models.Model):
     modified = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(null=True, blank=True)
-    users = models.ManyToManyField(User, related_name='groups')
+    users = models.ManyToManyField(User, related_name='movie_groups')
     creator = models.ForeignKey(User, related_name='groups_created')
 
     def __unicode__(self):
@@ -71,7 +71,7 @@ class Location(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    location_type = models.instance(choice=LOCATION_TYPES)
+    location_type = models.IntegerField(choices=LOCATION_TYPES)
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255, null=True, blank=True)
     group = models.ForeignKey('Group', related_name='locations')
