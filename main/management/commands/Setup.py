@@ -19,7 +19,7 @@ class Command(BaseCommand):
             print 'Creating Global Room'
             room, created = Group.objects.get_or_create(creator=user)
             room.name = 'World'
-            room.description = 'Welcome to the World'
+            room.description = 'Every user is added to the "World" group automatically upon registration.'
             room.save()
             print 'Success!'
 
