@@ -9,7 +9,6 @@
     <div class='container wrapper'>
         <div class='row'>
             <form id='user-login-form' class='col-sm-offset-3 col-sm-6' method='POST'action="{% url 'login' %}" style='{% if error_on_create %}display:none{% endif %}'>
-
                 <input type="hidden" name='type' value='login'>
 
                 {%csrf_token%}
@@ -25,54 +24,53 @@
                 </div>
                 <button type='submit' class='btn'>Login</button>
 
-                <a href='#' id='switch-to-create'>Create a User</a>
-        
+                <a href='#' id='switch-to-create'>Register as new user</a>
             </form>
-            </div>
+        </div>
 
-            <div class='row '>
-            
-                <form  id='user-create-form' class='col-sm-offset-3 col-sm-6' method='POST' action='{% url "login" %}' style='{% if error_on_create %}display:block{% endif %}'>
-                    {%csrf_token%}
+        <div class='row '>
+            <form  id='user-create-form' class='col-sm-offset-3 col-sm-6' method='POST' action='{% url "login" %}' style='{% if error_on_create %}display:block{% endif %}'>
+                {%csrf_token%}
 
-                    <p class='text-danger'>{{user_create_form.nonfield_errors}}</p>
+                <p class='text-danger'>{{user_create_form.nonfield_errors}}</p>
 
-                    <input type="hidden" name='type' value='create_user'>
+                <input type="hidden" name='type' value='create_user'>
 
-                    <div class='form-group'>
-                        
-                        <label>Username</label>
-                        <input name='username' class='form-control'>
-                    </div>
-                    <div class='form-group'>
-                        
-                        <label>Email</label>
-                        <input type='email' name='email' class='form-control'>
-                        <p>We only use your email to reset your password if you forget it</p>
-                    </div>
-                    <div class='form-group'>
-                        
-                        <label>Password</label>
-                        <input type='password' name='password1' class='form-control'>
-                    </div>
-                    <div class='form-group'>
-                        
-                        <label>Confirm Password</label>
-                        <input type='password' name='password2' class='form-control'>
-                    </div>
-                    <button type='submit' class='btn'>Create User</button>
+                <div class='form-group {% if user_create_form.username.errors %}has-error{% endif %}'>
+                    <span class="text-danger">{{ user_create_form.username.errors }}</span>
+                    <label>Username</label>
+                    {{ user_create_form.username }}
+                </div>
 
-                    <a href='#' id='switch-to-login'>Want to login?</a>
-                    {{ user_create_form.username.errors }}
-                    {{ user_create_form.password1.errors }}
-                    {{ user_create_form.password2.errors }}
+                <div class='form-group {% if user_create_form.email.errors %}has-error{% endif %}'>
+                    <span class="text-danger">{{ user_create_form.email.errors }}</span>
+                    <label>Email</label>
+                    {{ user_create_form.email }}
+                    <p>We only use your email to reset your password if you forget it.</p>
+                </div>
 
-                </form>
-            </div>
-            <div class='row col-sm-offset-3 col-sm-6'>
-                <hr>
-                <a href='#'>Forgot your password?</a>
-            </div>
+                <div class='form-group{% if user_create_form.password1.errors or user_create_form.password2.errors %}has-error{% endif %}'>
+                    <span class="text-danger">{{ user_create_form.password1.errors }}</span>
+                    <span class="text-danger">{{ user_create_form.password2.errors }}</span>
+                    <label>Password</label>
+                    {{ user_create_form.password1 }}
+                </div>
+
+                <div class='form-group'>
+                    <label>Confirm Password</label>
+                    {{ user_create_form.password2 }}
+                </div>
+
+                <button type='submit' class='btn'>Register</button>
+
+                <a href='#' id='switch-to-login'>Login as existing user</a>
+            </form>
+        </div>
+
+        <div class='row col-sm-offset-3 col-sm-6'>
+            <hr>
+            <a href='#'>Forgot your password?</a>
+        </div>
     </div>
 
 {% endblock content %} 
