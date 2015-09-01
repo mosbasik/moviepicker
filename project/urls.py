@@ -34,6 +34,7 @@ urlpatterns = [
 
     url(r'^groups/$', 'main.views.all_groups', name='all_groups'),
     url(r'^groups/add/$', 'main.views.create_group', name='create_group'),
+    url(r'^groups/(?P<group_slug>[-\w]+)/$', 'main.views.group_details', name='group_details'),
 
     url(r'^events/add/$', 'main.views.create_event', name='create_event'),
 

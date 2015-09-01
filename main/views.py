@@ -1,11 +1,14 @@
+# django imports
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from django.template import RequestContext
-from main.models import Movie, Event, Group
+from django.utils.text import slugify
 from django.template import loader, RequestContext
-from main.forms import MovieSearchForm, GroupCreationForm, EventCreationForm
-from scripts import populate_movies as mov_in
 
+# local imports
+from main.forms import MovieSearchForm, GroupCreationForm, EventCreationForm
+from main.models import Movie, Event, Group
+from scripts import populate_movies as mov_in
 import user_auth
 
 
@@ -246,3 +249,11 @@ def create_event(request):
 
         return render_to_response(
             'add_event.html', context, context_instance=request_context)
+
+
+def group_details(request, group_slug):
+
+    group = Group.objects.get(slug=group_slug)
+    print group
+
+    return HttpResponse(status=200)
