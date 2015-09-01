@@ -1,11 +1,15 @@
+# django imports
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from django.template import RequestContext
-from main.models import Movie, Event, Group, Location
+from django.utils.text import slugify
 from django.template import loader, RequestContext
-from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
-from scripts import populate_movies as mov_in
 from django.views.generic import View
+
+# local imports
+from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
+from main.models import Movie, Event, Group, Location
+from scripts import populate_movies as mov_in
 
 import user_auth
 
@@ -16,7 +20,7 @@ def global_context(request):
     '''
     if request.user.is_authenticated():
         return {
-            'user_rooms': request.user.movie_groups.all(),
+            'user_groups': request.user.movie_groups.all(),
             'votes': request.user.votes.all(),
             'search_form': MovieSearchForm(),
         }
@@ -274,3 +278,19 @@ class CreateEvent(View):
 
         return render_to_response(
             'add_event.html', context, context_instance=request_context)
+
+
+def group_details(request, group_slug):
+
+    context = {}
+    request_context = RequestContext(request, processors=[global_context])
+
+    group = Group.objects.get(slug=group_slug)
+    group_users = group.users.all()
+
+    context['group'] = group
+    context['users'] = group_users
+    context['movies'] = Movie.objects.filter(voters__in=group_users).distinct().order_by('title')
+
+    return render_to_response(
+            'group_details.html', context, context_instance=request_context)

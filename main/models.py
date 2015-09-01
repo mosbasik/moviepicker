@@ -1,7 +1,11 @@
+# django imports
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+
+# external imports
+from autoslug import AutoSlugField
 
 
 class Movie(models.Model):
@@ -38,6 +42,7 @@ class Group(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255, unique=True)
+    slug = AutoSlugField(populate_from='name')
     description = models.TextField(null=True, blank=True)
     users = models.ManyToManyField(User, related_name='movie_groups')
     creator = models.ForeignKey(User, related_name='groups_created')

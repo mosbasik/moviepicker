@@ -13,7 +13,7 @@
         <h1>{{ page_title }}</h1>
         {% for group in groups %}
 
-            <h3>{{ group.name }}</h3>
+            <h3><a href="{% url 'group_details' group.slug %}">{{ group.name }}</a></h3>
             <ul>
                 <li>{{ group.description }}</li>
                 {% for user in group.users.all %}

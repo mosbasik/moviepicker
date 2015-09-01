@@ -1,6 +1,7 @@
-from django import forms
-from django.forms import ModelForm
 from datetimewidget.widgets import DateTimeWidget
+from django import forms
+from django.contrib.auth.models import User
+
 from main.models import Movie, Event, Group, Location
 
 
@@ -75,25 +76,11 @@ class EventForm(forms.Form):
         queryset=Group.objects.all(),   # TODO - Filter this based on the user's groups
         required=True, widget=forms.Select(attrs={'class': 'form-control'}))
 
-    # This is a stock overflow solutions for passing the user to the form
-    # def __init__(self, *args, **kwargs):
-    #     self.request = kwargs.pop('user', None)
-    #     super(EventCreationForm, self).__init__(*args, **kwargs)
-    #     self.fields['group'].queryset = User.objects.filter(pk=user.id)
-
-    # def clean(self):
-    #     print self.request.user
-
+   
     class Meta:
         model = Event
         fields = ['name', 'date_and_time', 'description', 'group']
-    #     widgets = {
-    #         'datetime': DateTimeWidget(
-    #             # attrs={'class': 'form-control'},
-    #             usel10n=True,
-    #             bootstrap_version=3)
-    #         }
-
+    
 
 class LocationForm(forms.ModelForm):
 
@@ -104,3 +91,58 @@ class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
         fields = ['text']
+
+
+class UserCreationForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+    error_messages = {
+        'password_mismatch': "The two password fields didn't match.",
+    }
+
+    username = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+            }))
+
+    email = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+            }))
+
+    password1 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control',
+            }))
+
+    password2 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control',
+            }))
+
+    def clean_password2(self):
+            password1 = self.cleaned_data.get('password1', None)
+            password2 = self.cleaned_data.get('password2', None)
+            if password1 and password2 and password1 != password2:
+                raise forms.ValidationError(
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch'
+                )
+
+    def save(self, commit=True):
+        user = super(UserCreationForm, self).save(commit=False)
+        user.set_password(self.cleaned_data['password1'])
+        if commit:
+            user.save()
+        return user
