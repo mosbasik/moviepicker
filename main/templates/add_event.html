@@ -28,6 +28,18 @@
                             {{ form.name }}
                             <br>
                             {{ form.description }}
+                            <br>
+                            {{ form.group }}
+                        <p class="help-block"> {{ errors }}</p>
+                    </div>
+                </div>
+                <div class="col-xs-9">
+                    <div class="form-group">
+                            {{ location.location_type }}
+                            <br>
+                            {{ location.url }}
+                            <br>
+                            {{ location.text }}
                         <p class="help-block"> {{ message }}</p>
                     </div>
                 </div>
