@@ -67,7 +67,26 @@ function unvote(id) {
 }
 
 
+/**
+ *
+ */
+$('#group-membership-button').click(function() {
+    var group_pk = parseInt($(this).attr('data-group-pk'))
+    var action = $(this).attr('data-group-action')
+    if (action === 'join') {
+        join_group(group_pk)
+    } else if (action === 'leave') {
+        leave_group(group_pk)
+    }
+})
 
+function join_group(group_pk) {
+    console.log('joining group #' + group_pk)
+}
+
+function leave_group(group_pk) {
+    console.log('leaving group #' + group_pk)
+}
 
 
 // get the cookie containing the CSRF token (needed for POSTing with ajax)

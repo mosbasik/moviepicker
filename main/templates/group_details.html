@@ -9,12 +9,12 @@
             <span>{{ group.name }}</span>
             {% if user.is_authenticated %}
                 {% if group in user.movie_groups.all %}
-                    <button id="group-membership-button" class="btn btn-danger pull-right">Leave Group</button>
+                    <button id="group-membership-button" class="btn btn-danger pull-right" data-group-pk="{{ group.pk }}" data-group-action="leave">Leave Group</button>
                 {% else %}
-                    <button id="group-membership-button" class="btn btn-success pull-right">Join Group</button>
+                    <button id="group-membership-button" class="btn btn-success pull-right" data-group-pk="{{ group.pk }}" data-group-action="join">Join Group</button>
                 {% endif %}
             {% else %}
-                <button id="group-membership-button" class="btn btn-success pull-right">Join Group</button>
+                <button id="group-membership-button" class="btn btn-success pull-right" data-group-pk="{{ group.pk }}" data-group-action="join">Join Group</button>
             {% endif %}
         </h1>
 
