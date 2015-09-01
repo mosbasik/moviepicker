@@ -43,14 +43,14 @@ def login(request):
                 else:
 
                     # load an error message to context and reload page
-                    context['error'] = 'Your account has been disabled'
+                    context['error'] = 'Your account has been disabled.'
                     return render(request, 'login.html', context)
 
             # if the user is not found in the database
             else:
 
                 # load an error message to context and reload page
-                context['error'] = 'Invalid username or password'
+                context['error'] = 'Invalid username or password.'
                 return render(request, 'login.html', context)
 
         # if the POST request was a submission of the registration form

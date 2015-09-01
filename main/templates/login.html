@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
 
-{% block css %}
-
-{% endblock css %}
-
 {% block content %}
 
     <div class='container wrapper'>
+
         <div class='row'>
             <form id='user-login-form' class='col-sm-offset-3 col-sm-6' method='POST'action="{% url 'login' %}" style='{% if error_on_create %}display:none{% endif %}'>
                 <input type="hidden" name='type' value='login'>
@@ -71,10 +68,7 @@
             <hr>
             <a href='#'>Forgot your password?</a>
         </div>
+
     </div>
 
-{% endblock content %} 
-
-{% block js %}
-
-{% endblock js %}
+{% endblock content %}
