@@ -4,11 +4,13 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils.text import slugify
 from django.template import loader, RequestContext
+from django.views.generic import View
 
 # local imports
-from main.forms import MovieSearchForm, GroupCreationForm, EventCreationForm
-from main.models import Movie, Event, Group
+from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
+from main.models import Movie, Event, Group, Location
 from scripts import populate_movies as mov_in
+
 import user_auth
 
 
@@ -175,7 +177,7 @@ def create_group(request):
     request_context = RequestContext(request, processors=[global_context])
 
     if request.method == 'POST' and request.user.is_authenticated():
-        form = GroupCreationForm(request.POST)
+        form = GroupForm(request.POST)
         context['form'] = form
 
         if form.is_valid():
@@ -208,44 +210,71 @@ def create_group(request):
                 'add_group.html', context, context_instance=request_context)
 
     else:
-        form = GroupCreationForm()
+        form = GroupForm()
         context['form'] = form
 
         return render_to_response(
             'add_group.html', context, context_instance=request_context)
 
 
-def create_event(request):
+class CreateEvent(View):
 
-    context = {}
-    request_context = RequestContext(request, processors=[global_context])
+    def post(self, request):
+        context = {}
+        request_context = RequestContext(request, processors=[global_context])
 
-    if request.method == 'POST' and request.user.is_authenticated():
-        form = EventCreationForm(request.POST)
-        context['form'] = form
+        if request.method == 'POST' and request.user.is_authenticated():
+            form = EventForm(request.POST)
+            location_form = LocationForm(request.POST)
+            context['form'] = form
+            context['location'] = location_form
 
-        if form.is_valid():
-            event = WatchEvent()
-            event.event_name = form.cleaned_data['event_name']
-            event.date_and_time = form.cleaned_data['date_and_time']
-            event.description = form.cleaned_data['description']
-            event.created_by = request.user
+            if form.is_valid() and location_form.is_valid():
+                # old = []
+                # old = Location.objects.filter(Q(url__iexact=location_form.cleaned_data['url']) | Q(text__iexact=location_form.cleaned_data['text']))
+                location, created = Location.objects.get_or_create(
+                    text=location_form.cleaned_data['text'],
+                    group=form.cleaned_data['group'])
+                # location.text = location_form.cleaned_data['text']
+                # location.group = form.cleaned_data['group'].id
 
-            event.save()
-            context['event'] = event
+                event = Event()
+                event.name = form.cleaned_data['name']
+                event.date_and_time = form.cleaned_data['date_and_time']
+                event.description = form.cleaned_data['description']
+                event.group = form.cleaned_data['group']
+                event.created_by = request.user
+                event.location = location
 
-            context['message'] = "Event created successfully."
-            return render_to_response(
-                'add_event.html', context, context_instance=request_context)
+                event.save()
+
+                context['event'] = event
+
+                context['message'] = "Event created successfully."
+                return render_to_response(
+                    'add_event.html', context,
+                    context_instance=request_context)
+            else:
+                context['message'] = form.errors
+                context['errors'] = location_form.errors
+                return render_to_response(
+                    'add_event.html', context,
+                    context_instance=request_context)
 
         else:
-            context['message'] = "Sorry, you must be a registered user to create an event."
+            context['message'] = "Sorry, you must be a registered user."
             return render_to_response(
-                'add_event.html', context, context_instance=request_context)
+                'add_event.html', context,
+                context_instance=request_context)
 
-    else:
-        form = EventCreationForm()
+    def get(self, request):
+        context = {}
+        user = request.user
+        request_context = RequestContext(request, processors=[global_context])
+        form = EventForm()
+        location_form = LocationForm()
         context['form'] = form
+        context['location'] = location_form
 
         return render_to_response(
             'add_event.html', context, context_instance=request_context)
