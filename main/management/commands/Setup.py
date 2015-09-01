@@ -32,17 +32,17 @@ class Command(BaseCommand):
             world.users.add(user)
         print 'Done'
 
-        self._import_movies()
+        self._import_movies(super_user)
         self._populate_testing_data(super_user)
 
-    def _import_movies(self):
+    def _import_movies(self, user):
         with open('main/static/setup_scripts/movie_data.json', 'r') as f:
             data = json.load(f)
 
         for movie in data['movie']:
             print 'Importing: ' + movie['title']
 
-            result = mov_in.MovieToPick.make_movie(movie['url'])
+            result = mov_in.MovieToPick.make_movie(movie['url'], user)
 
             if result == 'failed' or result == 'not a movie':
                 print 'FAILED'
