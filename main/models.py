@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 # external imports
 from autoslug import AutoSlugField
+import re
 
 
 class Movie(models.Model):
@@ -28,6 +29,12 @@ class Movie(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            no_articles = re.compile(r'(^a |^an |^the )', re.IGNORECASE)
+            self.truncated_title = no_articles.sub('', self.title)
+        super(Movie, self).save(*args, **kwargs)
 
 
 @receiver(post_delete, sender=Movie)
