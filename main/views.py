@@ -253,7 +253,15 @@ def create_event(request):
 
 def group_details(request, group_slug):
 
-    group = Group.objects.get(slug=group_slug)
-    print group
+    context = {}
+    request_context = RequestContext(request, processors=[global_context])
 
-    return HttpResponse(status=200)
+    group = Group.objects.get(slug=group_slug)
+    group_users = group.users.all()
+
+    context['group'] = group
+    context['users'] = group_users
+    context['movies'] = Movie.objects.filter(voters__in=group_users).distinct().order_by('title')
+
+    return render_to_response(
+            'group_details.html', context, context_instance=request_context)
