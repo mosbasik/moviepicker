@@ -51,13 +51,15 @@ def all_movies(request):
 
 def add_movie(request):
     context = {}
+    user = request.user
 
     if request.method == 'POST':
         url = request.POST.get('url')
 
         if url:
             # either imdb id or 'failed' or 'not a movie'
-            result = mov_in.MovieToPick.make_movie(url)
+            result = mov_in.MovieToPick.make_movie(url, user)
+            print result
             if result == 'failed' or result == 'not a movie':
                 context['is_movie'] = 'no'
                 context['message'] = 'Not a movie'
