@@ -1,22 +1,24 @@
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-
-from main.models import Movie, Event, Group
+from django.contrib.auth.models import User
+from main.models import Movie, Event, Group, Location
 
 from scripts import populate_movies as mov_in
 import json
+
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
         username = raw_input('Enter name of your SuperUser: ')
         user = User.objects.get(username=username)
+        super_user = user
         room_exists = Group.objects.filter(name='World').exists()
 
         if room_exists:
-            print "World Room Exists"
+            print "World Group Exists"
         else:
-            print 'Creating Global Room'
+            print 'Creating Global Group'
             room, created = Group.objects.get_or_create(creator=user)
             room.name = 'World'
             room.description = 'Every user is added to the "World" group automatically upon registration.'
@@ -31,10 +33,10 @@ class Command(BaseCommand):
         print 'Done'
 
         self._import_movies()
-
+        self._populate_testing_data(super_user)
 
     def _import_movies(self):
-        with open('main/static/movie_data.json', 'r') as f:
+        with open('main/static/setup_scripts/movie_data.json', 'r') as f:
             data = json.load(f)
 
         for movie in data['movie']:
@@ -47,4 +49,51 @@ class Command(BaseCommand):
             else:
                 print 'Success!'
 
-        print 'TROLOLOLOLOLOLOLOLOL!!!!11!!111!1'
+        print 'Finished'
+
+    def _populate_testing_data(self, super_user):
+        print "It's started"
+        with open('main/static/setup_scripts/groups.json', 'r') as f:
+            data = json.load(f)
+
+        user_list = []
+        group_list = []
+        event_list = []
+
+        for user in data['users']:
+            print 'Creating: ' + user['username']
+
+            new_user, created = User.objects.get_or_create(
+                username=user['username'], email=user['email'],
+                password=user['password1'])
+            user_list.append(new_user)
+
+        print 'Users created.'
+
+        for group in data['groups']:
+            print 'Creating: ' + group['name']
+
+            new_group, created = Group.objects.get_or_create(
+                name=group['name'], description=group['description'],
+                creator=super_user)
+            group_list.append(new_group)
+
+        print "Groups created."
+
+        for i, event in enumerate(data['events']):
+            print 'Creating: ' + event['name']
+
+            new_location, created = Location.objects.get_or_create(
+                text=event['location'], group=group_list[i])
+
+            new_event, created = Event.objects.get_or_create(
+                name=event['name'], date_and_time=event['date_and_time'],
+                description=event['description'], group=group_list[i],
+                created_by=super_user, location=new_location)
+            new_event.users.add(user_list[i])
+            new_event.save()
+
+            event_list.append(new_event)
+
+        print 'Events created.'
+        print "All done now!"
