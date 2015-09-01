@@ -59,29 +59,18 @@ class Event(models.Model):
     location = models.ForeignKey('Location', null=True, blank=True, related_name='events')
 
     def __unicode__(self):
-        return self.event_name
+        return self.name
 
 
 class Location(models.Model):
 
-    LOCATION_TYPES = (
-        (1, 'URL'),
-        (2, 'Text'),
-    )
-
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    location_type = models.IntegerField(choices=LOCATION_TYPES)
-    url = models.URLField(null=True, blank=True)
-    text = models.CharField(max_length=255, null=True, blank=True)
+    text = models.TextField(null=True, blank=True)
     group = models.ForeignKey('Group', related_name='locations')
 
-    @property
-    def name(self):
-        return self.url if self.url else self.text
-
     def __unicode__(self):
-        return self.name
+        return self.text
 
 
 class Viewing(models.Model):
