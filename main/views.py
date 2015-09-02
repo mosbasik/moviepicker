@@ -5,6 +5,7 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext, loader
 from django.utils.text import slugify
 from django.views.generic import View
+from django.db.models import Count
 
 # local imports
 from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
@@ -227,13 +228,9 @@ class CreateEvent(View):
             context['location'] = location_form
 
             if form.is_valid() and location_form.is_valid():
-                # old = []
-                # old = Location.objects.filter(Q(url__iexact=location_form.cleaned_data['url']) | Q(text__iexact=location_form.cleaned_data['text']))
                 location, created = Location.objects.get_or_create(
                     text=location_form.cleaned_data['text'],
                     group=form.cleaned_data['group'])
-                # location.text = location_form.cleaned_data['text']
-                # location.group = form.cleaned_data['group'].id
 
                 event = Event()
                 event.name = form.cleaned_data['name']
@@ -307,12 +304,15 @@ class EventDetails(View):
     def get(self, request, group_slug, event_id):
         context = {}
         request_context = RequestContext(request, processors=[global_context])
+
         event = Event.objects.get(id=event_id)
-        users = event.users.all()
-        movies = Movie.objects.filter(voters__in=users)
+        event_members = event.users.all()
+        movie_list = Movie.objects.filter(voters__in=event_members).distinct()
+        movie_list = movie_list.annotate(num_votes=Count('voters'))
+        movies = movie_list.distinct().order_by('-num_votes')
 
         context['event'] = event
-        context['users'] = users
+        context['users'] = event_members
         context['movies'] = movies
         return render_to_response(
             'event_details.html', context, context_instance=request_context)
@@ -331,6 +331,26 @@ def leave_group(request, group_slug):
     if request.user.is_authenticated():
         group = Group.objects.get(slug=request.POST.get('group_slug', None))
         group.users.remove(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def join_event(request, group_slug, event_id):
+    if request.user.is_authenticated():
+        event = Event.objects.get(id=event_id)
+        event.users.add(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def leave_event(request, group_slug, event_id):
+    if request.user.is_authenticated():
+        # user = request.user
+        # user.events.remove(event_id)
+        event = Event.objects.get(id=event_id)
+        event.users.remove(request.user)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)
