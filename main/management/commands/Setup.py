@@ -98,7 +98,7 @@ class Command(BaseCommand):
             new_event, created = Event.objects.get_or_create(
                 name=event['name'], date_and_time=event['date_and_time'],
                 description=event['description'], group=group_list[i],
-                created_by=super_user, location=new_location)
+                creator=super_user, location=new_location)
             new_event.users.add(user_list[i])
             new_event.users.add(user_list[i+2])
             new_event.users.add(user_list[i+3])

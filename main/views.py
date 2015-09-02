@@ -233,7 +233,7 @@ class CreateEvent(View):
                 event.date_and_time = form.cleaned_data['date_and_time']
                 event.description = form.cleaned_data['description']
                 event.group = form.cleaned_data['group']
-                event.created_by = request.user
+                event.creator = request.user
                 event.location = location
 
                 event.save()
@@ -307,13 +307,10 @@ class EventDetails(View):
 
         event = Event.objects.get(id=event_id)
         event_members = event.users.all()
-        movie_list = Movie.objects.filter(voters__in=event_members).distinct()
-        movie_list = movie_list.annotate(num_votes=Count('voters'))
-        movies = movie_list.distinct().order_by('-num_votes')
 
         context['event'] = event
         context['users'] = event_members
-        context['movies'] = movies
+        context['movies'] = get_voted_movie_qs(event_members)
         return render_to_response(
             'event_details.html', context, context_instance=request_context)
 

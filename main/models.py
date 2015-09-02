@@ -66,7 +66,7 @@ class Event(models.Model):
     movies = models.ManyToManyField('Movie', through='LockIn', related_name='events')
     users = models.ManyToManyField(User, related_name='events')
     group = models.ForeignKey('Group', related_name='events')
-    created_by = models.ForeignKey(User, related_name='events_created')
+    creator = models.ForeignKey(User, related_name='events_created')
     location = models.ForeignKey('Location', null=True, blank=True, related_name='events')
 
     def __unicode__(self):

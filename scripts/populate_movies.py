@@ -139,7 +139,7 @@ class MovieToPick():
                         '%s.jpg' % movie.title, File(movie_image))
 
                 if user is not None:
-                    movie.created_by = user
+                    movie.submitter = user
 
                 movie.save()
                 return movie
