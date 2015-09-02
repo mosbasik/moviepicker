@@ -30,10 +30,10 @@ class Movie(models.Model):
     def __unicode__(self):
         return self.title
 
+
     def save(self, *args, **kwargs):
-        if not self.pk:
-            no_articles = re.compile(r'(^a |^an |^the )', re.IGNORECASE)
-            self.truncated_title = no_articles.sub('', self.title)
+        no_articles = re.compile(r'(^a |^an |^the )', re.IGNORECASE)
+        self.truncated_title = no_articles.sub('', self.title)
         super(Movie, self).save(*args, **kwargs)
 
 

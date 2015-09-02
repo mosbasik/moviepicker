@@ -1,0 +1,88 @@
+{
+    "users": [
+        {
+            "username": "batman",
+            "email": "batman@batman.com",
+            "password1": "batman",
+            "password2": "batman"
+        },
+        {
+            "username": "alpha",
+            "email": "alpha@alpha.com",
+            "password1": "alpha",
+            "password2": "alpha"
+        },
+        {
+            "username": "bravo",
+            "email": "bravo@bravo.com",
+            "password1": "bravo",
+            "password2": "bravo"
+        },
+        {
+            "username": "charlie",
+            "email": "charlie@charlie.com",
+            "password1": "charlie",
+            "password2": "charlie"
+        },
+        {
+            "username": "delta",
+            "email": "delta@delta.com",
+            "password1": "delta",
+            "password2": "delta"
+        }
+    ],
+    "groups": [
+        {
+            "name": "Campus West",
+            "description": "Only west side campus residents"
+        },
+        {
+            "name": "Eve2.0",
+            "description": "Eve players who are looking to take their gaming to the next level"
+        },
+        {
+            "name": "Party all week",
+            "description": "The title says it all"
+        },
+        {
+            "name": "Chess Club",
+            "description": "The best chess players in the kingdom!"
+        },
+        {
+            "name": "Polo Club",
+            "description": "There will be no horsing around in this club!"
+        }
+    ],
+    "events": [
+        {
+            "name": "Friday Night Movie Night",
+            "date_and_time": "2015-09-11 20:33",
+            "description": "This is the normal Friday get-together",
+            "location": "Campus Theater"
+        },
+        {
+            "name": "Scrablle night movie",
+            "date_and_time": "2015-09-13 20:30",
+            "description": "We'll watch a movie after we've finished our game",
+            "location": "Dorm commons area"
+        },
+        {
+            "name": "Mid-Week movie time",
+            "date_and_time": "2015-09-19 21:30",
+            "description": "This week is boring, let's watch a movie!",
+            "location": "Building 309, room 213"
+        },
+        {
+            "name": "Online get-together",
+            "date_and_time": "2015-09-05 17:20",
+            "description": "Let's watch a movie online this week",
+            "location": "http://www.google.com"
+        },
+        {
+            "name": "Weekly movie night",
+            "date_and_time": "2015-09-10 18:30",
+            "description": "All the best movies for prepping for the competition",
+            "location": "http://www.hulu.com"
+        }
+    ]
+}
