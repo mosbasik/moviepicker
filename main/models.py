@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 # external imports
 from autoslug import AutoSlugField
+import re
 
 
 class Movie(models.Model):
@@ -29,14 +30,12 @@ class Movie(models.Model):
     def __unicode__(self):
         return self.title
 
-<<<<<<< Updated upstream
-=======
+
     def save(self, *args, **kwargs):
         no_articles = re.compile(r'(^a |^an |^the )', re.IGNORECASE)
         self.truncated_title = no_articles.sub('', self.title)
         super(Movie, self).save(*args, **kwargs)
 
->>>>>>> Stashed changes
 
 @receiver(post_delete, sender=Movie)
 def movie_post_delete_handler(sender, **kwargs):

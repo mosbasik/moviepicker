@@ -41,7 +41,7 @@ def front(request):
 def all_movies(request):
     context = {}
 
-    context['movies'] = Movie.objects.all().order_by('title')
+    context['movies'] = Movie.objects.all().order_by('truncated_title')
     context['page_title'] = 'List of all Movies'
 
     return render(
@@ -94,7 +94,7 @@ def user_movies(request):
     username = request.user.username.title()
 
     context['movies'] = Movie.objects.filter(
-        voters=request.user).order_by('title')
+        voters=request.user).order_by('truncated_title')
     context['page_title'] = username + '\'s Liked Movies'
 
     return render(
@@ -129,7 +129,7 @@ def get_votes(request):
         votes = request.user.votes.all()
         context['votes'] = votes
 
-    movies = User.votes.all().order_by('title')
+    movies = User.votes.all().order_by('truncated_title')
 
     if len(movies) > 0:
         context['movies'] = movies
@@ -153,7 +153,7 @@ def movie_search(request):
             title = form.cleaned_data['title']
 
             context['movies'] = Movie.objects.filter(
-                title__icontains=title).order_by('title')
+                title__icontains=title).order_by('truncated_title')
 
             context['message'] = "Here's Your Movies"
 
@@ -292,7 +292,7 @@ def group_details(request, group_slug):
 
     context['group'] = group
     context['users'] = group_users
-    context['movies'] = Movie.objects.filter(voters__in=group_users).distinct().order_by('title')
+    context['movies'] = Movie.objects.filter(voters__in=group_users).distinct().order_by('truncated_title')
 
     return render_to_response(
             'group_details.html', context, context_instance=request_context)
