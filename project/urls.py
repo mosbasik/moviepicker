@@ -18,7 +18,7 @@ from django.contrib import admin
 import django.contrib.auth.views
 from django.conf.urls.static import static
 from django.conf import settings
-from main.views import CreateEvent
+from main.views import CreateEvent, EventDetails
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -36,8 +36,10 @@ urlpatterns = [
     url(r'^groups/$', 'main.views.all_groups', name='all_groups'),
     url(r'^groups/add/$', 'main.views.create_group', name='create_group'),
     url(r'^groups/(?P<group_slug>[-\w]+)/$', 'main.views.group_details', name='group_details'),
+    url(r'^group/(?P<group>[-\w]+)/event/(?P<id>[0-9]+)/$', EventDetails.as_view(), name='event_details'),
 
     url(r'^events/add/$', CreateEvent.as_view(), name='create_event'),
+    url(r'^events/all/$', 'main.views.all_events', name='all_events'),
 
     url(r'^create-vote/$', 'main.views.create_vote', name='vote'),
     url(r'^delete-vote/$', 'main.views.delete_vote', name='unvote'),

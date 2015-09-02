@@ -30,7 +30,6 @@ class Movie(models.Model):
     def __unicode__(self):
         return self.title
 
-
     def save(self, *args, **kwargs):
         no_articles = re.compile(r'(^a |^an |^the )', re.IGNORECASE)
         self.truncated_title = no_articles.sub('', self.title)

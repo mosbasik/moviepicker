@@ -59,23 +59,29 @@ class Command(BaseCommand):
         user_list = []
         group_list = []
         event_list = []
+        movie_list = Movie.objects.all()
 
         for user in data['users']:
             print 'Creating: ' + user['username']
 
             new_user, created = User.objects.get_or_create(
                 username=user['username'], email=user['email'],
-                password=user['password1'])
+                password=user['password'])
             user_list.append(new_user)
 
         print 'Users created.'
 
-        for group in data['groups']:
+        for i, group in enumerate(data['groups']):
             print 'Creating: ' + group['name']
 
             new_group, created = Group.objects.get_or_create(
                 name=group['name'], description=group['description'],
                 creator=super_user)
+            new_group.users.add(user_list[i])
+            new_group.users.add(user_list[i+1])
+            new_group.users.add(user_list[i+3])
+            new_group.users.add(user_list[i+5])
+
             group_list.append(new_group)
 
         print "Groups created."
@@ -91,9 +97,20 @@ class Command(BaseCommand):
                 description=event['description'], group=group_list[i],
                 created_by=super_user, location=new_location)
             new_event.users.add(user_list[i])
-            new_event.save()
+            new_event.users.add(user_list[i+2])
+            new_event.users.add(user_list[i+3])
 
             event_list.append(new_event)
 
         print 'Events created.'
-        print "All done now!"
+
+        for i, user in enumerate(user_list):
+            user.votes.add(movie_list[i])
+            user.votes.add(movie_list[i+1])
+            user.votes.add(movie_list[i+3])
+            user.votes.add(movie_list[i+5])
+            user.votes.add(movie_list[i+8])
+
+        print "Movie votes have been added"
+
+        print "All done!"

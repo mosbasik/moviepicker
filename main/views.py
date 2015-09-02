@@ -296,3 +296,29 @@ def group_details(request, group_slug):
 
     return render_to_response(
             'group_details.html', context, context_instance=request_context)
+
+
+def all_events(request):
+    context = {}
+    request_context = RequestContext(request, processors=[global_context])
+    context['events'] = Event.objects.all()
+
+    return render_to_response(
+        'all_events.html', context, context_instance=request_context)
+
+
+class EventDetails(View):
+
+    def get(self, request, group, id):
+        context = {}
+        request_context = RequestContext(request, processors=[global_context])
+        event = Event.objects.get(id=id)
+        users = event.users.all()
+        movies = Movie.objects.filter(voters__in=users)
+        
+        context['event'] = event
+        context['users'] = users
+        context['movies'] = movies
+        return render_to_response(
+            'event_details.html', context, context_instance=request_context)
+
