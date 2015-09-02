@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
     {% for event in events %}
-        <a href="{% url 'event_details' group=event.group.slug id=event.id %}"><p>{{event.name}}</p></a>
+        <a href="{% url 'event_details' group_slug=event.group.slug event_id=event.id %}"><p>{{event.name}}</p></a>
     {% endfor %}
 {% endblock content %}
