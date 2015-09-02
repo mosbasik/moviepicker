@@ -5,9 +5,11 @@
         <div class="col-xs-12">
             <a href="#" title='{{ movie.title }}' data-toggle="tooltip">{{ movie.title|truncatechars:14 }} [{{ movie.year }}]</a>
         </div>
-        <div class="col-xs-12">
-            Votes: <span class="num-votes">{{ movie.num_votes }}</span>
-        </div>
+        {% if movie.num_votes %}
+            <div class="col-xs-12">
+                Votes: <span class="num-votes">{{ movie.num_votes }}</span>
+            </div>
+        {% endif %}
     </div>
     <div class="row">
         <div class="col-sm-12 col-md-12">
