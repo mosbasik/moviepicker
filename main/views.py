@@ -1,5 +1,7 @@
 # django imports
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext, loader
@@ -9,6 +11,7 @@ from django.db.models import Count
 
 # local imports
 from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
+from main.functions import get_voted_movie_qs
 from main.models import Movie, Event, Group, Location
 from scripts import populate_movies as mov_in
 
@@ -41,10 +44,8 @@ def front(request):
 
 def all_movies(request):
     context = {}
-
-    context['movies'] = Movie.objects.all().order_by('truncated_title')
+    context['movies'] = get_voted_movie_qs(User.objects.all(), include_unvoted=True)
     context['page_title'] = 'List of all Movies'
-
     return render(
         request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
@@ -79,25 +80,18 @@ def add_movie(request):
 
 def all_groups(request):
     context = {}
-
-    context['groups'] = Group.objects.all()
     context['page_title'] = 'List of all groups'
-
+    context['groups'] = Group.objects.all()
     return render(
         request, 'all_groups.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
 def user_movies(request):
+    user_qs = User.objects.filter(pk=request.user.pk)
     context = {}
-
-    # makes the first letter uppercase
-    username = request.user.username.title()
-
-    context['movies'] = Movie.objects.filter(
-        voters=request.user).order_by('truncated_title')
-    context['page_title'] = username + '\'s Liked Movies'
-
+    context['page_title'] = request.user.username.title() + "'s Movies"
+    context['movies'] = get_voted_movie_qs(user_qs, ['truncated_title'])
     return render(
         request, 'all_movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
@@ -123,18 +117,20 @@ def delete_vote(request):
     return HttpResponse(status=200)
 
 
-def get_votes(request):
-    context = {}
+# DON'T DELETE THIS RIGHT AWAY, I'M NOT SURE IF IT'S USED BY ANYTHING
 
-    if request.user.is_authenticated():
-        votes = request.user.votes.all()
-        context['votes'] = votes
+# def get_votes(request):
+#     context = {}
 
-    movies = User.votes.all().order_by('truncated_title')
+#     if request.user.is_authenticated():
+#         votes = request.user.votes.all()
+#         context['votes'] = votes
 
-    if len(movies) > 0:
-        context['movies'] = movies
-        return render(request, 'template tk.html', context)
+#     movies = User.votes.all().order_by('truncated_title')
+
+#     if len(movies) > 0:
+#         context['movies'] = movies
+#         return render(request, 'template tk.html', context)
 
 
 def movie_search(request):
@@ -280,11 +276,15 @@ def group_details(request, group_slug):
     request_context = RequestContext(request, processors=[global_context])
 
     group = Group.objects.get(slug=group_slug)
-    group_users = group.users.all()
+    group_members = group.users.all()
+
+    group_movies = Movie.objects.filter(voters__in=group_members)
+    group_movies = group_movies.annotate(num_votes=Count('voters'))
+    group_movies = group_movies.order_by('-num_votes').distinct()
 
     context['group'] = group
-    context['users'] = group_users
-    context['movies'] = Movie.objects.filter(voters__in=group_users).distinct().order_by('truncated_title')
+    context['users'] = group_members
+    context['movies'] = get_voted_movie_qs(group_members)
 
     return render_to_response(
             'group_details.html', context, context_instance=request_context)
