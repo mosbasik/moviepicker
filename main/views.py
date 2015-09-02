@@ -1,9 +1,9 @@
 # django imports
-from django.shortcuts import render, render_to_response
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.template import RequestContext
+from django.shortcuts import render, render_to_response
+from django.template import RequestContext, loader
 from django.utils.text import slugify
-from django.template import loader, RequestContext
 from django.views.generic import View
 
 # local imports
@@ -135,11 +135,6 @@ def get_votes(request):
         context['movies'] = movies
         return render(request, 'template tk.html', context)
 
-
-# def user_votes(request, username=None):
-#     viewing_user = User.objects.get(username=username)
-
-#     return render(request, 'votes.html', {'viewing_user': viewing_user})
 
 def movie_search(request):
     context = {}
@@ -296,3 +291,21 @@ def group_details(request, group_slug):
 
     return render_to_response(
             'group_details.html', context, context_instance=request_context)
+
+
+def join_group(request, group_slug):
+    if request.user.is_authenticated():
+        group = Group.objects.get(slug=request.POST.get('group_slug', None))
+        group.users.add(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def leave_group(request, group_slug):
+    if request.user.is_authenticated():
+        group = Group.objects.get(slug=request.POST.get('group_slug', None))
+        group.users.remove(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)

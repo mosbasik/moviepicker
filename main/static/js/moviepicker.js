@@ -71,21 +71,53 @@ function unvote(id) {
  *
  */
 $('#group-membership-button').click(function() {
-    var group_pk = parseInt($(this).attr('data-group-pk'))
+    var group_slug = $(this).attr('data-group-slug')
     var action = $(this).attr('data-group-action')
     if (action === 'join') {
-        join_group(group_pk)
+        join_group(this, group_slug)
     } else if (action === 'leave') {
-        leave_group(group_pk)
+        leave_group(this, group_slug)
     }
 })
 
-function join_group(group_pk) {
-    console.log('joining group #' + group_pk)
+function join_group(button, group_slug) {
+    var group_url = '/group/' + group_slug + '/'
+    $.ajax({
+        url: group_url + 'join/',
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + group_url)
+        }
+    })
 }
 
-function leave_group(group_pk) {
-    console.log('leaving group #' + group_pk)
+function leave_group(button, group_slug) {
+    var group_url = '/group/' + group_slug + '/'
+    $.ajax({
+        url: group_url + 'leave/',
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + group_url)
+        }
+    })
 }
 
 
