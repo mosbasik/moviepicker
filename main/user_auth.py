@@ -17,7 +17,9 @@ def login(request):
             return redirect('front')
 
     # load a blank registration form to context in case they want to register
-    context = {'user_create_form': UserCreationForm()}
+    context = {}
+    context['user_create_form'] = UserCreationForm()
+    context['next'] = request.GET.get('next', '/')
 
     if request.method == 'POST':
 
@@ -37,7 +39,7 @@ def login(request):
                     # then log the user in and redirect to front page
                     auth_login(request, user)
                     if request.user.is_authenticated():
-                        return redirect('front')
+                        return redirect(request.POST.get('next', '/'))
 
                 # if the user's account is not active
                 else:
@@ -82,7 +84,7 @@ def login(request):
                 group.users.add(user)
 
                 # redirect user to the front page
-                return redirect('front')
+                return redirect(request.POST.get('next', '/'))
 
             # if the filled form is invalid
             else:
@@ -90,6 +92,7 @@ def login(request):
                 # load invalid form to context to be passed back for editing
                 context['error_on_create'] = True
                 context['user_create_form'] = filled_user_creation_form
+
 
     return render(request, 'login.html', context)
 
