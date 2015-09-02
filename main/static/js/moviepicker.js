@@ -46,6 +46,9 @@ function vote(id) {
         },
         success: function() {
             $('#'+id).addClass('liked')
+            var votes = $('#'+id).find('.num-votes')
+            var current_vote_count = parseInt($(votes).html())
+            $(votes).html(current_vote_count + 1)
         },
     })
 }
@@ -62,6 +65,9 @@ function unvote(id) {
         },
         success: function() {
             $('#'+id).removeClass('liked')
+            var votes = $('#'+id).find('.num-votes')
+            var current_vote_count = parseInt($(votes).html())
+            $(votes).html(current_vote_count - 1)
         },
     })
 }
