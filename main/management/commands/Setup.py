@@ -63,10 +63,11 @@ class Command(BaseCommand):
 
         for user in data['users']:
             print 'Creating: ' + user['username']
-
             new_user, created = User.objects.get_or_create(
                 username=user['username'], email=user['email'],
-                password=user['password'])
+            )
+            if created:
+                new_user.set_password(user['password'])
             user_list.append(new_user)
 
         print 'Users created.'
@@ -75,8 +76,10 @@ class Command(BaseCommand):
             print 'Creating: ' + group['name']
 
             new_group, created = Group.objects.get_or_create(
-                name=group['name'], description=group['description'],
-                creator=super_user)
+                name=group['name'],
+                description=group['description'],
+                creator=super_user,
+            )
             new_group.users.add(user_list[i])
             new_group.users.add(user_list[i+1])
             new_group.users.add(user_list[i+3])

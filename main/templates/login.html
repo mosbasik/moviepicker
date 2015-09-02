@@ -7,6 +7,7 @@
         <div class='row'>
             <form id='user-login-form' class='col-sm-offset-3 col-sm-6' method='POST'action="{% url 'login' %}" style='{% if error_on_create %}display:none{% endif %}'>
                 <input type="hidden" name='type' value='login'>
+                <input type='hidden' name='next' value='{{ next }}'>
 
                 {%csrf_token%}
                 {% if error %}<p class='text-danger'>{{error}}</p>{% endif %}
@@ -32,6 +33,7 @@
                 <p class='text-danger'>{{user_create_form.nonfield_errors}}</p>
 
                 <input type="hidden" name='type' value='create_user'>
+                <input type='hidden' name='next' value='{{ next }}'>
 
                 <div class='form-group {% if user_create_form.username.errors %}has-error{% endif %}'>
                     <span class="text-danger">{{ user_create_form.username.errors }}</span>
