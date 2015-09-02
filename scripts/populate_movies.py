@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import sys, os
+import sys
+import os
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 import requests
@@ -25,16 +26,22 @@ class MovieToPick():
 
     # calls the methods, creates the Movie object, populates the database
     @staticmethod
-    def make_movie(url, user=None):
+    def make_movie(url, user):
         movie_id_final = MovieToPick._movie_id_from_url(url)
-        response_dict = MovieToPick._get_movie_json(movie_id_final)
-        # if the user happened to input a TV show and triggers json response,
-        # makes sure we don't store with the poster even as a local tempfile
-        if response_dict is not None:
-            movie = MovieToPick._movie_info(response_dict, movie_id_final, user=None)
+        movies_in_database = Movie.objects.all()
+
+        if movies_in_database.filter(imdb_id=movie_id_final):
             return movie_id_final
         else:
-            return 'not a movie'
+            response_dict = MovieToPick._get_movie_json(movie_id_final)
+            # if the user input a TV show and it triggers json response, this
+            # ensures we don't store the poster even as a local tempfile
+            if response_dict is not None:
+                movie = MovieToPick._movie_info(
+                    response_dict, movie_id_final, user=user)
+                return movie_id_final
+            else:
+                return 'not a movie'
 
     # runs regex on user input to extract the unique IMDB movie id
     @staticmethod
@@ -54,8 +61,9 @@ class MovieToPick():
     @staticmethod
     def _get_movie_json(movie_id_final):
         if movie_id_final is not None:
-            omdb_api_url = requests.get('http://www.omdbapi.com/?i=%s&plot=full&r=json'
-                            % movie_id_final)
+            omdb_api_url = requests.get(
+                'http://www.omdbapi.com/?i=%s&plot=full&r=json'
+                % movie_id_final)
 
             response_dict = omdb_api_url.json()
 
@@ -72,7 +80,8 @@ class MovieToPick():
     # ourselves with a quick scrape.
     @staticmethod
     def _get_poster(movie_id_final):
-        result = urllib.urlopen("http://www.imdb.com/title/%s/" % movie_id_final)
+        result = urllib.urlopen(
+            "http://www.imdb.com/title/%s/" % movie_id_final)
         html = result.read()
         parser = etree.HTMLParser()
         tree = etree.parse(StringIO.StringIO(html), parser)
@@ -96,14 +105,15 @@ class MovieToPick():
     # pulls in the poster tempfile for unpacking and inclusion
     # in the creation of the movie object
     @staticmethod
-    def _movie_info(response_dict, movie_id_final, user=None):
+    def _movie_info(response_dict, movie_id_final, user):
         movie_image = MovieToPick._get_poster(movie_id_final)
         # import ipdb; ipdb.set_trace()
 
         # in case the json parser returned None
         if response_dict:
 
-            movie_exists = Movie.objects.filter(imdb_id=response_dict['imdbID']).exists()
+            movie_exists = Movie.objects.filter(
+                imdb_id=response_dict['imdbID']).exists()
 
             if not movie_exists:
                 movie = Movie()
@@ -125,9 +135,9 @@ class MovieToPick():
                 movie.directed_by = response_dict['Director']
 
                 if movie_image is not None:
-                    movie.poster.save('%s.jpg' % movie.title, File(movie_image))
+                    movie.poster.save(
+                        '%s.jpg' % movie.title, File(movie_image))
 
-                # this doesn't work yet to assign a creator to each movie:
                 if user is not None:
                     movie.created_by = user
 
