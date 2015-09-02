@@ -1,9 +1,9 @@
 # django imports
-from django.shortcuts import render, render_to_response
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.template import RequestContext
+from django.shortcuts import render, render_to_response
+from django.template import RequestContext, loader
 from django.utils.text import slugify
-from django.template import loader, RequestContext
 from django.views.generic import View
 
 # local imports
@@ -135,11 +135,6 @@ def get_votes(request):
         context['movies'] = movies
         return render(request, 'template tk.html', context)
 
-
-# def user_votes(request, username=None):
-#     viewing_user = User.objects.get(username=username)
-
-#     return render(request, 'votes.html', {'viewing_user': viewing_user})
 
 def movie_search(request):
     context = {}
@@ -309,16 +304,33 @@ def all_events(request):
 
 class EventDetails(View):
 
-    def get(self, request, group, id):
+    def get(self, request, group_slug, event_id):
         context = {}
         request_context = RequestContext(request, processors=[global_context])
-        event = Event.objects.get(id=id)
+        event = Event.objects.get(id=event_id)
         users = event.users.all()
         movies = Movie.objects.filter(voters__in=users)
-        
+
         context['event'] = event
         context['users'] = users
         context['movies'] = movies
         return render_to_response(
             'event_details.html', context, context_instance=request_context)
 
+
+def join_group(request, group_slug):
+    if request.user.is_authenticated():
+        group = Group.objects.get(slug=request.POST.get('group_slug', None))
+        group.users.add(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def leave_group(request, group_slug):
+    if request.user.is_authenticated():
+        group = Group.objects.get(slug=request.POST.get('group_slug', None))
+        group.users.remove(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)

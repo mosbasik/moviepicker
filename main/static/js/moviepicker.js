@@ -1,3 +1,9 @@
+
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip;
+});
+
+
 /***** ANIMATIONS FOR LOGIN PAGE *****/
 $('#switch-to-create').click(function(e) {
     e.preventDefault()
@@ -13,33 +19,20 @@ $('#switch-to-login').click(function(e) {
     })
 })
 
-$('.dropdown-menu').on('click', function(e) {
-    e.stopPropagation()
-})
 
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip;
-});
-
-/***** VOTE FUNCTIONALITY *****/
-// triggers when clicking on a movie poster
-// a parent div of the movie poster needs the imdb_id and
-// it needs the class movie-vote
+/**
+ * Triggers when clicking on a movie poster. A parent div of the movie poster
+ * needs the imdb_id and it needs the class movie-vote
+ */
 $('.movie-image').click(function(e){
     e.preventDefault();
-
     var movie_id = $(this).parents('.movie-vote').attr('id')
-
     if ($('#' + movie_id).hasClass('liked')) {
-        // unvote
         unvote(movie_id);
     } else {
-        // vote
         vote(movie_id);
     }
-
 })
-
 
 function vote(id) {
     $.ajax({
@@ -52,15 +45,12 @@ function vote(id) {
             xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
         },
         success: function() {
-            console.log('voted')
             $('#'+id).addClass('liked')
         },
     })
 }
 
-
 function unvote(id) {
-
     $.ajax({
         url: '/delete-vote/',
         method: 'POST',
@@ -71,9 +61,62 @@ function unvote(id) {
             xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
         },
         success: function() {
-            console.log('unvoted')
             $('#'+id).removeClass('liked')
         },
+    })
+}
+
+
+/**
+ *
+ */
+$('#group-membership-button').click(function() {
+    var group_slug = $(this).attr('data-group-slug')
+    var action = $(this).attr('data-group-action')
+    if (action === 'join') {
+        join_group(this, group_slug)
+    } else if (action === 'leave') {
+        leave_group(this, group_slug)
+    }
+})
+
+function join_group(button, group_slug) {
+    var group_url = '/group/' + group_slug + '/'
+    $.ajax({
+        url: group_url + 'join/',
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + group_url)
+        }
+    })
+}
+
+function leave_group(button, group_slug) {
+    var group_url = '/group/' + group_slug + '/'
+    $.ajax({
+        url: group_url + 'leave/',
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + group_url)
+        }
     })
 }
 
