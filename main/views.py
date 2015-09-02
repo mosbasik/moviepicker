@@ -1,5 +1,6 @@
 # django imports
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext, loader
@@ -41,7 +42,10 @@ def front(request):
 def all_movies(request):
     context = {}
 
-    context['movies'] = Movie.objects.all().order_by('truncated_title')
+    all_movies = Movie.objects.annotate(num_votes=Count('voters'))
+    all_movies = all_movies.order_by('-num_votes').distinct()
+
+    context['movies'] = all_movies
     context['page_title'] = 'List of all Movies'
 
     return render(
@@ -283,11 +287,15 @@ def group_details(request, group_slug):
     request_context = RequestContext(request, processors=[global_context])
 
     group = Group.objects.get(slug=group_slug)
-    group_users = group.users.all()
+    group_members = group.users.all()
+
+    group_movies = Movie.objects.filter(voters__in=group_members)
+    group_movies = group_movies.annotate(num_votes=Count('voters'))
+    group_movies = group_movies.order_by('-num_votes').distinct()
 
     context['group'] = group
-    context['users'] = group_users
-    context['movies'] = Movie.objects.filter(voters__in=group_users).distinct().order_by('truncated_title')
+    context['users'] = group_members
+    context['movies'] = group_movies
 
     return render_to_response(
             'group_details.html', context, context_instance=request_context)
