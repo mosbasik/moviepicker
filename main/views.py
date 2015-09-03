@@ -13,9 +13,10 @@ from django.db.models import Count
 from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
 from main.functions import get_voted_movie_qs
 from main.models import Movie, Event, Group, Location
-from scripts import populate_movies as mov_in
-
 import user_auth
+# from scripts import populate_movies as mov_in
+
+import re
 
 
 def global_context(request):
@@ -53,25 +54,25 @@ def all_movies(request):
 
 def add_movie(request):
     context = {}
-    user = request.user
 
     if request.method == 'POST':
-        url = request.POST.get('url')
 
-        if url:
-            # either imdb id or 'failed' or 'not a movie'
-            result = mov_in.MovieToPick.make_movie(url, user)
-            print result
-            if result == 'failed' or result == 'not a movie':
-                context['is_movie'] = 'no'
-                context['message'] = 'Not a movie'
-            else:
-                context['is_movie'] = 'yes'
-                context['message'] = 'Movie entered'
-                context['movie'] = Movie.objects.get(imdb_id=result)
+        # extract the IMDB id from the posted URL
+        imdb_id = None
+        r = r't{2}\d+'
+        match = re.search(r, request.POST.get('url', None))
+        if match:
+            imdb_id = match.group()
 
+        # attempt to submit the movie to the database
+        submitted_movie = Movie.submit_movie(request.user.pk, imdb_id)
+
+        # check to see if a movie was successfully submitted
+        if submitted_movie is not None:
+            context['message'] = 'Movie submitted.'
+            context['movie'] = submitted_movie
         else:
-            context['url_response'] = 'No url was entered'
+            context['message'] = 'Not a movie.'
 
     return render(
         request, 'add_movie.html', context,
