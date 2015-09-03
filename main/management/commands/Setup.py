@@ -108,11 +108,15 @@ class Command(BaseCommand):
         print 'Events created.'
 
         for i, user in enumerate(user_list):
+            user.votes.clear()
             user.votes.add(movie_list[i])
             user.votes.add(movie_list[i+1])
             user.votes.add(movie_list[i+3])
             user.votes.add(movie_list[i+5])
             user.votes.add(movie_list[i+8])
+            user.votes.add(movie_list[i+12])
+            user.votes.add(movie_list[i+15])
+            user.votes.add(movie_list[i+20])
 
         print "Movie votes have been added"
 

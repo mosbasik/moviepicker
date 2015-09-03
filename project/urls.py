@@ -43,6 +43,8 @@ urlpatterns = [
     url(r'^group/(?P<group_slug>[-\w]+)/join/$', 'main.views.join_group', name='join_group'),
     url(r'^group/(?P<group_slug>[-\w]+)/leave/$', 'main.views.leave_group', name='leave_group'),
     url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/$', EventDetails.as_view(), name='event_details'),
+    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/join/$', 'main.views.join_event', name='join_event'),
+    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/leave/$', 'main.views.leave_event', name='leave_event'),
 
     # events
     url(r'^events/add/$', CreateEvent.as_view(), name='create_event'),
