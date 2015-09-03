@@ -30,6 +30,7 @@ urlpatterns = [
 
     # movies
     url(r'^movies/$', 'main.views.all_movies', name='all_movies'),
+    url(r'^movies/(?P<imdb_id>tt\d+)/$', 'main.views.movie_details', name='movie_details'),
     url(r'^movies/add/$', 'main.views.add_movie', name='add_movie'),
     url(r'^movies/liked/$', 'main.views.user_movies', name='user_movies'),
     url(r'^movies/search/$', 'main.views.movie_search', name='movie_search'),

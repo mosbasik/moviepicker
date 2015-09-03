@@ -62,10 +62,10 @@ def add_movie(request):
             result = mov_in.MovieToPick.make_movie(url, user)
             print result
             if result == 'failed' or result == 'not a movie':
-                context['is_movie'] = 'no'
+                # context['is_movie'] = 'no'
                 context['message'] = 'Not a movie'
             else:
-                context['is_movie'] = 'yes'
+                # context['is_movie'] = 'yes'
                 context['message'] = 'Movie entered'
                 context['movie'] = Movie.objects.get(imdb_id=result)
 
@@ -161,6 +161,13 @@ def movie_search(request):
         context['form'] = form
 
         return render_to_response(
+            'movie_search.html', context, context_instance=request_context)
+
+
+def movie_details(request, imdb_id):
+    movie = Movie.objects.get(imdb_id=imdb_id)
+    context = {}
+    return render_to_response(
             'movie_search.html', context, context_instance=request_context)
 
 
