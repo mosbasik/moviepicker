@@ -1,66 +1,111 @@
 from django.test import TestCase
-
-# Events model tests
-
-# Feature - IS_ACTIVE
-# When an event is active, users can join,
-# Lockins can be created, Viewings can be assigned
-
-# When an event is NOT active, users cannot join,
-# Lockins can't be created, Viewings can't be assigned
-
-# Only the event creator can toggle IS_ACTIVE
+from myapp.models import Animal
 
 
-# TESTS
+# class AnimalTestCase(TestCase):
+#     def setUp(self):
+#         Animal.objects.create(name="lion", sound="roar")
+#         Animal.objects.create(name="cat", sound="meow")
 
-# IS_ACTIVE can be toggled by the creator
+#     def test_animals_can_speak(self):
+#         """Animals that can speak are correctly identified"""
+#         lion = Animal.objects.get(name="lion")
+#         cat = Animal.objects.get(name="cat")
+#         self.assertEqual(lion.speak(), 'The lion says "roar"')
+#         self.assertEqual(cat.speak(), 'The cat says "meow"')
 
-# IS_ACTIVE can't be toggled by other users
 
-# IS_ACTIVE = True - Users can join the event
+class MovieTestCase(TestCase):
 
-# IS_ACTIVE = False - Users can't join the event
+    def setUp(self):
+        pass
 
-# Any person can add a movie
+    # Any person can add a movie
+    def test_movie_submission(self):
+        pass
 
-# When a movie is added, a truncated title is automatically created for it
+    # When a movie is added, a truncated title is automatically created for it
+    def test_truncated_title_creation(self):
+        pass
 
-# An authenticated user can vote for a movie
+    # An authenticated user can vote for a movie
+    # An anonymous user can't vote for a movie
+    def test_movie_voting(self):
+        pass
 
-# An anonymous user can't vote for a movie
 
-# An authenticated user can create a group
+class GroupTestCase(TestCase):
 
-# An anonymous user can't create a group
+    def setUp(self):
+        pass
 
-# An authenticated user can join a group
+    # An authenticated user can create a group
+    # An anonymous user can't create a group
+    def test_group_creation(self):
+        pass
 
-# An anonymous user can't join a group
+    # An authenticated user can join a group
+    # An anonymous user can't join a group
+    def test_group_joining(self):
+        pass
 
-# All of the movies that members of a groups have voted for
-# are shown in the group
+    # All of the movies that members of a groups have voted for
+    #   are shown in the group
+    def test_group_movie_list(self):
+        pass
 
-# Only the votes for movies of members of a group are counted within the group
+    # Only the votes for movies of members of a group are counted within the
+    #   group
+    def test_group_vote_count(self):
+        pass
 
-# An authenticated user can create an event
 
-# An anonymous user can't create an event
+class EventTestCase(TestCase):
 
-# An event must be associated with a group
+    def setUp(self):
+        pass
 
-# An authenticated user can join an event
+    # An event must be associated with a group
+    def test_event_group_parent(self):
+        pass
 
-# An anonymous user can't join an event
+    # An authenticated user can create an event
+    # An anonymous user can't create an event
+    def test_event_creation(self):
+        pass
 
-# Only the votes for the people who have joined the event are
-# counted for the movies in an event
+    # event IS_ACTIVE attribute can be toggled by the creator
+    # event IS_ACTIVE attribute can't be toggled by other users
+    def test_event_creator_toggle_active(self):
+        pass
 
-# Only the event creator can lock in a movie
+    # event IS_ACTIVE attribute = True - Users can join the event
+    # event IS_ACTIVE attribute = False - Users can't join the event
+    def test_event_active_join(self):
+        pass
 
-# Non-event creators can't lockin a movie
+    # An authenticated group member can join an event
+    # An authenticated non group member can join an event
+    # An anonymous user can't join an event
+    def test_event_join(self):
+        pass
 
-# When an event creator locks in a movie, a movie viewing is assigned to
-# the members of that event
+    # Only the votes for the people who have joined the event are
+    #   counted for the movies in an event
+    def test_event_vote_count(self):
+        pass
 
-# A lockin 
+    # Only the event creator can lock in or remove a movie from an event
+    # Non-event creators can't lock in or remove a movie from an event
+    def test_event_creator_lockin(self):
+        pass
+
+    # When an event creator locks in a movie, a movie viewing is assigned to
+    #   the members of that event
+    def test_event_lockin_creates_views(self):
+        pass
+
+    # When a user joins an event, a movie viewing is assigned to them for every
+    # movie already locked in to that event
+    def test_event_join_creates_views(self):
+        pass
