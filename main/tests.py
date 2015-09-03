@@ -1,66 +1,240 @@
+# django imports
 from django.test import TestCase
+from django.contrib.auth.models import User
 
-# Events model tests
+# local imports
+from main.models import (
+    Movie,
+    Group,
+    Event,
+    Location,
+    Viewing,
+    LockIn,
+)
 
-# Feature - IS_ACTIVE
-# When an event is active, users can join,
-# Lockins can be created, Viewings can be assigned
-
-# When an event is NOT active, users cannot join,
-# Lockins can't be created, Viewings can't be assigned
-
-# Only the event creator can toggle IS_ACTIVE
+# python imports
+# from unittest.TestCase import *
 
 
-# TESTS
+# class AnimalTestCase(TestCase):
+#     def setUp(self):
+#         Animal.objects.create(name="lion", sound="roar")
+#         Animal.objects.create(name="cat", sound="meow")
 
-# IS_ACTIVE can be toggled by the creator
+#     def test_animals_can_speak(self):
+#         """Animals that can speak are correctly identified"""
+#         lion = Animal.objects.get(name="lion")
+#         cat = Animal.objects.get(name="cat")
+#         self.assertEqual(lion.speak(), 'The lion says "roar"')
+#         self.assertEqual(cat.speak(), 'The cat says "meow"')
 
-# IS_ACTIVE can't be toggled by other users
 
-# IS_ACTIVE = True - Users can join the event
+class MovieTestCase(TestCase):
 
-# IS_ACTIVE = False - Users can't join the event
+    def setUp(self):
 
-# Any person can add a movie
+        # user setup
+        user1 = User.objects.create(username='alice', email='alice@alice.com')
+        user1.set_password('alice')
 
-# When a movie is added, a truncated title is automatically created for it
+        # movie setup
+        Movie.objects.create(imbd_id='tt0770828', title='Man of Steel')
 
-# An authenticated user can vote for a movie
+    def test_movie_submission(self):
+        '''Any user can add a movie to the database.'''
 
-# An anonymous user can't vote for a movie
+        # registered user case
+        user_id = User.objects.get(username='alice').pk
+        movie_1 = submit_movie(user_id_1, 'tt0468569')
+        assert(Movie.object.filter(pk=movie_1.pk).exists())
 
-# An authenticated user can create a group
+        # anonymous user case
+        movie_2 = submit_movie(None, 'tt0096895')
+        assert(Movie.object.filter(pk=movie_2.pk).exists())
 
-# An anonymous user can't create a group
+    def test_truncated_title_creation(self):
+        '''Truncated title automatically created for newly submitted movie.'''
 
-# An authenticated user can join a group
+        movie = submit_movie(None, 'tt0468569')
+        assert(movie.truncated_title)
 
-# An anonymous user can't join a group
+    # An authenticated user can vote for a movie
+    # An anonymous user can't vote for a movie
+    def test_movie_voting(self):
 
-# All of the movies that members of a groups have voted for
-# are shown in the group
+        # registered user case
+        user = User.objects.get(username='alice')
+        user_id = user.pk
 
-# Only the votes for movies of members of a group are counted within the group
+        movie = Movie.objects.get(imdb_id='tt0770828')
+        imdb_id = movie.imdb_id
 
-# An authenticated user can create an event
+        vote_succeeded = vote_for_movie(user_id, imdb_id)
 
-# An anonymous user can't create an event
+        assert(vote_succeeded)
+        assert(movie in user.votes.all())
 
-# An event must be associated with a group
+        # anonymous user case
+        user_id = None
+        movie = Movie.objects.get(imdb_id='tt0770828')
+        imdb_id = movie.imdb_id
 
-# An authenticated user can join an event
+        vote_succeeded = vote_for_movie(user_id, imdb_id)
 
-# An anonymous user can't join an event
+        assert(not vote_succeeded)
 
-# Only the votes for the people who have joined the event are
-# counted for the movies in an event
 
-# Only the event creator can lock in a movie
+class GroupTestCase(TestCase):
 
-# Non-event creators can't lockin a movie
+    def setUp(self):
 
-# When an event creator locks in a movie, a movie viewing is assigned to
-# the members of that event
+        # user setup
+        alice = User.objects.create(username='alice')
+        bob = User.objects.create(username='bob')
+        eve = User.objects.create(username='eve')
 
-# A lockin 
+        # movie setup
+        trek_into_darkness = Movie.objects.create(
+            imbdb_id='tt1408101',
+            title='Star Trek Into Darkness')
+        trek = Movie.objects.create(
+            imbdb_id='tt0796366',
+            title='Star Trek')
+        star_wars = Movie.objects.create(
+            imbdb_id='tt0076759',
+            title='Star Wars: Episode IV - A New Hope')
+
+        # vote setup
+        alice.votes.add(trek_into_darkness)
+        bob.votes.add(trek)
+        eve.votes.add(star_wars)
+        eve.votes.add(trek)
+
+        # group setup
+        alpha = Group.objects.create(name='Alpha', creator=alice)
+        alpha.users.add(alice)
+        alpha.users.add(bob)
+
+    # An authenticated user can create a group
+    # An anonymous user can't create a group
+    def test_group_creation(self):
+
+        # registered user case
+        user = User.objects.get(username='alice')
+        user_id = user.pk
+
+        group_2 = create_group(user_id, 'Bravo', description='second group')
+        assert(Group.objects.filter(pk=group_2.pk).exists())
+        assert(user == group_2.creator)
+
+        group_3 = create_group(user_id, 'Charlie')
+        assert(Group.objects.filter(pk=group_3.pk).exists())
+        assert(user == group_3.creator)
+
+        # anonymous user case
+        user_id = None
+
+        group_4 = create_group(user_id, 'Delta')
+
+        assert(group_4 is None)
+
+    # An authenticated user can join a group
+    # An anonymous user can't join a group
+    def test_group_joining(self):
+
+        # registered user case
+        user = User.objects.get(username='alice')
+        user_id = user.pk
+
+        group = Group.objects.get(name='Alpha')
+        group_id
+
+        join_succeeded = join_group(user_id, group_id)
+
+        assert(join_succeeded)
+        assert(user in group.users.all())
+
+        # anonymous user case
+        user_id = None
+
+        group = Group.objects.get(name='Alpha')
+        group_id = group.pk
+
+        join_succeeded = join_group(user_id, group_id)
+
+        assert(not join_succeeded)
+
+    # Specifically the movies that members of a groups have voted for
+    #   are shown in the group
+    def test_group_movie_list(self):
+        trek_movies = Movies.objects.filter(title__icontains='trek')
+
+        group = Group.objects.get(name='Alpha')
+        group_movies = get_group_movies(group.pk)
+
+        assert(group_movies.count() == 2)
+        group_movies = group_movies.distinct()
+        assert(group_movies.count() == 2)
+        for movie in group_movies:
+            assert(movie in trek_movies)
+
+    # Only the votes for movies of members of a group are counted within the
+    #   group
+    def test_group_vote_count(self):
+        group = Group.objects.get(name='Alpha')
+        group_movies = get_group_movies(group.pk)
+
+        trek = group_movies.get(title='Star Trek')
+
+        assert(trek.num_votes == 1)
+
+
+class EventTestCase(TestCase):
+
+    def setUp(self):
+        assert(Falsef)
+
+    # An event must be associated with a group
+    def test_event_group_parent(self):
+        assert(Falsef)
+
+    # An authenticated user can create an event
+    # An anonymous user can't create an event
+    def test_event_creation(self):
+        assert(Falsef)
+
+    # event IS_ACTIVE attribute can be toggled by the creator
+    # event IS_ACTIVE attribute can't be toggled by other users
+    def test_event_creator_toggle_active(self):
+        assert(Falsef)
+
+    # event IS_ACTIVE attribute = True - Users can join the event
+    # event IS_ACTIVE attribute = False - Users can't join the event
+    def test_event_active_join(self):
+        assert(Falsef)
+
+    # An authenticated group member can join an event
+    # An authenticated non group member can join an event
+    # An anonymous user can't join an event
+    def test_event_join(self):
+        assert(Falsef)
+
+    # Only the votes for the people who have joined the event are
+    #   counted for the movies in an event
+    def test_event_vote_count(self):
+        assert(Falsef)
+
+    # Only the event creator can lock in or remove a movie from an event
+    # Non-event creators can't lock in or remove a movie from an event
+    def test_event_creator_lockin(self):
+        assert(Falsef)
+
+    # When an event creator locks in a movie, a movie viewing is assigned to
+    #   the members of that event
+    def test_event_lockin_creates_views(self):
+        assert(Falsef)
+
+    # When a user joins an event, a movie viewing is assigned to them for every
+    # movie already locked in to that event
+    def test_event_join_creates_views(self):
+        assert(Falsef)
