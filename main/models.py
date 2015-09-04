@@ -216,21 +216,82 @@ class Group(models.Model):
             return True
         return False
 
+    def create_event(self, uid, name,
+                     date_and_time=None, description=None, location=None):
+        # TODO
+        pass
+
 
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255)
-    date_and_time = models.DateTimeField()
+    date_and_time = models.DateTimeField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    movies = models.ManyToManyField('Movie', through='LockIn', related_name='events')
+    watched_movies = models.ManyToManyField('Movie', through='LockIn', related_name='events')
     users = models.ManyToManyField(User, related_name='events')
     group = models.ForeignKey('Group', related_name='events')
     creator = models.ForeignKey(User, related_name='events_created')
     location = models.ForeignKey('Location', null=True, blank=True, related_name='events')
+    is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
+
+    def join(self, uid):
+        '''
+        Given any valid user id from the site, adds that user to the members of
+        the group. Fails on invalid user id.  Returns True if successful; False
+        if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def leave(self, uid):
+        '''
+        Given any valid user id from the site, removes that user from the
+        members of the group. Fails on invalid user id.  Returns True if
+        successful; False if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def activate(self, uid):
+        '''
+        Given the user id of the event's creator, sets is_active to True on the
+        event. Fails if the user id is not the event's creator.  Returns True
+        if successful; False if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def deactivate(self, uid):
+        '''
+        Given the user id of the event's creator, sets is_active to False on
+        the event. Fails if the user id is not the event's creator.  Returns
+        True if successful; False if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def movie_pool(self):
+        '''
+        Returns the queryset of Movie objects for which this event's members
+        have voted.  Each movie must include an annotation field "num_votes"
+        containing the number of votes for that movie from event members.
+        '''
+        # TODO
+        return Movie.objects.none()
+
+    def lockin(self, uid, imdb_id):
+        # TODO
+        pass
+
+    def lockin_remove(self, uid, imdb_id):
+        # TODO
+        pass
+
+
 
 
 class Location(models.Model):
