@@ -98,7 +98,7 @@ class Command(BaseCommand):
             new_event, created = Event.objects.get_or_create(
                 name=event['name'], date_and_time=event['date_and_time'],
                 description=event['description'], group=group_list[i],
-                created_by=super_user, location=new_location)
+                creator=super_user, location=new_location)
             new_event.users.add(user_list[i])
             new_event.users.add(user_list[i+2])
             new_event.users.add(user_list[i+3])
@@ -108,11 +108,15 @@ class Command(BaseCommand):
         print 'Events created.'
 
         for i, user in enumerate(user_list):
+            user.votes.clear()
             user.votes.add(movie_list[i])
             user.votes.add(movie_list[i+1])
             user.votes.add(movie_list[i+3])
             user.votes.add(movie_list[i+5])
             user.votes.add(movie_list[i+8])
+            user.votes.add(movie_list[i+12])
+            user.votes.add(movie_list[i+15])
+            user.votes.add(movie_list[i+20])
 
         print "Movie votes have been added"
 

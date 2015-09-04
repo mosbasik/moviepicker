@@ -2,22 +2,34 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-sm-offset-1 col-sm-3">
-                <h2>{{event.name}}</h2>
-                <p>{{event.description}}</p>
-                <p>We will watch the movie on {{event.date_and_time}}</p>
+            <div class="col-sm-offset-2 col-sm-8">
+                <h2><center>{{event.name}}</center></h2>
+                <p><center>{{event.description}}</center></p>
+                <br>
+                <p><center>Movie start time: {{event.date_and_time}}</center></p>
             </div>
-            <div class="col-sm-offset-1 col-sm-3">
+            <div class="col-sm-2">
+                {% if user.is_authenticated %}
+                    {% if event in user.events.all %}
+                        <button id="event-membership-button" class="btn btn-danger pull-right" event-group-slug="{{event.group.slug}}" data-event-id="{{event.id}}" data-event-action="leave">Leave Event</button>
+                    {% else %}
+                        <button id="event-membership-button" class="btn btn-success pull-right" event-group-slug="{{ event.group.slug }}" data-event-id="{{ event.id }}" data-event-action="join">Join Event</button>
+                    {% endif %}
+                {% else %}
+                    <button id="event-membership-button" class="btn btn-success pull-right" event-group-slug="{{ event.group.slug }}" data-event-id="{{ event.id }}" data-event-action="join">Join Event</button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-offset-2 col-sm-8">
+                <h3><center>Current Event Members</center></h3>
                 {% for user in users %}
-                    <p>{{user}}</p>
-                {% endfor %}
-            </div>
-            <div class="col-sm-offset-1 col-sm-3">
-                {% for movie in movies %}
-                    <p>{{movie.name}}</p>
-                    <img src="{{movie.poster.url}}" alt="">
+                    <div class="col-xs-3 col-sm-2">
+                        <p>{{user.username}}</p>
+                    </div>
                 {% endfor %}
             </div>
         </div>
+        {% include "movie_list.html" %}
     </div>
 {% endblock content %}

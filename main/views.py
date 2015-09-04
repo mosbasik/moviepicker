@@ -7,14 +7,16 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext, loader
 from django.utils.text import slugify
 from django.views.generic import View
+from django.db.models import Count
 
 # local imports
 from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
 from main.functions import get_voted_movie_qs
 from main.models import Movie, Event, Group, Location
-from scripts import populate_movies as mov_in
-
 import user_auth
+# from scripts import populate_movies as mov_in
+
+import re
 
 
 def global_context(request):
@@ -52,25 +54,25 @@ def all_movies(request):
 
 def add_movie(request):
     context = {}
-    user = request.user
 
     if request.method == 'POST':
-        url = request.POST.get('url')
 
-        if url:
-            # either imdb id or 'failed' or 'not a movie'
-            result = mov_in.MovieToPick.make_movie(url, user)
-            print result
-            if result == 'failed' or result == 'not a movie':
-                # context['is_movie'] = 'no'
-                context['message'] = 'Not a movie'
-            else:
-                # context['is_movie'] = 'yes'
-                context['message'] = 'Movie entered'
-                context['movie'] = Movie.objects.get(imdb_id=result)
+        # extract the IMDB id from the posted URL
+        imdb_id = None
+        r = r't{2}\d+'
+        match = re.search(r, request.POST.get('url', None))
+        if match:
+            imdb_id = match.group()
 
+        # attempt to submit the movie to the database
+        submitted_movie = Movie.submit_movie(request.user.pk, imdb_id)
+
+        # check to see if a movie was successfully submitted
+        if submitted_movie is not None:
+            context['message'] = 'Movie submitted.'
+            context['movie'] = submitted_movie
         else:
-            context['url_response'] = 'No url was entered'
+            context['message'] = 'Not a movie.'
 
     return render(
         request, 'add_movie.html', context,
@@ -97,23 +99,17 @@ def user_movies(request):
 
 
 def create_vote(request):
-    user = request.user
-    movie = Movie.objects.get(imdb_id=str(request.POST['id']))
-
-    user.votes.add(movie)
-    user.save()
-
-    return HttpResponse(status=200)
+    user_id = request.user.pk
+    imdb_id = request.POST.get('id', None)
+    status_code = 200 if Movie.create_vote(user_id, imdb_id) else 400
+    return HttpResponse(status=status_code)
 
 
 def delete_vote(request):
-    user = request.user
-    movie = Movie.objects.get(imdb_id=request.POST['id'])
-
-    user.votes.remove(movie)
-    user.save()
-
-    return HttpResponse(status=200)
+    user_id = request.user.pk
+    imdb_id = request.POST.get('id', None)
+    status_code = 200 if Movie.delete_vote(user_id, imdb_id) else 400
+    return HttpResponse(status=status_code)
 
 
 # DON'T DELETE THIS RIGHT AWAY, I'M NOT SURE IF IT'S USED BY ANYTHING
@@ -230,20 +226,16 @@ class CreateEvent(View):
             context['location'] = location_form
 
             if form.is_valid() and location_form.is_valid():
-                # old = []
-                # old = Location.objects.filter(Q(url__iexact=location_form.cleaned_data['url']) | Q(text__iexact=location_form.cleaned_data['text']))
                 location, created = Location.objects.get_or_create(
                     text=location_form.cleaned_data['text'],
                     group=form.cleaned_data['group'])
-                # location.text = location_form.cleaned_data['text']
-                # location.group = form.cleaned_data['group'].id
 
                 event = Event()
                 event.name = form.cleaned_data['name']
                 event.date_and_time = form.cleaned_data['date_and_time']
                 event.description = form.cleaned_data['description']
                 event.group = form.cleaned_data['group']
-                event.created_by = request.user
+                event.creator = request.user
                 event.location = location
 
                 event.save()
@@ -314,13 +306,13 @@ class EventDetails(View):
     def get(self, request, group_slug, event_id):
         context = {}
         request_context = RequestContext(request, processors=[global_context])
+
         event = Event.objects.get(id=event_id)
-        users = event.users.all()
-        movies = Movie.objects.filter(voters__in=users)
+        event_members = event.users.all()
 
         context['event'] = event
-        context['users'] = users
-        context['movies'] = movies
+        context['users'] = event_members
+        context['movies'] = get_voted_movie_qs(event_members)
         return render_to_response(
             'event_details.html', context, context_instance=request_context)
 
@@ -338,6 +330,26 @@ def leave_group(request, group_slug):
     if request.user.is_authenticated():
         group = Group.objects.get(slug=request.POST.get('group_slug', None))
         group.users.remove(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def join_event(request, group_slug, event_id):
+    if request.user.is_authenticated():
+        event = Event.objects.get(id=event_id)
+        event.users.add(request.user)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def leave_event(request, group_slug, event_id):
+    if request.user.is_authenticated():
+        # user = request.user
+        # user.events.remove(event_id)
+        event = Event.objects.get(id=event_id)
+        event.users.remove(request.user)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)

@@ -133,3 +133,59 @@ function getCookie(name) {
   var parts = value.split("; " + name + "=");
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
+
+$('#event-membership-button').click(function(){
+    var event_id = $(this).attr('data-event-id')
+    var action = $(this).attr('data-event-action')
+    var group_slug = $(this).attr('event-group-slug')
+    console.log(this, action, group_slug)
+
+    if (action === 'join') {
+        join_event(group_slug, event_id)
+    } else if(action === 'leave') {
+        leave_event(group_slug, event_id)
+    }
+})
+
+function join_event(group_slug, event_id) {
+    console.log('started Join function')
+    var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
+    $.ajax({
+        url: event_url + 'join/',
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+            event_id: event_id
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + event_url)
+        }
+    })
+}
+function leave_event(group_slug, event_id) {
+    console.log('started Leave function')
+    var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
+    $.ajax({
+        url: event_url + 'leave/',
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+            event_id: event_id
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + event_url)
+        }
+    })
+}

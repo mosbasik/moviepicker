@@ -1,12 +1,21 @@
 # django imports
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
+# local imports
+# from scripts import populate_movies as mov_in
+
 # external imports
+from lxml import etree
 from autoslug import AutoSlugField
 import re
+import requests
+import StringIO
+import urllib
 
 
 class Movie(models.Model):
@@ -34,6 +43,115 @@ class Movie(models.Model):
         no_articles = re.compile(r'(^a |^an |^the )', re.IGNORECASE)
         self.truncated_title = no_articles.sub('', self.title)
         super(Movie, self).save(*args, **kwargs)
+
+    @staticmethod
+    def create_vote(uid, imdb_id):
+        '''
+        Given a valid uid & valid IMDB id, adds the movie to the users' votes.
+        Returns True on success and False on failure.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            if Movie.objects.filter(imdb_id=imdb_id).exists():
+                user = User.objects.get(pk=uid)
+                movie = Movie.objects.get(imdb_id=imdb_id)
+                movie.voters.add(user)
+                return True
+        return False
+
+    @staticmethod
+    def delete_vote(uid, imdb_id):
+        '''
+        Given a valid uid & valid IMDB id, removes the movie from the users'
+        votes. Returns True on success and False on failure.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            if Movie.objects.filter(imdb_id=imdb_id).exists():
+                user = User.objects.get(pk=uid)
+                movie = Movie.objects.get(imdb_id=imdb_id)
+                movie.voters.remove(user)
+                return True
+        return False
+
+    @staticmethod
+    def submit_movie(uid, imdb_id):
+        '''
+        Given a uid (may contain None) and an IMDB id, returns a Movie
+        object corresponding to that IMDB id.  Returns none if the IMDB id is
+        malformed or not a movie.
+        '''
+        result = None
+
+        if imdb_id is not None:
+
+            # if the movie already exists locally, just retrieve the object
+            # from our database and we're done
+            if Movie.objects.filter(imdb_id=imdb_id).exists():
+                result = Movie.objects.get(imdb_id=imdb_id)
+
+            # if the movie doesn't already exist locally
+            else:
+
+                # hit the OMDB API to get information and start storing it
+                o_url = 'http://www.omdbapi.com/?i=%s&plot=full&r=json'
+                o_request = requests.get(o_url % imdb_id)
+                o_json = o_request.json()
+
+                #  continue if OMDB says the id is valid and belongs to a movie
+                if o_json['Response'] == 'True' and o_json['Type'] == 'movie':
+
+                    # get the submitter's user object if it exists
+                    user = None if uid is None else User.objects.get(pk=uid)
+
+                    # create the movie object
+                    movie = Movie()
+
+                    # populate with guaranteed information
+                    movie.submitter = user
+                    movie.imdb_id = imdb_id
+                    movie.title = o_json['Title']
+                    movie.year = o_json['Year']
+                    movie.runtime = o_json['Runtime']
+                    movie.genre = o_json['Genre']
+                    movie.description = o_json['Plot']
+                    movie.starring = o_json['Actors']
+                    movie.written_by = o_json['Writer']
+                    movie.directed_by = o_json['Director']
+
+                    # movies not yet released do not have ratings;
+                    try:
+                        movie.imbdb_rating = float(o_json['imdbRating'])
+                    except ValueError:
+                        pass
+
+                    # get the movie poster if it exists
+                    movie.set_poster()
+
+                    # save the movie and queue it for returning
+                    movie.save()
+                    result = movie
+
+        return result
+
+    def set_poster(self):
+        '''
+        Scrapes the poster image from IMDB and stores it in the Movie's
+        poster field.  If IMDB has no poster, nothing is stored.
+        '''
+        imdb_url = "http://www.imdb.com/title/%s/" % self.imdb_id
+        result = urllib.urlopen(imdb_url)
+        html = result.read()
+        parser = etree.HTMLParser()
+        tree = etree.parse(StringIO.StringIO(html), parser)
+        poster_xpath = '//*[@id="img_primary"]/div[1]/a/img/@src'
+        poster = tree.xpath(poster_xpath)
+
+        # there's only ever one poster -- unless there isn't one.
+        if len(poster) == 1:
+            poster = poster[0]
+            poster_response = urllib.urlopen(poster).read()
+            poster_temp = NamedTemporaryFile(delete=True)
+            poster_temp.write(poster_response)
+            self.poster.save('%s.jpg' % self.title, File(poster_temp))
 
 
 @receiver(post_delete, sender=Movie)
@@ -66,7 +184,7 @@ class Event(models.Model):
     movies = models.ManyToManyField('Movie', through='LockIn', related_name='events')
     users = models.ManyToManyField(User, related_name='events')
     group = models.ForeignKey('Group', related_name='events')
-    created_by = models.ForeignKey(User, related_name='events_created')
+    creator = models.ForeignKey(User, related_name='events_created')
     location = models.ForeignKey('Location', null=True, blank=True, related_name='events')
 
     def __unicode__(self):
