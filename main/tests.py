@@ -440,7 +440,7 @@ class EventTestCase(TestCase):
         alice = User.objects.get(username='alice')
         trek = Movie.objects.get(title='Star Trek')
         assert(trek not in e1.watched_movies.all())
-        lockin_successful = e1.lockin(alice.pk, trek.pk)
+        lockin_successful = e1.lockin(alice.pk, trek.imdb_id)
         assert(lockin_successful)
         assert(trek in e1.watched_movies.all())
 
@@ -465,7 +465,7 @@ class EventTestCase(TestCase):
         alice = User.objects.get(username='alice')
         titanic = Movie.objects.get(title='Titanic')
         assert(titanic in e1.watched_movies.all())
-        lockin_remove_successful = e1.lockin_remove(alice.pk, titanic.pk)
+        lockin_remove_successful = e1.lockin_remove(alice.pk, titanic.imdb_id)
         assert(lockin_remove_successful)
         assert(titanic not in e1.watched_movies.all())
 
@@ -475,12 +475,12 @@ class EventTestCase(TestCase):
         assert(avatar in e1.watched_movies.all())
         lockin_remove_successful = e1.lockin_remove(bob.pk, avatar.pk)
         assert(not lockin_remove_successful)
-        assert(avatar not in e1.watched_movies.all())
+        assert(avatar in e1.watched_movies.all())
 
         # anonymous case
-        assert(avatar not in e1.watched_movies.all())
+        assert(avatar in e1.watched_movies.all())
         lockin_remove_successful = e1.lockin_remove(None, avatar)
-        assert(avatar not in e1.watched_movies.all())
+        assert(avatar in e1.watched_movies.all())
 
     def test_event_lockin_create_viewings(self):
         '''Locking in a movie creates a viewing of it for all event members.'''
@@ -495,7 +495,7 @@ class EventTestCase(TestCase):
         assert(not Viewing.objects.filter(event=e1, user=bob, movie=trek).exists())
         assert(not Viewing.objects.filter(event=e1, user=eve, movie=trek).exists())
 
-        e1.lockin(alice.pk, trek.pk)
+        e1.lockin(alice.pk, trek.imdb_id)
 
         assert(Viewing.objects.filter(event=e1, user=alice, movie=trek).exists())
         assert(Viewing.objects.filter(event=e1, user=bob, movie=trek).exists())
