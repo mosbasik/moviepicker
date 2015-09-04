@@ -325,7 +325,8 @@ class Event(models.Model):
         containing the number of votes for that movie from event members.
         '''
         movies = Movie.objects.filter(
-            voters__in=self.users.all()).annotate(num_votes=Count('voters'))
+            voters__in=self.users.all()).annotate(
+            num_votes=Count('voters')).order_by('-num_votes')
         return movies
 
     def lockin(self, uid, imdb_id):
