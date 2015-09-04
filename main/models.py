@@ -330,9 +330,13 @@ class Event(models.Model):
         # Remember to update the date and time of the Viewing's field
         # Need to include the Lockin creation function here
         # Should we also create a viewing event now for all event members?
-        if User.objects.get(id=uid) is self.creator:
-            Lockin.objects.create(event=self, movie__imdb_id=imdb_id)
-            return True
+        if User.objects.filter(pk=uid).exists():
+            user = User.objects.get(pk=uid)
+            if user == self.creator:
+                if Movie.objects.filter(imdb_id=imdb_id).exists():
+                    movie = Movie.objects.get(imdb_id=imdb_id)
+                    LockIn.objects.create(event=self, movie=movie)
+                    return True
         return False
 
     def lockin_remove(self, uid, imdb_id):

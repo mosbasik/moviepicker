@@ -440,7 +440,7 @@ class EventTestCase(TestCase):
         alice = User.objects.get(username='alice')
         trek = Movie.objects.get(title='Star Trek')
         assert(trek not in e1.watched_movies.all())
-        lockin_successful = e1.lockin(alice.pk, trek.pk)
+        lockin_successful = e1.lockin(alice.pk, trek.imdb_id)
         assert(lockin_successful)
         assert(trek in e1.watched_movies.all())
 
