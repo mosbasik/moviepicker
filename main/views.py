@@ -25,7 +25,8 @@ def global_context(request):
     '''
     if request.user.is_authenticated():
         return {
-            'user_groups': request.user.movie_groups.all(),
+            'user_groups': request.user.movie_groups.exclude(name='World'),
+            'user_events': request.user.events.all(),
             'votes': request.user.votes.all(),
             'search_form': MovieSearchForm(),
         }
