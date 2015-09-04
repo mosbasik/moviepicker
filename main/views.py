@@ -194,15 +194,14 @@ class CreateEvent(View):
                     text=location_form.cleaned_data['text'],
                     group=form.cleaned_data['group'])
 
-                event = Event()
-                event.name = form.cleaned_data['name']
-                event.date_and_time = form.cleaned_data['date_and_time']
-                event.description = form.cleaned_data['description']
-                event.group = form.cleaned_data['group']
-                event.creator = request.user
-                event.location = location
+                name = form.cleaned_data['name']
+                date_and_time = form.cleaned_data['date_and_time']
+                description = form.cleaned_data['description']
+                group = form.cleaned_data['group']
 
-                event.save()
+                event = group.create_event(
+                    request.user.pk, name, date_and_time, description,
+                    location)
 
                 context['event'] = event
 
@@ -227,7 +226,7 @@ class CreateEvent(View):
         context = {}
         user = request.user
         request_context = RequestContext(request, processors=[global_context])
-        form = EventForm()
+        form = EventForm(user=request.user)
         location_form = LocationForm()
         context['form'] = form
         context['location'] = location_form
@@ -276,7 +275,7 @@ class EventDetails(View):
 
         context['event'] = event
         context['users'] = event_members
-        context['movies'] = get_voted_movie_qs(event_members)
+        context['movies'] = event.movie_pool()
         return render_to_response(
             'event_details.html', context, context_instance=request_context)
 
@@ -284,7 +283,7 @@ class EventDetails(View):
 def join_group(request, group_slug):
     if request.user.is_authenticated():
         group = Group.objects.get(slug=request.POST.get('group_slug', None))
-        group.users.add(request.user)
+        group.join(request.user.pk)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)
@@ -293,7 +292,7 @@ def join_group(request, group_slug):
 def leave_group(request, group_slug):
     if request.user.is_authenticated():
         group = Group.objects.get(slug=request.POST.get('group_slug', None))
-        group.users.remove(request.user)
+        group.leave(request.user.pk)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)
@@ -302,7 +301,7 @@ def leave_group(request, group_slug):
 def join_event(request, group_slug, event_id):
     if request.user.is_authenticated():
         event = Event.objects.get(id=event_id)
-        event.users.add(request.user)
+        event.join(request.user.pk)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)
@@ -313,7 +312,7 @@ def leave_event(request, group_slug, event_id):
         # user = request.user
         # user.events.remove(event_id)
         event = Event.objects.get(id=event_id)
-        event.users.remove(request.user)
+        event.leave(request.user.pk)
         return HttpResponse(status=200)
     else:
         return HttpResponse(status=401)
