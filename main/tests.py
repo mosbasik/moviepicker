@@ -495,7 +495,7 @@ class EventTestCase(TestCase):
         assert(not Viewing.objects.filter(event=e1, user=bob, movie=trek).exists())
         assert(not Viewing.objects.filter(event=e1, user=eve, movie=trek).exists())
 
-        e1.lockin(alice.pk, trek.pk)
+        e1.lockin(alice.pk, trek.imdb_id)
 
         assert(Viewing.objects.filter(event=e1, user=alice, movie=trek).exists())
         assert(Viewing.objects.filter(event=e1, user=bob, movie=trek).exists())
