@@ -288,12 +288,12 @@ class EventTestCase(TestCase):
                                     'fun event', alpha, user_1, "basement")
         test_event_1.users.add(user_2)
 
-        assert(user_2 is in test_event_1.users.all())
+        assert(user_2 in test_event_1.users.all())
 
         deactivate_event(test_event_1, user_1)
         test_event_1.users.add(user_3)
 
-        assert(user_3 is not in test_event_1.users.all())
+        assert(user_3 not in test_event_1.users.all())
 
     # An authenticated group member can join an event
     # An authenticated non group member can join an event
@@ -311,11 +311,11 @@ class EventTestCase(TestCase):
 
         test_event_1.users.add(user_1)
 
-        assert(user_1 is in test_event_1.users.all())
+        assert(user_1 in test_event_1.users.all())
 
         test_event_1.users.add(user_2)
 
-        assert(user_2 is in test_event_1.users.all())
+        assert(user_2 in test_event_1.users.all())
 
         test_event_2 = create_event('test2', "2015-10-19 21:30",
                                     'a fun event', group_1, user_1, "my room")
@@ -361,10 +361,10 @@ class EventTestCase(TestCase):
         other_user = User.objects.get(username='bob')
 
         new_lockin = lockin_event(event.pk, event_creator)
-        assert(new_lockin is in event.lockins.all())
+        assert(new_lockin in event.lockins.all())
 
         other_lockin = lockin_event(event.pk, other_user)
-        assert(other_lockin is not in event.lockins.all())
+        assert(other_lockin not in event.lockins.all())
 
     # When an event creator locks in a movie, a movie viewing is assigned to
     #   the members of that event
