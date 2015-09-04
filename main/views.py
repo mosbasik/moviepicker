@@ -25,7 +25,8 @@ def global_context(request):
     '''
     if request.user.is_authenticated():
         return {
-            'user_groups': request.user.movie_groups.all(),
+            'user_groups': request.user.movie_groups.exclude(name='World'),
+            'user_events': request.user.events.all(),
             'votes': request.user.votes.all(),
             'search_form': MovieSearchForm(),
         }
@@ -91,7 +92,7 @@ def add_movie(request):
 def all_groups(request):
     context = {}
     context['page_title'] = 'List of all groups'
-    context['groups'] = Group.objects.all()
+    context['groups'] = Group.objects.exclude(name='World')
     return render(
         request, 'all_groups.html', context,
         context_instance=RequestContext(request, processors=[global_context]))

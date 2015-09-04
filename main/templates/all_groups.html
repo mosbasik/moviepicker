@@ -9,20 +9,30 @@
 
 <div class="container">
     <div class="row">
-        
-        <h1>{{ page_title }}</h1>
+        <h1><center>{{ page_title }}</center></h1>
+        <div class="col-sm-offset-3 col-sm-6">
         {% for group in groups %}
 
-            <h3><a href="{% url 'group_details' group.slug %}">{{ group.name }}</a></h3>
+            <h3><a href="{% url 'group_details' group.slug %}">{{ group.name }}</a>
+                {% if user.is_authenticated %}
+                    {% if group in user.movie_groups.all %}
+                        <button class="btn btn-danger pull-right leave-group-button" data-group-slug="{{ group.slug }}" data-group-action="leave">Leave Group</button>
+                    {% else %}
+                        <button class="btn btn-success pull-right join-group-button" data-group-slug="{{ group.slug }}" data-group-action="join">Join Group</button>
+                    {% endif %}
+                {% else %}
+                    <button class="btn btn-success pull-right join-group-button" data-group-slug="{{ group.slug }}" data-group-action="join">Join Group</button>
+                {% endif %}
+            </h3>
             <ul>
-                <li>{{ group.description }}</li>
-                {% for user in group.users.all %}
-                    <li>{{ user }}</li>
-                {% endfor %}
+                <li>{{ group.description|truncatewords:10 }}</li>
+                <li>This group has {{group.users.all.count}} users</li>
+                
             </ul>
-            
+            <hr>
+            <br>
         {% endfor %}
-        <p>{{  user.Group_set }}</p>
+        </div>
         
     </div>
 </div>
