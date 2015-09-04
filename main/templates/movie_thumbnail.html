@@ -3,7 +3,7 @@
 <div id='{{ movie.imdb_id }}' class="col-xs-4 col-sm-3 col-md-2 movie-summary movie-vote {% if user.is_authenticated and movie in votes %}liked{% endif %}">
     <div class="row">
         <div class="col-xs-12">
-            <a href="#" title='{{ movie.title }}' data-toggle="tooltip">{{ movie.title|truncatechars:14 }} [{{ movie.year }}]</a>
+            <a href="{% url 'movie_details' movie.imdb_id %}" title='{{ movie.title }}' data-toggle="tooltip">{{ movie.title|truncatechars:14 }} [{{ movie.year }}]</a>
         </div>
         {% if movie.num_votes %}
             <div class="col-xs-12">

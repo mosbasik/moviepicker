@@ -161,10 +161,12 @@ def movie_search(request):
 
 
 def movie_details(request, imdb_id):
-    movie = Movie.objects.get(imdb_id=imdb_id)
     context = {}
+    request_context = RequestContext(request, processors=[global_context])
+
+    context['movie'] = Movie.objects.get(imdb_id=imdb_id)
     return render_to_response(
-            'movie_search.html', context, context_instance=request_context)
+            'movie_details.html', context, context_instance=request_context)
 
 
 def create_group(request):
