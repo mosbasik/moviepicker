@@ -284,10 +284,22 @@ class Event(models.Model):
         return Movie.objects.none()
 
     def lockin(self, uid, imdb_id):
+        '''
+        Given the user id of the event's creator and a valid imdb_id, adds that
+        movie to the the event's watched movies via the LockIn model.  Fails if
+        the user is invalid, the user is not the creator, or the imdb_id is
+        invalid. Returns True if successful; False if unsuccessful.
+        '''
         # TODO
         pass
 
     def lockin_remove(self, uid, imdb_id):
+        '''
+        Given the user id of the event's creator and a valid imdb_id, removes
+        that movie from the the event's watched movies via the LockIn model.
+        Fails if the user is invalid, the user is not the creator, or the
+        imdb_id is invalid. Returns True if successful; False if unsuccessful.
+        '''
         # TODO
         pass
 
