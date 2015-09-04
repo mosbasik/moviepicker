@@ -288,7 +288,7 @@ class EventTestCase(TestCase):
         # member fancy event
         bob = User.objects.get(username='bob')
         alpha = Group.objects.get(name='Alpha')
-        basement = Location.objects.filter(group=alpha).get(name='basement')
+        basement = Location.objects.filter(group=alpha).get(text='basement')
         bob_event_count = bob.events_created.all().count()
         bass_music = alpha.create_event(
             bob.pk,
