@@ -72,15 +72,15 @@ class EventForm(forms.Form):
         )
     )
 
-    group = forms.ModelChoiceField(
-        queryset=Group.objects.all(),   # TODO - Filter this based on the user's groups
-        required=True, widget=forms.Select(attrs={'class': 'form-control'}))
-
-   
     class Meta:
         model = Event
         fields = ['name', 'date_and_time', 'description', 'group']
-    
+
+    def __init__(self, user, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        self.fields['group'] = forms.ModelChoiceField(
+            queryset=Group.objects.filter(users=user).exclude(name='World'))
+
 
 class LocationForm(forms.ModelForm):
 
