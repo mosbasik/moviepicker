@@ -208,11 +208,6 @@ class EventTestCase(TestCase):
 
     def setUp(self):
 
-        # user setup
-        alice = User.objects.create(username='alice')
-        bob = User.objects.create(username='bob')
-        eve = User.objects.create(username='eve')
-
         # movie setup
         trek_into_darkness = Movie.objects.create(
             imdb_id='tt1408101',
@@ -229,6 +224,14 @@ class EventTestCase(TestCase):
         avatar = Movie.objects.create(
             imdb_id='tt0499549',
             title='Avatar')
+        raiders = Movie.objects.create(
+            imdb_id='tt0082971',
+            title='Raiders of the Lost Ark')
+
+        # user setup
+        alice = User.objects.create(username='alice')
+        bob = User.objects.create(username='bob')
+        eve = User.objects.create(username='eve')
 
         # vote setup
         alice.votes.add(trek_into_darkness)
@@ -247,8 +250,6 @@ class EventTestCase(TestCase):
         e1.users.add(bob)
         LockIn.objects.create(event=e1, movie=titanic)
         LockIn.objects.create(event=e1, movie=avatar)
-        # e1.watched_movies.add(titanic)
-        # e1.watched_movies.add(avatar)
 
         e2 = Event.objects.create(name='E2', group=alpha, creator=alice)
         e2.users.add(alice)
@@ -264,6 +265,11 @@ class EventTestCase(TestCase):
 
         # location setup
         basement = Location.objects.create(text='basement', group=alpha)
+
+        # viewing setup
+        Viewing.objects.create(event=e1, movie=raiders, user=alice)
+        Viewing.objects.create(event=e1, movie=raiders, user=eve)
+        Viewing.objects.create(event=e1, movie=raiders, user=bob)
 
     def test_event_create(self):
         '''Only authed group members can create events.'''
@@ -475,28 +481,56 @@ class EventTestCase(TestCase):
         lockin_remove_successful = e1.lockin_remove(None, avatar)
         assert(avatar not in e1.watched_movies.all())
 
-    # When an event creator locks in a movie, a movie viewing is assigned to
-    #   the members of that event
-    def test_event_lockin_creates_viewings(self):
-        '''Locking in an event creates a Viewing for all event members'''
-        event_member = User.objects.get(username='alice')
-        event = Event.objects.get(name='alpha_event')
-        movie = event.movies.get(title='Star Trek')
+    def test_event_lockin_create_viewings(self):
+        '''Locking in a movie creates a viewing of it for all event members.'''
 
-        first_lockin = lockin_event(event.pk, movie.pk)
+        alice = User.objects.get(username='alice')
+        bob = User.objects.get(username='bob')
+        eve = User.objects.get(username='eve')
+        e1 = Event.objects.get(name='E1')
+        trek = Movie.objects.get(title='Star Trek')
 
-        assert(movie in event_member.viewings.all())
+        assert(not Viewing.objects.filter(event=e1, user=alice, movie=trek).exists())
+        assert(not Viewing.objects.filter(event=e1, user=bob, movie=trek).exists())
+        assert(not Viewing.objects.filter(event=e1, user=eve, movie=trek).exists())
 
-    # When a user joins an event, a movie viewing is assigned to them for every
-    # movie already locked in to that event
+        e1.lockin(alice.pk, trek.pk)
+
+        assert(Viewing.objects.filter(event=e1, user=alice, movie=trek).exists())
+        assert(Viewing.objects.filter(event=e1, user=bob, movie=trek).exists())
+        assert(not Viewing.objects.filter(event=e1, user=eve, movie=trek).exists())
+
+    def test_event_lockin_remove_delete_viewings(self):
+        '''Removing a locked in movie deletes its viewing from all event members.'''
+
+        alice = User.objects.get(username='alice')
+        bob = User.objects.get(username='bob')
+        eve = User.objects.get(username='eve')
+        e1 = Event.objects.get(name='E1')
+        raiders = Movie.objects.get(title='Raiders of the Lost Ark')
+
+        assert(Viewing.objects.filter(event=e1, user=alice, movie=raiders).exists())
+        assert(Viewing.objects.filter(event=e1, user=bob, movie=raiders).exists())
+        assert(Viewing.objects.filter(event=e1, user=eve, movie=raiders).exists())
+
+        e1.lockin_remove(alice.pk, raiders.pk)
+
+        assert(not Viewing.objects.filter(event=e1, user=alice, movie=raiders).exists())
+        assert(not Viewing.objects.filter(event=e1, user=bob, movie=raiders).exists())
+        assert(Viewing.objects.filter(event=e1, user=eve, movie=raiders).exists())
+
     def test_event_join_creates_viewings(self):
-        '''A viewing will be assigned to a user who joins a locked-in event'''
-        late_event_member = User.objects.get(username='eve')
-        event = Event.objects.get(name='alpha_event')
-        movie = event.movies.get(title='Star Trek')
+        '''Users joining an event w/existing lock ins get viewings for all.'''
 
-        first_lockin = lockin_event(event.pk, movie.pk)
+        eve = User.objects.get(username='eve')
+        e1 = Event.objects.get(name='E1')
+        titanic = Movie.objects.get(title='Titanic')
+        avatar = Movie.objects.get(title='Avatar')
 
-        event.users.add(late_event_member)
+        assert(not Viewing.objects.filter(event=e1, user=eve, movie=titanic).exists())
+        assert(not Viewing.objects.filter(event=e1, user=eve, movie=avatar).exists())
 
-        assert(movie in late_event_member.viewings.all())
+        e1.join(eve.pk)
+
+        assert(Viewing.objects.filter(event=e1, user=eve, movie=titanic).exists())
+        assert(Viewing.objects.filter(event=e1, user=eve, movie=avatar).exists())

@@ -33,8 +33,9 @@ class Movie(models.Model):
     written_by = models.TextField(null=True, blank=True)
     directed_by = models.CharField(max_length=255, null=True, blank=True)
     poster = models.ImageField(upload_to='posters', null=True, blank=True)
-    voters = models.ManyToManyField(User, related_name='votes', blank=True)
-    submitter = models.ForeignKey(User, blank=True, null=True, related_name='movies_submitted')
+    voters = models.ManyToManyField(User, related_name='votes')
+    submitter = models.ForeignKey(User, blank=True, null=True, related_name='submitted_movies')
+    watchers = models.ManyToManyField(User, through='Viewing', related_name='watched_movies')
 
     def __unicode__(self):
         return self.title
@@ -245,6 +246,7 @@ class Event(models.Model):
         if unsuccessful.
         '''
         # TODO
+        # need to add viewings for any existing locked in movies to this user
         pass
 
     def leave(self, uid):
@@ -286,24 +288,26 @@ class Event(models.Model):
     def lockin(self, uid, imdb_id):
         '''
         Given the user id of the event's creator and a valid imdb_id, adds that
-        movie to the the event's watched movies via the LockIn model.  Fails if
-        the user is invalid, the user is not the creator, or the imdb_id is
+        movie to the the event's watched movies (via the LockIn model) and adds
+        it to all event members' watched movies (via the Viewing model). Fails
+        if the user is invalid, the user is not the creator, or the imdb_id is
         invalid. Returns True if successful; False if unsuccessful.
         '''
         # TODO
+        # Remember to update the date and time of the Viewing's field
         pass
 
     def lockin_remove(self, uid, imdb_id):
         '''
         Given the user id of the event's creator and a valid imdb_id, removes
-        that movie from the the event's watched movies via the LockIn model.
-        Fails if the user is invalid, the user is not the creator, or the
-        imdb_id is invalid. Returns True if successful; False if unsuccessful.
+        that movie from the the event's watched movies (via the LockIn model)
+        and removes it from all event members' watched movies (via the Viewing
+        model). Fails if the user is invalid, the user is not the creator, or
+        the imdb_id is invalid. Returns True if successful; False if
+        unsuccessful.
         '''
         # TODO
         pass
-
-
 
 
 class Location(models.Model):
