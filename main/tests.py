@@ -114,8 +114,6 @@ class GroupTestCase(TestCase):
         alpha.users.add(alice)
         alpha.users.add(bob)
 
-    # An authenticated user can create a group
-    # An anonymous user can't create a group
     def test_group_creation(self):
         '''Authed users can create groups; anonymous users can't.'''
 
@@ -148,31 +146,37 @@ class GroupTestCase(TestCase):
         assert(msg == 'Only registered users can create groups.')
         assert(delta is None)
 
-    # An authenticated user can join a group
-    # An anonymous user can't join a group
-    def test_group_joining(self):
+    def test_group_join(self):
+        '''Authed users can join groups; anonymous users can't.'''
 
         # registered user case
-        user = User.objects.get(username='alice')
-        user_id = user.pk
-
-        group = Group.objects.get(name='Alpha')
-        group_id
-
-        join_succeeded = join_group(user_id, group_id)
-
+        eve = User.objects.get(username='eve')
+        alpha = Group.objects.get(name='Alpha')
+        assert(eve not in alpha.users.all())
+        join_succeeded = alpha.join(eve.pk)
         assert(join_succeeded)
-        assert(user in group.users.all())
+        assert(eve in alpha.users.all())
 
         # anonymous user case
-        user_id = None
-
-        group = Group.objects.get(name='Alpha')
-        group_id = group.pk
-
-        join_succeeded = join_group(user_id, group_id)
-
+        alpha = Group.objects.get(name='Alpha')
+        join_succeeded = alpha.join(None)
         assert(not join_succeeded)
+
+    def test_group_leave(self):
+        '''Authed users can leave groups; anonymous users can't.'''
+
+        # registered user case
+        alice = User.objects.get(username='alice')
+        alpha = Group.objects.get(name='Alpha')
+        assert(alice in alpha.users.all())
+        leave_succeeded = alpha.leave(alice.pk)
+        assert(leave_succeeded)
+        assert(alice not in alpha.users.all())
+
+        # anonymous user case
+        alpha = Group.objects.get(name='Alpha')
+        leave_succeeded = alpha.leave(None)
+        assert(not leave_succeeded)
 
     # Specifically the movies that members of a groups have voted for
     #   are shown in the group

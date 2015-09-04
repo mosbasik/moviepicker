@@ -194,6 +194,26 @@ class Group(models.Model):
             return None, 'Group name already exists.'
         return None, 'Only registered users can create groups.'
 
+    def join(self, uid):
+        '''
+        Given a user id, adds that user to the members of the group.  Returns
+        True if successful, False if unsuccessful.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            self.users.add(User.objects.get(pk=uid))
+            return True
+        return False
+
+    def leave(self, uid):
+        '''
+        Given a user id, remove that user from the members of the group.
+        Returns True if successful, False if unsuccessful.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            self.users.remove(User.objects.get(pk=uid))
+            return True
+        return False
+
 
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
