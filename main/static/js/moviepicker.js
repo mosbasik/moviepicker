@@ -72,24 +72,38 @@ function unvote(id) {
     })
 }
 
+// ========== Group Membership Mangement ==========
 
-/**
- *
- */
-$('#group-membership-button').click(function() {
+$('.join-group-button').click(function(e){
+    e.preventDefault();
     var group_slug = $(this).attr('data-group-slug')
-    var action = $(this).attr('data-group-action')
-    if (action === 'join') {
-        join_group(this, group_slug)
-    } else if (action === 'leave') {
-        leave_group(this, group_slug)
-    }
+    var join_group_url = '/group/' + group_slug + '/join/'
+
+    $.ajax({
+        url: join_group_url,
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + join_group_url)
+        }
+    })
 })
 
-function join_group(button, group_slug) {
-    var group_url = '/group/' + group_slug + '/'
+$('.leave-group-button').click(function(e){
+    e.preventDefault();
+    var group_slug = $(this).attr('data-group-slug')
+    var leave_group_url = '/group/' + group_slug + '/leave/'
+
     $.ajax({
-        url: group_url + 'join/',
+        url: leave_group_url,
         method: 'POST',
         data: {
             group_slug: group_slug,
@@ -101,31 +115,13 @@ function join_group(button, group_slug) {
             location.reload()
         },
         error: function() {
-            window.location.replace('/login/?next=' + group_url)
+            window.location.replace('/login/?next=' + leave_group_url)
         }
     })
-}
+})
 
-function leave_group(button, group_slug) {
-    var group_url = '/group/' + group_slug + '/'
-    $.ajax({
-        url: group_url + 'leave/',
-        method: 'POST',
-        data: {
-            group_slug: group_slug,
-        },
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
-        },
-        success: function() {
-            location.reload()
-        },
-        error: function() {
-            window.location.replace('/login/?next=' + group_url)
-        }
-    })
-}
 
+// ========== Get CSRF Cookie ==========
 
 // get the cookie containing the CSRF token (needed for POSTing with ajax)
 function getCookie(name) {
@@ -134,24 +130,41 @@ function getCookie(name) {
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
 
-$('#event-membership-button').click(function(){
-    var event_id = $(this).attr('data-event-id')
-    var action = $(this).attr('data-event-action')
-    var group_slug = $(this).attr('event-group-slug')
-    console.log(this, action, group_slug)
+// ========== Event Membership Mangement ==========
 
-    if (action === 'join') {
-        join_event(group_slug, event_id)
-    } else if(action === 'leave') {
-        leave_event(group_slug, event_id)
-    }
+$('.join-event-button').click(function(e){
+    e.preventDefault();
+    var group_slug = $(this).attr('data-group-slug')
+    var event_id = $(this).attr('data-event-id')
+    var join_event_url = '/group/' + group_slug + '/event/' + event_id + '/join/'
+
+    $.ajax({
+        url: join_event_url,
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+            event_id: event_id
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + join_event_url)
+        }
+    })
 })
 
-function join_event(group_slug, event_id) {
-    console.log('started Join function')
-    var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
+$('.leave-event-button').click(function(e){
+    e.preventDefault();
+    var group_slug = $(this).attr('data-group-slug')
+    var event_id = $(this).attr('data-event-id')
+    var leave_event_url = '/group/' + group_slug + '/event/' + event_id + '/leave/'
+
     $.ajax({
-        url: event_url + 'join/',
+        url: leave_event_url,
         method: 'POST',
         data: {
             group_slug: group_slug,
@@ -164,28 +177,7 @@ function join_event(group_slug, event_id) {
             location.reload()
         },
         error: function() {
-            window.location.replace('/login/?next=' + event_url)
+            window.location.replace('/login/?next=' + leave_event_url)
         }
     })
-}
-function leave_event(group_slug, event_id) {
-    console.log('started Leave function')
-    var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
-    $.ajax({
-        url: event_url + 'leave/',
-        method: 'POST',
-        data: {
-            group_slug: group_slug,
-            event_id: event_id
-        },
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
-        },
-        success: function() {
-            location.reload()
-        },
-        error: function() {
-            window.location.replace('/login/?next=' + event_url)
-        }
-    })
-}
+})

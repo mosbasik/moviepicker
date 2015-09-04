@@ -119,15 +119,17 @@ class Movie(models.Model):
 
                     # movies not yet released do not have ratings;
                     try:
-                        movie.imbdb_rating = float(o_json['imdbRating'])
+                        movie.imdb_rating = float(o_json['imdbRating'])
                     except ValueError:
                         pass
+
+                    # save the movie
+                    movie.save()
 
                     # get the movie poster if it exists
                     movie.set_poster()
 
-                    # save the movie and queue it for returning
-                    movie.save()
+                    # queue the movie for return
                     result = movie
 
         return result
