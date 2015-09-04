@@ -82,7 +82,7 @@ class MovieTestCase(TestCase):
         assert(not delete_successful)
 
 
-# @skip
+@skip
 class GroupTestCase(TestCase):
 
     def setUp(self):
@@ -203,7 +203,7 @@ class GroupTestCase(TestCase):
         assert(trek.num_votes == 1)
 
 
-@skip
+# @skip
 class EventTestCase(TestCase):
 
     def setUp(self):
@@ -223,6 +223,12 @@ class EventTestCase(TestCase):
         star_wars = Movie.objects.create(
             imdb_id='tt0076759',
             title='Star Wars: Episode IV - A New Hope')
+        titanic = Movie.objects.create(
+            imdb_id='tt0120338',
+            title='Titanic')
+        avatar = Movie.objects.create(
+            imdb_id='tt0499549',
+            title='Avatar')
 
         # vote setup
         alice.votes.add(trek_into_darkness)
@@ -235,152 +241,239 @@ class EventTestCase(TestCase):
         alpha.users.add(alice)
         alpha.users.add(bob)
 
-        alpha_event = Event.objects.create(name='aplha',
-                                           date_and_time="2015-09-19 21:30",
-                                           description='fun event',
-                                           group=alpha, creator=alice,
-                                           location="basement")
-        alpha_event.users.add(alice)
-        alpha_event.users.add(bob)
+        # event setup
+        e1 = Event.objects.create(name='E1', group=alpha, creator=alice)
+        e1.users.add(alice)
+        e1.users.add(bob)
+        LockIn.objects.create(event=e1, movie=titanic)
+        LockIn.objects.create(event=e1, movie=avatar)
+        # e1.watched_movies.add(titanic)
+        # e1.watched_movies.add(avatar)
 
-    # An event must be associated with a group
-    def test_event_group_parent(self):
-        '''An event must be associated with a group'''
-        user = User.objects.get(username='alice')
+        e2 = Event.objects.create(name='E2', group=alpha, creator=alice)
+        e2.users.add(alice)
 
-        test_event_1 = create_event('test1', "2015-09-19 21:30",
-                                    'fun event', alpha, user, "basement")
-        assert(test_event_1)
+        e3 = Event.objects.create(name='E3', group=alpha, creator=alice)
+        e3.users.add(alice)
 
-        test_event_2 = create_event('test2', "2015-10-19 21:30",
-                                    'fun event', None, user, "basement")
-        assert(not test_event_2)
+        e4 = Event.objects.create(name='E4', group=alpha, creator=alice, is_active=False)
+        e4.users.add(alice)
 
-    # An authenticated user can create an event
-    # An anonymous user can't create an event
-    def test_event_creation(self):
-        '''Only authenticated users can create an event'''
+        e5 = Event.objects.create(name='E5', group=alpha, creator=alice, is_active=False)
+        e5.users.add(alice)
 
-        user = User.objects.get(username='alice')
+        # location setup
+        basement = Location.objects.create(text='basement', group=alpha)
 
-        test_event_1 = create_event('test1', "2015-09-19 21:30",
-                                    'fun event', alpha, user, "basement")
-        assert(test_event_1)
+    def test_event_create(self):
+        '''Only authed group members can create events.'''
 
-        test_event_2 = create_event('test2', "2015-10-19 21:30",
-                                    'fun event', alpha, None, "basement")
-        assert(not test_event_2)
+        # member basic event
+        alice = User.objects.get(username='alice')
+        alpha = Group.objects.get(name='Alpha')
+        alice_event_count = alice.events_created.all().count()
+        alt_rock = alpha.create_event(alice.pk, 'Alt Rock')
+        assert(alice.events_created.all().count() == alice_event_count + 1)
+        assert(alt_rock is not None)
+        assert(alt_rock.name == 'Alt Rock')
+        assert(alt_rock.group == alpha)
+        assert(alt_rock.creator == alice)
 
-    # event IS_ACTIVE attribute can be toggled by the creator
-    # event IS_ACTIVE attribute can't be toggled by other users
-    def test_event_creator_toggle_active(self):
-        '''Only the event creator can toggle the is_active property'''
+        # member fancy event
+        bob = User.objects.get(username='bob')
+        alpha = Group.objects.get(name='Alpha')
+        basement = Location.objects.filter(group=alpha).get(name='basement')
+        bob_event_count = bob.events_created.all().count()
+        bass_music = alpha.create_event(
+            bob.pk,
+            'Bass Music',
+            date_and_time='2015-10-19 21:30',
+            description='feat. Techmaster P.E.B.',
+            location=basement
+        )
+        assert(bob.events_created.all().count() == bob_event_count + 1)
+        assert(bass_music is not None)
+        assert(bass_music.name == 'Bass Music')
+        assert(bass_music.group == alpha)
+        assert(bass_music.creator == bob)
+        assert(bass_music.date_and_time == '2015-10-19 21:30')
+        assert(bass_music.description == 'feat. Techmaster P.E.B.')
+        assert(bass_music.location == basement)
 
-        user_1 = User.objects.get(username='alice')
-        user_2 = User.objects.get(username='bob')
+        # non-member case
+        eve = User.objects.get(username='eve')
+        alpha = Group.objects.get(name='Alpha')
+        eve_event_count = eve.events_created.all().count()
+        zamrock = alpha.create_event(eve.pk, 'Zamrock')
+        assert(eve.events_created.all().count() == eve_event_count)
+        assert(zamrock is None)
 
-        test_event_1 = create_event('test1', "2015-09-19 21:30",
-                                    'fun event', alpha, user_1, "basement")
-        deactivate_event(test_event_1, user_1)
+        # anonymous user case
+        alpha = Group.objects.get(name='Alpha')
+        yodeling = alpha.create_event(None, 'Yodeling')
+        assert(yodeling is None)
 
-        assert(test_event_1)
+    def test_event_deactivate(self):
+        '''Only the event creator can set an active event to inactive.'''
 
-        test_event_2 = create_event('test2', "2015-10-19 21:30",
-                                    'fun event', alpha, user_1, "basement")
+        # creator case
+        alice = User.objects.get(username='alice')
+        e2 = Event.objects.get(name='E2')
+        assert(e2.is_active)
+        e2.deactivate(alice.pk)
+        assert(not e2.is_active)
 
-        deactivate_event(test_event_2, user_2)
+        # non-creator case
+        eve = User.objects.get(username='eve')
+        e3 = Event.objects.get(name='E3')
+        assert(e3.is_active)
+        e3.deactivate(eve.pk)
+        assert(e3.is_active)
 
-        assert(not test_event_2)
+        # anonymous case
+        e3 = Event.objects.get(name='E3')
+        assert(e3.is_active)
+        e3.deactivate(None)
+        assert(e3.is_active)
 
-    # event IS_ACTIVE attribute = True - Users can join the event
-    # event IS_ACTIVE attribute = False - Users can't join the event
-    def test_event_active_join(self):
-        '''Users can only join an event while the event is active'''
-        user_1 = User.objects.get(username='alice')
-        user_2 = User.objects.get(username='bob')
-        user_3 = User.objects.get(username='eve')
+    def test_event_activate(self):
+        '''Only the event creator can set an inactive event to active.'''
 
-        test_event_1 = create_event('test1', "2015-09-19 21:30",
-                                    'fun event', alpha, user_1, "basement")
-        test_event_1.users.add(user_2)
+        # creator case
+        alice = User.objects.get(username='alice')
+        e4 = Event.objects.get(name='E4')
+        assert(not e4.is_active)
+        e4.activate(alice.pk)
+        assert(e4.is_active)
 
-        assert(user_2 in test_event_1.users.all())
+        # non-creator case
+        eve = User.objects.get(username='eve')
+        e5 = Event.objects.get(name='E5')
+        assert(not e5.is_active)
+        e5.activate(eve.pk)
+        assert(not e5.is_active)
 
-        deactivate_event(test_event_1, user_1)
-        test_event_1.users.add(user_3)
+        # anonymous case
+        e5 = Event.objects.get(name='E5')
+        assert(not e5.is_active)
+        e5.activate(None)
+        assert(not e5.is_active)
 
-        assert(user_3 not in test_event_1.users.all())
+    def test_event_join_active(self):
+        '''Any site user can join an active event.'''
 
-    # An authenticated group member can join an event
-    # An authenticated non group member can join an event
-    # An anonymous user can't join an event
-    def test_event_join(self):
-        '''Any authenticated user can join an event'''
-        user_1 = User.objects.get(username='alice')
-        user_2 = User.objects.get(username='bob')
-        group_1 = Group.objects.get(name='alpha')
+        # group member case
+        bob = User.objects.get(username='bob')
+        e2 = Event.objects.get(name='E2')
+        assert(bob not in e2.users.all())
+        e2.join(bob.pk)
+        assert(bob in e2.users.all())
 
-        group_1.users.add(user_1)
+        # site user but not group member case
+        eve = User.objects.get(username='eve')
+        e2 = Event.objects.get(name='E2')
+        assert(eve not in e2.users.all())
+        e2.join(eve.pk)
+        assert(eve in e2.users.all())
 
-        test_event_1 = create_event('test1', "2015-09-19 21:30",
-                                    'fun event', group_1, user_1, "basement")
+        # anonymous user case
+        e2 = Event.objects.get(name='E2')
+        e2_initial_member_count = e2.users.all().count()
+        e2.join(None)
+        assert(e2.users.all().count() == e2_initial_member_count)
 
-        test_event_1.users.add(user_1)
+    def test_event_join_inactive(self):
+        '''No one can join join an inactive event.'''
 
-        assert(user_1 in test_event_1.users.all())
+        # group member case
+        bob = User.objects.get(username='bob')
+        e4 = Event.objects.get(name='E4')
+        assert(bob not in e4.users.all())
+        e4.join(bob.pk)
+        assert(bob not in e4.users.all())
 
-        test_event_1.users.add(user_2)
+        # site user but not group member case
+        eve = User.objects.get(username='eve')
+        e4 = Event.objects.get(name='E4')
+        assert(eve not in e4.users.all())
+        e4.join(eve.pk)
+        assert(eve not in e4.users.all())
 
-        assert(user_2 in test_event_1.users.all())
+        # anonymous user case
+        e4 = Event.objects.get(name='E4')
+        e4_initial_member_count = e4.users.all().count()
+        e4.join(None)
+        assert(e4.users.all().count() == e4_initial_member_count)
 
-        test_event_2 = create_event('test2', "2015-10-19 21:30",
-                                    'a fun event', group_1, user_1, "my room")
-
-        test_event_2.users.add(None)
-
-        assert(test_event_2.users.all().count == 0)
-
-    # Only movies that have been voted on by event member votes are
-    #    brought into the event
     def test_event_movies(self):
-        '''Only movies that have been voted on by event member votes are
-        brought into the event'''
-        trek_movies = Movies.objects.filter(title__icontains='trek')
+        '''In an event, only event member movies are included.'''
 
-        event = Event.objects.get(name='alpha_event')
-        event_movies = get_event_movies(event.pk)
+        e1_movies = Event.objects.get(name='E1').movie_pool()
 
-        assert(event_movies.count() == 2)
-        event_movies = event_movies.distinct()
-        assert(event_movies.count() == 2)
-        for movie in event_movies:
+        assert(e1_movies.all().count() == 2)
+        e1_movies = e1_movies.distinct()
+        assert(e1_movies.all().count() == 2)
+
+        trek_movies = Movie.objects.filter(title__icontains='trek')
+        for movie in e1_movies:
             assert(movie in trek_movies)
 
-    # Only the votes for the people who have joined the event are
-    #   counted for the movies in an event
     def test_event_vote_count(self):
-        '''Only event member votes are counted for the movie in the event'''
-        event = Event.objects.get(name='alpha_event')
-        event_movies = get_event_movies(event.pk)
+        '''In an event, only event member movie votes are counted.'''
 
-        trek = event_movies.get(title='Star Trek')
-
+        e1_movies = Event.objects.get(name='E1').movie_pool()
+        trek = e1_movies.get(title='Star Trek')
         assert(trek.num_votes == 1)
 
-    # Only the event creator can lock in or remove a movie from an event
-    # Non-event creators can't lock in or remove a movie from an event
-    def test_event_creator_lockin(self):
-        '''Only the event creator should be able to lock in a movie'''
+    def test_event_lockin(self):
+        '''A movie can only be locked in to an event by the event creator.'''
 
-        event = Event.objects.get(name='alpha_event')
-        event_creator = User.objects.get(username='alice')
-        other_user = User.objects.get(username='bob')
+        # creator case
+        e1 = Event.objects.get(name='E1')
+        alice = User.objects.get(username='alice')
+        trek = Movie.objects.get(title='Star Trek')
+        assert(trek not in e1.watched_movies.all())
+        lockin_successful = e1.lockin(alice.pk, trek.pk)
+        assert(lockin_successful)
+        assert(trek in e1.watched_movies.all())
 
-        new_lockin = lockin_event(event.pk, event_creator)
-        assert(new_lockin in event.lockins.all())
+        # non creator case
+        bob = User.objects.get(username='bob')
+        trek_into_darkness = Movie.objects.get(title='Star Trek Into Darkness')
+        assert(trek_into_darkness not in e1.watched_movies.all())
+        lockin_successful = e1.lockin(bob.pk, trek_into_darkness.pk)
+        assert(not lockin_successful)
+        assert(trek_into_darkness not in e1.watched_movies.all())
 
-        other_lockin = lockin_event(event.pk, other_user)
-        assert(other_lockin not in event.lockins.all())
+        # anonymous case
+        assert(trek_into_darkness not in e1.watched_movies.all())
+        lockin_successful = e1.lockin(None, trek_into_darkness)
+        assert(trek_into_darkness not in e1.watched_movies.all())
+
+    def test_event_lockin_remove(self):
+        '''A locked in movie can only removed from an event by the event creator.'''
+
+        # creator case
+        e1 = Event.objects.get(name='E1')
+        alice = User.objects.get(username='alice')
+        titanic = Movie.objects.get(title='Titanic')
+        assert(titanic in e1.watched_movies.all())
+        lockin_remove_successful = e1.lockin_remove(alice.pk, titanic.pk)
+        assert(lockin_remove_successful)
+        assert(titanic not in e1.watched_movies.all())
+
+        # non creator case
+        bob = User.objects.get(username='bob')
+        avatar = Movie.objects.get(title='Avatar')
+        assert(avatar in e1.watched_movies.all())
+        lockin_remove_successful = e1.lockin_remove(bob.pk, avatar.pk)
+        assert(not lockin_remove_successful)
+        assert(avatar not in e1.watched_movies.all())
+
+        # anonymous case
+        assert(avatar not in e1.watched_movies.all())
+        lockin_remove_successful = e1.lockin_remove(None, avatar)
+        assert(avatar not in e1.watched_movies.all())
 
     # When an event creator locks in a movie, a movie viewing is assigned to
     #   the members of that event
