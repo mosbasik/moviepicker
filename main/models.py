@@ -227,11 +227,11 @@ class Group(models.Model):
         user = User.objects.get(id=uid)
         if User.objects.filter(id=uid).exists():
             if user in self.users.all():
-                Event.objects.create(group=self, creator=user, name=name,
-                                     date_and_time=date_and_time,
-                                     description=description,
-                                     location=location)
-                return True
+                event = Event.objects.create(
+                    group=self, creator=user, name=name,
+                    date_and_time=date_and_time, description=description,
+                    location=location)
+                return event
             return False
         return False
 
@@ -307,7 +307,8 @@ class Event(models.Model):
         have voted.  Each movie must include an annotation field "num_votes"
         containing the number of votes for that movie from event members.
         '''
-        movies = Movie.objects.filter(voters__in=self.users).annotate(num_votes=Count('voters'))
+        movies = Movie.objects.filter(
+            voters__in=self.users).annotate(num_votes=Count('voters'))
         return Movie.objects.none()
 
     def lockin(self, uid, imdb_id):
