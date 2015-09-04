@@ -335,7 +335,7 @@ class Event(models.Model):
             return True
         return False
 
-    def lockin_remove(self, uid, lockin_id):
+    def lockin_remove(self, uid, imdb_id):
         '''
         Given the user id of the event's creator and a valid imdb_id, removes
         that movie from the the event's watched movies (via the LockIn model)
@@ -344,10 +344,20 @@ class Event(models.Model):
         the imdb_id is invalid. Returns True if successful; False if
         unsuccessful.
         '''
-        # Should we move this one under the Lockin model?
-        if User.objects.get(id=uid) is self.creator:
-            Lockin.objects.delete(event=self, id=lockin_id)
-            return True
+        if User.objects.filter(pk=uid).exists():
+            user = User.objects.get(pk=uid)
+            if user == self.creator:
+                if self.watched_movies.filter(imdb_id=imdb_id).exists():
+                    movie = Movie.objects.get(imdb_id=imdb_id)
+                    event_members = self.users.all()
+                    for event_member in event_members:
+                        Viewing.objects.filter(
+                            user=event_member,
+                            event=self,
+                            movie=movie,
+                        ).delete()
+                    LockIn.objects.filter(event=self, movie=movie).delete()
+                    return True
         return False
 
 

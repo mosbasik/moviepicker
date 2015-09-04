@@ -248,6 +248,7 @@ class EventTestCase(TestCase):
         e1 = Event.objects.create(name='E1', group=alpha, creator=alice)
         e1.users.add(alice)
         e1.users.add(bob)
+        LockIn.objects.create(event=e1, movie=raiders)
         LockIn.objects.create(event=e1, movie=titanic)
         LockIn.objects.create(event=e1, movie=avatar)
 
@@ -513,7 +514,7 @@ class EventTestCase(TestCase):
         assert(Viewing.objects.filter(event=e1, user=bob, movie=raiders).exists())
         assert(Viewing.objects.filter(event=e1, user=eve, movie=raiders).exists())
 
-        e1.lockin_remove(alice.pk, raiders.pk)
+        e1.lockin_remove(alice.pk, raiders.imdb_id)
 
         assert(not Viewing.objects.filter(event=e1, user=alice, movie=raiders).exists())
         assert(not Viewing.objects.filter(event=e1, user=bob, movie=raiders).exists())
