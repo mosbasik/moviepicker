@@ -13,20 +13,7 @@ from main.models import (
 )
 
 # python imports
-# from unittest.TestCase import *
-
-
-# class AnimalTestCase(TestCase):
-#     def setUp(self):
-#         Animal.objects.create(name="lion", sound="roar")
-#         Animal.objects.create(name="cat", sound="meow")
-
-#     def test_animals_can_speak(self):
-#         """Animals that can speak are correctly identified"""
-#         lion = Animal.objects.get(name="lion")
-#         cat = Animal.objects.get(name="cat")
-#         self.assertEqual(lion.speak(), 'The lion says "roar"')
-#         self.assertEqual(cat.speak(), 'The cat says "meow"')
+from unittest import skip
 
 
 class MovieTestCase(TestCase):
@@ -34,56 +21,67 @@ class MovieTestCase(TestCase):
     def setUp(self):
 
         # user setup
-        user1 = User.objects.create(username='alice', email='alice@alice.com')
-        user1.set_password('alice')
+        alice = User.objects.create(username='alice')
 
         # movie setup
-        Movie.objects.create(imbd_id='tt0770828', title='Man of Steel')
+        mos = Movie.objects.create(imdb_id='tt0770828', title='Man of Steel')
+        superman = Movie.objects.create(imdb_id='tt0078346', title='Superman')
+
+        # vote setup
+        alice.votes.add(superman)
 
     def test_movie_submission(self):
         '''Any user can add a movie to the database.'''
 
         # registered user case
-        user_id = User.objects.get(username='alice').pk
-        movie_1 = submit_movie(user_id_1, 'tt0468569')
-        assert(Movie.object.filter(pk=movie_1.pk).exists())
+        alice = User.objects.get(username='alice')
+        movie_1 = Movie.submit_movie(alice.pk, 'tt0468569')
+        assert(Movie.objects.filter(pk=movie_1.pk).exists())
 
         # anonymous user case
-        movie_2 = submit_movie(None, 'tt0096895')
-        assert(Movie.object.filter(pk=movie_2.pk).exists())
+        movie_2 = Movie.submit_movie(None, 'tt0096895')
+        assert(Movie.objects.filter(pk=movie_2.pk).exists())
 
     def test_truncated_title_creation(self):
         '''Truncated title automatically created for newly submitted movie.'''
 
-        movie = submit_movie(None, 'tt0468569')
+        movie = Movie.submit_movie(None, 'tt0468569')
         assert(movie.truncated_title)
 
-    # An authenticated user can vote for a movie
-    # An anonymous user can't vote for a movie
-    def test_movie_voting(self):
+    def test_movie_create_vote(self):
+        '''Authed users can create votes for a movie; anonymous users can't.'''
 
         # registered user case
-        user = User.objects.get(username='alice')
-        user_id = user.pk
-
-        movie = Movie.objects.get(imdb_id='tt0770828')
-        imdb_id = movie.imdb_id
-
-        vote_succeeded = vote_for_movie(user_id, imdb_id)
-
-        assert(vote_succeeded)
-        assert(movie in user.votes.all())
+        alice = User.objects.get(username='alice')
+        man_of_steel = Movie.objects.get(title='Man of Steel')
+        assert(man_of_steel not in alice.votes.all())
+        create_succesful = Movie.create_vote(alice.pk, man_of_steel.imdb_id)
+        assert(create_succesful)
+        assert(man_of_steel in alice.votes.all())
 
         # anonymous user case
-        user_id = None
-        movie = Movie.objects.get(imdb_id='tt0770828')
-        imdb_id = movie.imdb_id
+        man_of_steel = Movie.objects.get(title='Man of Steel')
+        create_succesful = Movie.create_vote(None, man_of_steel.imdb_id)
+        assert(not create_succesful)
 
-        vote_succeeded = vote_for_movie(user_id, imdb_id)
+    def test_movie_delete_vote(self):
+        '''Authed users can delete votes for a movie; anonymous users can't.'''
 
-        assert(not vote_succeeded)
+        # registered user case
+        alice = User.objects.get(username='alice')
+        superman = Movie.objects.get(title='Superman')
+        assert(superman in alice.votes.all())
+        delete_successful = Movie.delete_vote(alice.pk, superman.imdb_id)
+        assert(delete_successful)
+        assert(superman not in alice.votes.all())
+
+        # anonymous user case
+        superman = Movie.objects.get(title='Superman')
+        delete_successful = Movie.delete_vote(None, superman.imdb_id)
+        assert(not delete_successful)
 
 
+@skip
 class GroupTestCase(TestCase):
 
     def setUp(self):
@@ -189,6 +187,7 @@ class GroupTestCase(TestCase):
         assert(trek.num_votes == 1)
 
 
+@skip
 class EventTestCase(TestCase):
 
     def setUp(self):
@@ -289,12 +288,12 @@ class EventTestCase(TestCase):
                                     'fun event', alpha, user_1, "basement")
         test_event_1.users.add(user_2)
 
-        assert(user_2 is in test_event_1.users.all())
+        assert(user_2 in test_event_1.users.all())
 
         deactivate_event(test_event_1, user_1)
         test_event_1.users.add(user_3)
 
-        assert(user_3 is not in test_event_1.users.all())
+        assert(user_3 not in test_event_1.users.all())
 
     # An authenticated group member can join an event
     # An authenticated non group member can join an event
@@ -312,11 +311,11 @@ class EventTestCase(TestCase):
 
         test_event_1.users.add(user_1)
 
-        assert(user_1 is in test_event_1.users.all())
+        assert(user_1 in test_event_1.users.all())
 
         test_event_1.users.add(user_2)
 
-        assert(user_2 is in test_event_1.users.all())
+        assert(user_2 in test_event_1.users.all())
 
         test_event_2 = create_event('test2', "2015-10-19 21:30",
                                     'a fun event', group_1, user_1, "my room")
@@ -362,10 +361,10 @@ class EventTestCase(TestCase):
         other_user = User.objects.get(username='bob')
 
         new_lockin = lockin_event(event.pk, event_creator)
-        assert(new_lockin is in event.lockins.all())
+        assert(new_lockin in event.lockins.all())
 
         other_lockin = lockin_event(event.pk, other_user)
-        assert(other_lockin is not in event.lockins.all())
+        assert(other_lockin not in event.lockins.all())
 
     # When an event creator locks in a movie, a movie viewing is assigned to
     #   the members of that event

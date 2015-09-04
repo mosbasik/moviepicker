@@ -2,16 +2,14 @@
 
 {# used in the add movie page #}
 
-<div class="row">
-    <div class="col-xs-12">
-
-        <h2>{{movie.title}}</h2>
-
+{% if movie %}
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>{{movie.title}}</h2>
+        </div>
     </div>
-</div>
-<br>
-<div class="row">
-    {% if is_movie == 'yes' %}
+    <br>
+    <div class="row">
         {% if user.is_authenticated %}
             {% if movie in votes %}
                 <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote liked">
@@ -58,5 +56,5 @@
             <br>
             <span class='title-format'>Director: </span><span>{{ movie.directed_by }}</span>
         </div>
-    {% endif %}
-</div>
+    </div>
+{% endif %}
