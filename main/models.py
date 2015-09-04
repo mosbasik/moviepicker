@@ -75,7 +75,7 @@ class Movie(models.Model):
     @staticmethod
     def submit_movie(uid, imdb_id):
         '''
-        Given a uid (may contain None) and an IMDB id, returns a Movie
+        Given a user id (may contain None) and an IMDB id, returns a Movie
         object corresponding to that IMDB id.  Returns none if the IMDB id is
         malformed or not a movie.
         '''
@@ -173,6 +173,26 @@ class Group(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @staticmethod
+    def create_group(uid, name, description=None):
+        '''
+        Given a user id, a name string, and an optional description string,
+        creates a new Group object.  If successful, returns the new group and a
+        success message.  If unsuccessful, returns None and an error message.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            if not Group.objects.filter(name=name).exists():
+                user = User.objects.get(pk=uid)
+                group = Group()
+                group.creator = user
+                group.name = name
+                if description is not None:
+                    group.description = description
+                group.save()
+                return group, 'Group "%s" created successfully.' % group.name
+            return None, 'Group name already exists.'
+        return None, 'Only registered users can create groups.'
 
 
 class Event(models.Model):

@@ -16,6 +16,7 @@ from main.models import (
 from unittest import skip
 
 
+@skip
 class MovieTestCase(TestCase):
 
     def setUp(self):
@@ -81,7 +82,7 @@ class MovieTestCase(TestCase):
         assert(not delete_successful)
 
 
-@skip
+# @skip
 class GroupTestCase(TestCase):
 
     def setUp(self):
@@ -93,13 +94,13 @@ class GroupTestCase(TestCase):
 
         # movie setup
         trek_into_darkness = Movie.objects.create(
-            imbdb_id='tt1408101',
+            imdb_id='tt1408101',
             title='Star Trek Into Darkness')
         trek = Movie.objects.create(
-            imbdb_id='tt0796366',
+            imdb_id='tt0796366',
             title='Star Trek')
         star_wars = Movie.objects.create(
-            imbdb_id='tt0076759',
+            imdb_id='tt0076759',
             title='Star Wars: Episode IV - A New Hope')
 
         # vote setup
@@ -116,25 +117,36 @@ class GroupTestCase(TestCase):
     # An authenticated user can create a group
     # An anonymous user can't create a group
     def test_group_creation(self):
+        '''Authed users can create groups; anonymous users can't.'''
 
         # registered user case
-        user = User.objects.get(username='alice')
-        user_id = user.pk
+        alice = User.objects.get(username='alice')
 
-        group_2 = create_group(user_id, 'Bravo', description='second group')
-        assert(Group.objects.filter(pk=group_2.pk).exists())
-        assert(user == group_2.creator)
+        # group name already exists
+        alpha, msg = Group.create_group(alice.pk, 'Alpha')
+        assert(msg == 'Group name already exists.')
+        assert(alpha is None)
 
-        group_3 = create_group(user_id, 'Charlie')
-        assert(Group.objects.filter(pk=group_3.pk).exists())
-        assert(user == group_3.creator)
+        # with description
+        bravo, msg = Group.create_group(alice.pk, 'Bravo', description='second')
+        assert(msg == 'Group "Bravo" created successfully.')
+        assert(Group.objects.filter(pk=bravo.pk).exists())
+        assert(bravo.creator == alice)
+        assert(bravo.name == 'Bravo')
+        assert(bravo.description == 'second')
+
+        # without description
+        charlie, msg = Group.create_group(alice.pk, 'Charlie')
+        assert(msg == 'Group "Charlie" created successfully.')
+        assert(Group.objects.filter(pk=charlie.pk).exists())
+        assert(charlie.creator == alice)
+        assert(charlie.name == 'Charlie')
+        assert(charlie.description is None)
 
         # anonymous user case
-        user_id = None
-
-        group_4 = create_group(user_id, 'Delta')
-
-        assert(group_4 is None)
+        delta, msg = Group.create_group(None, 'Delta')
+        assert(msg == 'Only registered users can create groups.')
+        assert(delta is None)
 
     # An authenticated user can join a group
     # An anonymous user can't join a group
@@ -199,13 +211,13 @@ class EventTestCase(TestCase):
 
         # movie setup
         trek_into_darkness = Movie.objects.create(
-            imbdb_id='tt1408101',
+            imdb_id='tt1408101',
             title='Star Trek Into Darkness')
         trek = Movie.objects.create(
-            imbdb_id='tt0796366',
+            imdb_id='tt0796366',
             title='Star Trek')
         star_wars = Movie.objects.create(
-            imbdb_id='tt0076759',
+            imdb_id='tt0076759',
             title='Star Wars: Episode IV - A New Hope')
 
         # vote setup
