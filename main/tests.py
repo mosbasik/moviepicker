@@ -82,7 +82,7 @@ class MovieTestCase(TestCase):
         assert(not delete_successful)
 
 
-@skip
+# @skip
 class GroupTestCase(TestCase):
 
     def setUp(self):
@@ -178,28 +178,31 @@ class GroupTestCase(TestCase):
         leave_succeeded = alpha.leave(None)
         assert(not leave_succeeded)
 
-    # Specifically the movies that members of a groups have voted for
-    #   are shown in the group
     def test_group_movie_list(self):
-        trek_movies = Movies.objects.filter(title__icontains='trek')
+        '''In a group, only group member movies are included.'''
 
-        group = Group.objects.get(name='Alpha')
-        group_movies = get_group_movies(group.pk)
+        alpha = Group.objects.get(name='Alpha')
+        alpha_movies = alpha.movie_pool()
 
-        assert(group_movies.count() == 2)
-        group_movies = group_movies.distinct()
-        assert(group_movies.count() == 2)
-        for movie in group_movies:
+        assert(alpha_movies.count() == 2)
+        alpha_movies = alpha_movies.distinct()
+        assert(alpha_movies.count() == 2)
+
+        trek_movies = Movie.objects.filter(title__icontains='trek')
+        for movie in alpha_movies:
             assert(movie in trek_movies)
 
-    # Only the votes for movies of members of a group are counted within the
-    #   group
+        non_trek_movies = Movie.objects.exclude(title__icontains='trek')
+        for movie in alpha_movies:
+            assert(movie not in non_trek_movies)
+
     def test_group_vote_count(self):
-        group = Group.objects.get(name='Alpha')
-        group_movies = get_group_movies(group.pk)
+        '''In an event, only event member movie votes are counted.'''
 
-        trek = group_movies.get(title='Star Trek')
+        alpha = Group.objects.get(name='Alpha')
+        alpha_movies = alpha.movie_pool()
 
+        trek = alpha_movies.get(title='Star Trek')
         assert(trek.num_votes == 1)
 
 
