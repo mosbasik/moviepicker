@@ -21,11 +21,14 @@ class MovieTestCase(TestCase):
     def setUp(self):
 
         # user setup
-        user1 = User.objects.create(username='alice', email='alice@alice.com')
-        user1.set_password('alice')
+        alice = User.objects.create(username='alice')
 
         # movie setup
-        Movie.objects.create(imdb_id='tt0770828', title='Man of Steel')
+        mos = Movie.objects.create(imdb_id='tt0770828', title='Man of Steel')
+        superman = Movie.objects.create(imdb_id='tt0078346', title='Superman')
+
+        # vote setup
+        alice.votes.add(superman)
 
     def test_movie_submission(self):
         '''Any user can add a movie to the database.'''
@@ -45,30 +48,37 @@ class MovieTestCase(TestCase):
         movie = Movie.submit_movie(None, 'tt0468569')
         assert(movie.truncated_title)
 
-    # An authenticated user can vote for a movie
-    # An anonymous user can't vote for a movie
-    def test_movie_voting(self):
+    def test_movie_create_vote(self):
+        '''Authed users can create votes for a movie; anonymous users can't.'''
 
         # registered user case
-        user = User.objects.get(username='alice')
-        user_id = user.pk
-
-        movie = Movie.objects.get(imdb_id='tt0770828')
-        imdb_id = movie.imdb_id
-
-        vote_succeeded = vote_for_movie(user_id, imdb_id)
-
-        assert(vote_succeeded)
-        assert(movie in user.votes.all())
+        alice = User.objects.get(username='alice')
+        man_of_steel = Movie.objects.get(title='Man of Steel')
+        assert(man_of_steel not in alice.votes.all())
+        create_succesful = Movie.create_vote(alice.pk, man_of_steel.imdb_id)
+        assert(create_succesful)
+        assert(man_of_steel in alice.votes.all())
 
         # anonymous user case
-        user_id = None
-        movie = Movie.objects.get(imdb_id='tt0770828')
-        imdb_id = movie.imdb_id
+        man_of_steel = Movie.objects.get(title='Man of Steel')
+        create_succesful = Movie.create_vote(None, man_of_steel.imdb_id)
+        assert(not create_succesful)
 
-        vote_succeeded = vote_for_movie(user_id, imdb_id)
+    def test_movie_delete_vote(self):
+        '''Authed users can delete votes for a movie; anonymous users can't.'''
 
-        assert(not vote_succeeded)
+        # registered user case
+        alice = User.objects.get(username='alice')
+        superman = Movie.objects.get(title='Superman')
+        assert(superman in alice.votes.all())
+        delete_successful = Movie.delete_vote(alice.pk, superman.imdb_id)
+        assert(delete_successful)
+        assert(superman not in alice.votes.all())
+
+        # anonymous user case
+        superman = Movie.objects.get(title='Superman')
+        delete_successful = Movie.delete_vote(None, superman.imdb_id)
+        assert(not delete_successful)
 
 
 @skip

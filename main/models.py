@@ -45,6 +45,34 @@ class Movie(models.Model):
         super(Movie, self).save(*args, **kwargs)
 
     @staticmethod
+    def create_vote(uid, imdb_id):
+        '''
+        Given a valid uid & valid IMDB id, adds the movie to the users' votes.
+        Returns True on success and False on failure.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            if Movie.objects.filter(imdb_id=imdb_id).exists():
+                user = User.objects.get(pk=uid)
+                movie = Movie.objects.get(imdb_id=imdb_id)
+                movie.voters.add(user)
+                return True
+        return False
+
+    @staticmethod
+    def delete_vote(uid, imdb_id):
+        '''
+        Given a valid uid & valid IMDB id, removes the movie from the users'
+        votes. Returns True on success and False on failure.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            if Movie.objects.filter(imdb_id=imdb_id).exists():
+                user = User.objects.get(pk=uid)
+                movie = Movie.objects.get(imdb_id=imdb_id)
+                movie.voters.remove(user)
+                return True
+        return False
+
+    @staticmethod
     def submit_movie(uid, imdb_id):
         '''
         Given a uid (may contain None) and an IMDB id, returns a Movie

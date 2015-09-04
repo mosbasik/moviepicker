@@ -99,23 +99,17 @@ def user_movies(request):
 
 
 def create_vote(request):
-    user = request.user
-    movie = Movie.objects.get(imdb_id=str(request.POST['id']))
-
-    user.votes.add(movie)
-    user.save()
-
-    return HttpResponse(status=200)
+    user_id = request.user.pk
+    imdb_id = request.POST.get('id', None)
+    status_code = 200 if Movie.create_vote(user_id, imdb_id) else 400
+    return HttpResponse(status=status_code)
 
 
 def delete_vote(request):
-    user = request.user
-    movie = Movie.objects.get(imdb_id=request.POST['id'])
-
-    user.votes.remove(movie)
-    user.save()
-
-    return HttpResponse(status=200)
+    user_id = request.user.pk
+    imdb_id = request.POST.get('id', None)
+    status_code = 200 if Movie.delete_vote(user_id, imdb_id) else 400
+    return HttpResponse(status=status_code)
 
 
 # DON'T DELETE THIS RIGHT AWAY, I'M NOT SURE IF IT'S USED BY ANYTHING
