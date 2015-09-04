@@ -75,7 +75,7 @@ class Movie(models.Model):
     @staticmethod
     def submit_movie(uid, imdb_id):
         '''
-        Given a uid (may contain None) and an IMDB id, returns a Movie
+        Given a user id (may contain None) and an IMDB id, returns a Movie
         object corresponding to that IMDB id.  Returns none if the IMDB id is
         malformed or not a movie.
         '''
@@ -119,15 +119,17 @@ class Movie(models.Model):
 
                     # movies not yet released do not have ratings;
                     try:
-                        movie.imbdb_rating = float(o_json['imdbRating'])
+                        movie.imdb_rating = float(o_json['imdbRating'])
                     except ValueError:
                         pass
+
+                    # save the movie
+                    movie.save()
 
                     # get the movie poster if it exists
                     movie.set_poster()
 
-                    # save the movie and queue it for returning
-                    movie.save()
+                    # queue the movie for return
                     result = movie
 
         return result
@@ -174,21 +176,122 @@ class Group(models.Model):
     def __unicode__(self):
         return self.name
 
+    @staticmethod
+    def create_group(uid, name, description=None):
+        '''
+        Given a user id, a name string, and an optional description string,
+        creates a new Group object.  If successful, returns the new group and a
+        success message.  If unsuccessful, returns None and an error message.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            if not Group.objects.filter(name=name).exists():
+                user = User.objects.get(pk=uid)
+                group = Group()
+                group.creator = user
+                group.name = name
+                if description is not None:
+                    group.description = description
+                group.save()
+                return group, 'Group "%s" created successfully.' % group.name
+            return None, 'Group name already exists.'
+        return None, 'Only registered users can create groups.'
+
+    def join(self, uid):
+        '''
+        Given a user id, adds that user to the members of the group.  Returns
+        True if successful, False if unsuccessful.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            self.users.add(User.objects.get(pk=uid))
+            return True
+        return False
+
+    def leave(self, uid):
+        '''
+        Given a user id, remove that user from the members of the group.
+        Returns True if successful, False if unsuccessful.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            self.users.remove(User.objects.get(pk=uid))
+            return True
+        return False
+
+    def create_event(self, uid, name,
+                     date_and_time=None, description=None, location=None):
+        # TODO
+        pass
+
 
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255)
-    date_and_time = models.DateTimeField()
+    date_and_time = models.DateTimeField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    movies = models.ManyToManyField('Movie', through='LockIn', related_name='events')
+    watched_movies = models.ManyToManyField('Movie', through='LockIn', related_name='events')
     users = models.ManyToManyField(User, related_name='events')
     group = models.ForeignKey('Group', related_name='events')
     creator = models.ForeignKey(User, related_name='events_created')
     location = models.ForeignKey('Location', null=True, blank=True, related_name='events')
+    is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
+
+    def join(self, uid):
+        '''
+        Given any valid user id from the site, adds that user to the members of
+        the group. Fails on invalid user id.  Returns True if successful; False
+        if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def leave(self, uid):
+        '''
+        Given any valid user id from the site, removes that user from the
+        members of the group. Fails on invalid user id.  Returns True if
+        successful; False if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def activate(self, uid):
+        '''
+        Given the user id of the event's creator, sets is_active to True on the
+        event. Fails if the user id is not the event's creator.  Returns True
+        if successful; False if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def deactivate(self, uid):
+        '''
+        Given the user id of the event's creator, sets is_active to False on
+        the event. Fails if the user id is not the event's creator.  Returns
+        True if successful; False if unsuccessful.
+        '''
+        # TODO
+        pass
+
+    def movie_pool(self):
+        '''
+        Returns the queryset of Movie objects for which this event's members
+        have voted.  Each movie must include an annotation field "num_votes"
+        containing the number of votes for that movie from event members.
+        '''
+        # TODO
+        return Movie.objects.none()
+
+    def lockin(self, uid, imdb_id):
+        # TODO
+        pass
+
+    def lockin_remove(self, uid, imdb_id):
+        # TODO
+        pass
+
+
 
 
 class Location(models.Model):

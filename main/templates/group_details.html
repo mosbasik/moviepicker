@@ -9,12 +9,12 @@
 
             {% if user.is_authenticated %}
                 {% if group in user.movie_groups.all %}
-                    <button id="group-membership-button" class="btn btn-danger pull-right" data-group-slug="{{ group.slug }}" data-group-action="leave">Leave Group</button>
+                    <button class="btn btn-danger pull-right leave-group-button" data-group-slug="{{ group.slug }}" data-group-action="leave">Leave Group</button>
                 {% else %}
-                    <button id="group-membership-button" class="btn btn-success pull-right" data-group-slug="{{ group.slug }}" data-group-action="join">Join Group</button>
+                    <button class="btn btn-success pull-right join-group-button" data-group-slug="{{ group.slug }}" data-group-action="join">Join Group</button>
                 {% endif %}
             {% else %}
-                <button id="group-membership-button" class="btn btn-success pull-right" data-group-slug="{{ group.slug }}" data-group-action="join">Join Group</button>
+                <button class="btn btn-success pull-right join-group-button" data-group-slug="{{ group.slug }}" data-group-action="join">Join Group</button>
             {% endif %}
         </h1>
 
