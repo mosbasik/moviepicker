@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.http import HttpResponse
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext, loader
 from django.utils.text import slugify
 from django.views.generic import View
@@ -13,9 +13,10 @@ from django.db.models import Count
 from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
 from main.functions import get_voted_movie_qs
 from main.models import Movie, Event, Group, Location
-from scripts import populate_movies as mov_in
-
 import user_auth
+# from scripts import populate_movies as mov_in
+
+import re
 
 
 def global_context(request):
@@ -42,40 +43,49 @@ def front(request):
         context_instance=RequestContext(request, processors=[global_context]))
 
 
-def all_movies(request):
+def movies(request):
     context = {}
-    context['movies'] = get_voted_movie_qs(User.objects.all(), include_unvoted=True)
-    context['page_title'] = 'List of all Movies'
+
+    search = request.GET.get('search', None)
+    order = request.GET.get('order', 'truncated_title')
+
+    if search is not None:
+        context['movies'] = Movie.objects.filter(title__icontains=search).order_by(order)
+        context['page_title'] = 'Movies containing "%s"' % search
+
+    else:
+        context['movies'] = Movie.objects.all().order_by('truncated_title')
+        context['page_title'] = 'All Movies'
+
     return render(
-        request, 'all_movies.html', context,
+        request, 'movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
 def add_movie(request):
     context = {}
-    user = request.user
 
     if request.method == 'POST':
-        url = request.POST.get('url')
 
-        if url:
-            # either imdb id or 'failed' or 'not a movie'
-            result = mov_in.MovieToPick.make_movie(url, user)
-            print result
-            if result == 'failed' or result == 'not a movie':
-                context['is_movie'] = 'no'
-                context['message'] = 'Not a movie'
-            else:
-                context['is_movie'] = 'yes'
-                context['message'] = 'Movie entered'
-                context['movie'] = Movie.objects.get(imdb_id=result)
+        # extract the IMDB id from the posted URL
+        imdb_id = None
+        r = r't{2}\d+'
+        match = re.search(r, request.POST.get('url', None))
+        if match:
+            imdb_id = match.group()
 
+        # attempt to submit the movie to the database
+        submitted_movie = Movie.submit_movie(request.user.pk, imdb_id)
+
+        # check to see if a movie was successfully submitted
+        if submitted_movie is not None:
+            context['message'] = 'Movie submitted.'
+            context['movie'] = submitted_movie
         else:
-            context['url_response'] = 'No url was entered'
+            context['message'] = 'Not a movie.'
 
-    return render(
-        request, 'add_movie.html', context,
-        context_instance=RequestContext(request, processors=[global_context]))
+        return redirect('movie_details', submitted_movie.imdb_id)
+    return HttpResponse(status=400)
 
 
 def all_groups(request):
@@ -93,76 +103,31 @@ def user_movies(request):
     context['page_title'] = request.user.username.title() + "'s Movies"
     context['movies'] = get_voted_movie_qs(user_qs, ['truncated_title'])
     return render(
-        request, 'all_movies.html', context,
+        request, 'movies.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
 
 
 def create_vote(request):
-    user = request.user
-    movie = Movie.objects.get(imdb_id=str(request.POST['id']))
-
-    user.votes.add(movie)
-    user.save()
-
-    return HttpResponse(status=200)
+    user_id = request.user.pk
+    imdb_id = request.POST.get('id', None)
+    status_code = 200 if Movie.create_vote(user_id, imdb_id) else 400
+    return HttpResponse(status=status_code)
 
 
 def delete_vote(request):
-    user = request.user
-    movie = Movie.objects.get(imdb_id=request.POST['id'])
-
-    user.votes.remove(movie)
-    user.save()
-
-    return HttpResponse(status=200)
+    user_id = request.user.pk
+    imdb_id = request.POST.get('id', None)
+    status_code = 200 if Movie.delete_vote(user_id, imdb_id) else 400
+    return HttpResponse(status=status_code)
 
 
-# DON'T DELETE THIS RIGHT AWAY, I'M NOT SURE IF IT'S USED BY ANYTHING
-
-# def get_votes(request):
-#     context = {}
-
-#     if request.user.is_authenticated():
-#         votes = request.user.votes.all()
-#         context['votes'] = votes
-
-#     movies = User.votes.all().order_by('truncated_title')
-
-#     if len(movies) > 0:
-#         context['movies'] = movies
-#         return render(request, 'template tk.html', context)
-
-
-def movie_search(request):
+def movie_details(request, imdb_id):
     context = {}
     request_context = RequestContext(request, processors=[global_context])
 
-    if request.method == 'POST':
-        form = MovieSearchForm(request.POST)
-        context['form'] = form
-
-        if form.is_valid():
-            title = form.cleaned_data['title']
-
-            context['movies'] = Movie.objects.filter(
-                title__icontains=title).order_by('truncated_title')
-
-            context['message'] = "Here's Your Movies"
-
-            return render_to_response(
-                'movie_search.html', context, context_instance=request_context)
-
-        else:
-            context['message'] = 'Cannot search for Nothing'
-            return render_to_response(
-                'movie_search.html', context, context_instance=request_context)
-
-    else:
-        form = MovieSearchForm()
-        context['form'] = form
-
-        return render_to_response(
-            'movie_search.html', context, context_instance=request_context)
+    context['movie'] = Movie.objects.get(imdb_id=imdb_id)
+    return render_to_response(
+            'movie_details.html', context, context_instance=request_context)
 
 
 def create_group(request):
@@ -233,7 +198,7 @@ class CreateEvent(View):
                 event.date_and_time = form.cleaned_data['date_and_time']
                 event.description = form.cleaned_data['description']
                 event.group = form.cleaned_data['group']
-                event.created_by = request.user
+                event.creator = request.user
                 event.location = location
 
                 event.save()
@@ -307,13 +272,10 @@ class EventDetails(View):
 
         event = Event.objects.get(id=event_id)
         event_members = event.users.all()
-        movie_list = Movie.objects.filter(voters__in=event_members).distinct()
-        movie_list = movie_list.annotate(num_votes=Count('voters'))
-        movies = movie_list.distinct().order_by('-num_votes')
 
         context['event'] = event
         context['users'] = event_members
-        context['movies'] = movies
+        context['movies'] = get_voted_movie_qs(event_members)
         return render_to_response(
             'event_details.html', context, context_instance=request_context)
 
