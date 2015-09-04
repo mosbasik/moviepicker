@@ -6,17 +6,17 @@
                 <h2><center>{{event.name}}</center></h2>
                 <p><center>{{event.description}}</center></p>
                 <br>
-                <p><center>Movie start time: {{event.date_and_time}}</center></p>
+                <p><center>Movie starts time: {{event.date_and_time}}</center></p>
             </div>
             <div class="col-sm-2">
                 {% if user.is_authenticated %}
                     {% if event in user.events.all %}
-                        <button id="event-membership-button" class="btn btn-danger pull-right" event-group-slug="{{event.group.slug}}" data-event-id="{{event.id}}" data-event-action="leave">Leave Event</button>
+                        <button class="btn btn-danger pull-right leave-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Leave Event</button>
                     {% else %}
-                        <button id="event-membership-button" class="btn btn-success pull-right" event-group-slug="{{ event.group.slug }}" data-event-id="{{ event.id }}" data-event-action="join">Join Event</button>
+                        <button class="btn btn-success pull-right join-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Join Event</button>
                     {% endif %}
                 {% else %}
-                    <button id="event-membership-button" class="btn btn-success pull-right" event-group-slug="{{ event.group.slug }}" data-event-id="{{ event.id }}" data-event-action="join">Join Event</button>
+                    <button class="btn btn-success pull-right join-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Join Event</button>
                 {% endif %}
             </div>
         </div>
