@@ -236,6 +236,16 @@ class Group(models.Model):
             return False
         return False
 
+    def movie_pool(self):
+        '''
+        Returns the queryset of Movie objects for which this group's members
+        have voted.  Each movie must include an annotation field "num_votes"
+        containing the number of votes for that movie from group members.
+        '''
+        movies = Movie.objects.filter(
+            voters__in=self.users.all()).annotate(num_votes=Count('voters'))
+        return movies
+
 
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -326,13 +336,21 @@ class Event(models.Model):
         if the user is invalid, the user is not the creator, or the imdb_id is
         invalid. Returns True if successful; False if unsuccessful.
         '''
-        # TODO
-        # Remember to update the date and time of the Viewing's field
-        # Need to include the Lockin creation function here
-        # Should we also create a viewing event now for all event members?
-        if User.objects.get(id=uid) is self.creator:
-            Lockin.objects.create(event=self, movie__imdb_id=imdb_id)
-            return True
+        if User.objects.filter(pk=uid).exists():
+            user = User.objects.get(pk=uid)
+            if user == self.creator:
+                if Movie.objects.filter(imdb_id=imdb_id).exists():
+                    movie = Movie.objects.get(imdb_id=imdb_id)
+                    lockin = LockIn.objects.create(event=self, movie=movie)
+                    event_members = self.users.all()
+                    for event_member in event_members:
+                        Viewing.objects.create(
+                            user=event_member,
+                            event=self,
+                            movie=movie,
+                            date_and_time=lockin.created,
+                        )
+                    return True
         return False
 
     def lockin_remove(self, uid, imdb_id):
@@ -349,6 +367,7 @@ class Event(models.Model):
             if user == self.creator:
                 if self.watched_movies.filter(imdb_id=imdb_id).exists():
                     movie = Movie.objects.get(imdb_id=imdb_id)
+                    LockIn.objects.filter(event=self, movie=movie).delete()
                     event_members = self.users.all()
                     for event_member in event_members:
                         Viewing.objects.filter(
@@ -356,7 +375,6 @@ class Event(models.Model):
                             event=self,
                             movie=movie,
                         ).delete()
-                    LockIn.objects.filter(event=self, movie=movie).delete()
                     return True
         return False
 
