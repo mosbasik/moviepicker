@@ -224,8 +224,8 @@ class Group(models.Model):
         Fails if the user is not authenticated or is not a member of the group.
         Return False if unsuccessful, return True if successful.
         '''
-        user = User.objects.get(id=uid)
         if User.objects.filter(id=uid).exists():
+            user = User.objects.get(id=uid)
             if user in self.users.all():
                 event = Event.objects.create(
                     group=self, creator=user, name=name,
