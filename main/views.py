@@ -91,7 +91,7 @@ def add_movie(request):
 def all_groups(request):
     context = {}
     context['page_title'] = 'List of all groups'
-    context['groups'] = Group.objects.all()
+    context['groups'] = Group.objects.exclude(name='World')
     return render(
         request, 'all_groups.html', context,
         context_instance=RequestContext(request, processors=[global_context]))
