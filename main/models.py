@@ -291,7 +291,7 @@ class Event(models.Model):
         event. Fails if the user id is not the event's creator.  Returns True
         if successful; False if unsuccessful.
         '''
-        if User.objects.get(id=uid) is self.creator:
+        if self.creator.id == uid:
             self.is_active = True
             return True
         return False
@@ -302,7 +302,7 @@ class Event(models.Model):
         the event. Fails if the user id is not the event's creator.  Returns
         True if successful; False if unsuccessful.
         '''
-        if User.objects.get(id=uid) is self.creator:
+        if self.creator.id == uid:
             self.is_active = False
             return True
         return False
