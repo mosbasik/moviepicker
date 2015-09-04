@@ -218,8 +218,21 @@ class Group(models.Model):
 
     def create_event(self, uid, name,
                      date_and_time=None, description=None, location=None):
-        # TODO
-        pass
+        '''
+        Given an authenticated user who is a group member, create an Event.
+        Fails if the user is not authenticated or is not a member of the group.
+        Return False if unsuccessful, return True if successful.
+        '''
+        user = User.objects.get(id=uid)
+        if User.objects.filter(id=uid).exists():
+            if user in self.users.all():
+                Event.objects.create(group=self, creator=user, name=name,
+                                     date_and_time=date_and_time,
+                                     description=description,
+                                     location=location)
+                return True
+            return False
+        return False
 
 
 class Event(models.Model):
@@ -241,11 +254,16 @@ class Event(models.Model):
     def join(self, uid):
         '''
         Given any valid user id from the site, adds that user to the members of
-        the group. Fails on invalid user id.  Returns True if successful; False
+        the group. Fails on invalid user id. The event must be active for users
+        to be able to join the event.  Returns True if successful; False
         if unsuccessful.
         '''
-        # TODO
-        pass
+        if User.objects.filter(id=uid).exists():
+            if self.is_active is True:
+                self.users.add(User.objects.get(id=uid))
+                return True
+            return False
+        return False
 
     def leave(self, uid):
         '''
@@ -253,8 +271,10 @@ class Event(models.Model):
         members of the group. Fails on invalid user id.  Returns True if
         successful; False if unsuccessful.
         '''
-        # TODO
-        pass
+        if User.objects.filter(id=uid).exists():
+            self.users.remove(User.objects.get(id=uid))
+            return True
+        return False
 
     def activate(self, uid):
         '''
@@ -262,8 +282,10 @@ class Event(models.Model):
         event. Fails if the user id is not the event's creator.  Returns True
         if successful; False if unsuccessful.
         '''
-        # TODO
-        pass
+        if User.objects.get(id=uid) is self.creator:
+            self.is_active = True
+            return True
+        return False
 
     def deactivate(self, uid):
         '''
@@ -271,8 +293,10 @@ class Event(models.Model):
         the event. Fails if the user id is not the event's creator.  Returns
         True if successful; False if unsuccessful.
         '''
-        # TODO
-        pass
+        if User.objects.get(id=uid) is self.creator:
+            self.is_active = False
+            return True
+        return False
 
     def movie_pool(self):
         '''
@@ -280,18 +304,33 @@ class Event(models.Model):
         have voted.  Each movie must include an annotation field "num_votes"
         containing the number of votes for that movie from event members.
         '''
-        # TODO
+        movies = Movie.objects.filter(voters__in=self.users).annotate(num_votes=Count('voters'))
         return Movie.objects.none()
 
     def lockin(self, uid, imdb_id):
-        # TODO
-        pass
+        '''
+        Given the user id of the event's creator, creates a lockin instance for
+        the event. Fails if the user id is not the event's creator.  Returns
+        True if successful; False if unsuccessful.
+        '''
+        # Need to include the Lockin creation function here
+        # Should we also create a viewing event now for all event members?
+        if User.objects.get(id=uid) is self.creator:
+            Lockin.objects.create(event=self, movie__imdb_id=imdb_id)
+            return True
+        return False
 
-    def lockin_remove(self, uid, imdb_id):
-        # TODO
-        pass
-
-
+    def lockin_remove(self, uid, lockin_id):
+        '''
+        Given the user id of the event's creator, and the lockin id deletes a
+        lockin instance for the event. Fails if the user id is not the event's
+        creator.  Returns True if successful; False if unsuccessful.
+        '''
+        # Should we move this one under the Lockin model?
+        if User.objects.get(id=uid) is self.creator:
+            Lockin.objects.delete(event=self, id=lockin_id)
+            return True
+        return False
 
 
 class Location(models.Model):
