@@ -259,13 +259,19 @@ class Event(models.Model):
         to be able to join the event.  Returns True if successful; False
         if unsuccessful.
         '''
-        # TODO
-        # need to add viewings for any existing locked in movies to this user
         if User.objects.filter(id=uid).exists():
             if self.is_active is True:
-                self.users.add(User.objects.get(id=uid))
+                user = User.objects.get(pk=uid)
+                lockins = LockIn.objects.filter(event=self)
+                for lockin in lockins:
+                    Viewing.objects.get_or_create(
+                        user=user,
+                        event=self,
+                        movie=lockin.movie,
+                        date_and_time=lockin.created,
+                    )
+                self.users.add(user)
                 return True
-            return False
         return False
 
     def leave(self, uid):
