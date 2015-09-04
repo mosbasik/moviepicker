@@ -236,6 +236,16 @@ class Group(models.Model):
             return False
         return False
 
+    def movie_pool(self):
+        '''
+        Returns the queryset of Movie objects for which this group's members
+        have voted.  Each movie must include an annotation field "num_votes"
+        containing the number of votes for that movie from group members.
+        '''
+        movies = Movie.objects.filter(
+            voters__in=self.users.all()).annotate(num_votes=Count('voters'))
+        return movies
+
 
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
