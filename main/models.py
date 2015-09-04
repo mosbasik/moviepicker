@@ -5,6 +5,7 @@ from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.db.models import Count
 
 # local imports
 # from scripts import populate_movies as mov_in
@@ -224,14 +225,14 @@ class Group(models.Model):
         Fails if the user is not authenticated or is not a member of the group.
         Return False if unsuccessful, return True if successful.
         '''
-        user = User.objects.get(id=uid)
         if User.objects.filter(id=uid).exists():
+            user = User.objects.get(id=uid)
             if user in self.users.all():
-                Event.objects.create(group=self, creator=user, name=name,
-                                     date_and_time=date_and_time,
-                                     description=description,
-                                     location=location)
-                return True
+                event = Event.objects.create(
+                    group=self, creator=user, name=name,
+                    date_and_time=date_and_time, description=description,
+                    location=location)
+                return event
             return False
         return False
 
@@ -291,7 +292,7 @@ class Event(models.Model):
         event. Fails if the user id is not the event's creator.  Returns True
         if successful; False if unsuccessful.
         '''
-        if User.objects.get(id=uid) is self.creator:
+        if self.creator.id == uid:
             self.is_active = True
             return True
         return False
@@ -302,7 +303,7 @@ class Event(models.Model):
         the event. Fails if the user id is not the event's creator.  Returns
         True if successful; False if unsuccessful.
         '''
-        if User.objects.get(id=uid) is self.creator:
+        if self.creator.id == uid:
             self.is_active = False
             return True
         return False
@@ -313,8 +314,9 @@ class Event(models.Model):
         have voted.  Each movie must include an annotation field "num_votes"
         containing the number of votes for that movie from event members.
         '''
-        movies = Movie.objects.filter(voters__in=self.users).annotate(num_votes=Count('voters'))
-        return Movie.objects.none()
+        movies = Movie.objects.filter(
+            voters__in=self.users.all()).annotate(num_votes=Count('voters'))
+        return movies
 
     def lockin(self, uid, imdb_id):
         '''
@@ -333,7 +335,7 @@ class Event(models.Model):
             return True
         return False
 
-    def lockin_remove(self, uid, lockin_id):
+    def lockin_remove(self, uid, imdb_id):
         '''
         Given the user id of the event's creator and a valid imdb_id, removes
         that movie from the the event's watched movies (via the LockIn model)
@@ -342,10 +344,20 @@ class Event(models.Model):
         the imdb_id is invalid. Returns True if successful; False if
         unsuccessful.
         '''
-        # Should we move this one under the Lockin model?
-        if User.objects.get(id=uid) is self.creator:
-            Lockin.objects.delete(event=self, id=lockin_id)
-            return True
+        if User.objects.filter(pk=uid).exists():
+            user = User.objects.get(pk=uid)
+            if user == self.creator:
+                if self.watched_movies.filter(imdb_id=imdb_id).exists():
+                    movie = Movie.objects.get(imdb_id=imdb_id)
+                    event_members = self.users.all()
+                    for event_member in event_members:
+                        Viewing.objects.filter(
+                            user=event_member,
+                            event=self,
+                            movie=movie,
+                        ).delete()
+                    LockIn.objects.filter(event=self, movie=movie).delete()
+                    return True
         return False
 
 

@@ -248,6 +248,7 @@ class EventTestCase(TestCase):
         e1 = Event.objects.create(name='E1', group=alpha, creator=alice)
         e1.users.add(alice)
         e1.users.add(bob)
+        LockIn.objects.create(event=e1, movie=raiders)
         LockIn.objects.create(event=e1, movie=titanic)
         LockIn.objects.create(event=e1, movie=avatar)
 
@@ -288,7 +289,7 @@ class EventTestCase(TestCase):
         # member fancy event
         bob = User.objects.get(username='bob')
         alpha = Group.objects.get(name='Alpha')
-        basement = Location.objects.filter(group=alpha).get(name='basement')
+        basement = Location.objects.filter(group=alpha).get(text='basement')
         bob_event_count = bob.events_created.all().count()
         bass_music = alpha.create_event(
             bob.pk,
@@ -312,12 +313,12 @@ class EventTestCase(TestCase):
         eve_event_count = eve.events_created.all().count()
         zamrock = alpha.create_event(eve.pk, 'Zamrock')
         assert(eve.events_created.all().count() == eve_event_count)
-        assert(zamrock is None)
+        assert(zamrock is False)
 
         # anonymous user case
         alpha = Group.objects.get(name='Alpha')
         yodeling = alpha.create_event(None, 'Yodeling')
-        assert(yodeling is None)
+        assert(yodeling is False)
 
     def test_event_deactivate(self):
         '''Only the event creator can set an active event to inactive.'''
@@ -513,7 +514,7 @@ class EventTestCase(TestCase):
         assert(Viewing.objects.filter(event=e1, user=bob, movie=raiders).exists())
         assert(Viewing.objects.filter(event=e1, user=eve, movie=raiders).exists())
 
-        e1.lockin_remove(alice.pk, raiders.pk)
+        e1.lockin_remove(alice.pk, raiders.imdb_id)
 
         assert(not Viewing.objects.filter(event=e1, user=alice, movie=raiders).exists())
         assert(not Viewing.objects.filter(event=e1, user=bob, movie=raiders).exists())
