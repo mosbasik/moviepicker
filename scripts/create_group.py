@@ -28,7 +28,7 @@ class CreateGroups():
                     group.name = form.cleaned_data['name']
                     group.description = form.cleaned_data['description']
                     group.users = 'users'
-                    created_by = user
+                    creator = user
 
                     group.save()
                     context['group'] = group

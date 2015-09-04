@@ -36,7 +36,9 @@
 
     </div>
     <br>
-    {% include "movie_details.html" %}
+    {% if movie %}
+        {% include "movie_details_body.html" %}
+    {% endif %}
 </div>
 
 {% endblock content %}

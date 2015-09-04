@@ -7,8 +7,6 @@
                 <p><center>{{event.description}}</center></p>
                 <br>
                 <p><center>Movie start time: {{event.date_and_time}}</center></p>
-                {{ event.group.slug }}
-                {{ event.id }}
             </div>
             <div class="col-sm-2">
                 {% if user.is_authenticated %}
@@ -32,18 +30,6 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Movies</h3>
-                <div class="event-movie-container">
-                    {% for movie in movies %}
-                        <div class="col-xs-4 col-sm-3 col-md-2">
-                            <p>{{movie.title|truncatechars_html:15}}</p>
-                            <p><img src="{{movie.poster.url}}" alt="" class="event-movie-poster"></p>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+        {% include "movie_list.html" %}
     </div>
 {% endblock content %}
