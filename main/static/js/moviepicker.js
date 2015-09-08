@@ -181,3 +181,29 @@ $('.leave-event-button').click(function(e){
         }
     })
 })
+
+$('.delete-lockin').click(function(){
+    var lockin = $(this).attr('data-lockin-id')
+    var group_slug = $(this).attr('data-group-slug')
+    var event_id = $(this).attr('data-event-id')
+    var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
+    var movie = $(this).attr('data-movie-id')
+    if (confirm('Are you sure you want to remove this Locked in movie?')){
+        $.ajax({
+            url: event_url,
+            method: 'POST',
+            data: {
+                type: 'delete',
+                group_slug: group_slug,
+                event_id: event_id,
+                movie: movie,
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+            },
+            success: function() {
+                location.reload()
+            },
+        })
+    }
+})

@@ -346,11 +346,10 @@ class Event(models.Model):
                     lockin = LockIn.objects.create(event=self, movie=movie)
                     event_members = self.users.all()
                     for event_member in event_members:
-                        Viewing.objects.create(
-                            user=event_member,
-                            event=self,
-                            movie=movie,
-                            date_and_time=lockin.created,
+                        Viewing.create(
+                            uid=event_member.pk,
+                            imdb_id=imdb_id,
+                            event_id=self.pk,
                         )
                     return True
         return False
