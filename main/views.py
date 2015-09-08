@@ -2,17 +2,23 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext, loader
 from django.utils.text import slugify
 from django.views.generic import View
 from django.db.models import Count
+from django.core.urlresolvers import reverse
 
 # local imports
-from main.forms import MovieSearchForm, GroupForm, EventForm, LocationForm
+from main.forms import (
+    MovieSearchForm,
+    GroupForm,
+    EventForm,
+    LocationForm,
+    LockInForm, )
 from main.functions import get_voted_movie_qs
-from main.models import Movie, Event, Group, Location
+from main.models import Movie, Event, Group, Location, LockIn
 import user_auth
 # from scripts import populate_movies as mov_in
 
@@ -273,12 +279,45 @@ class EventDetails(View):
 
         event = Event.objects.get(id=event_id)
         event_members = event.users.all()
+        lockin_form = LockInForm(event=event)
 
+        context['lockin_form'] = lockin_form
         context['event'] = event
+        context['user'] = request.user
         context['users'] = event_members
         context['movies'] = event.movie_pool()
+        context['creator'] = event.creator
+        context['lockins'] = event.lockins.all()
         return render_to_response(
             'event_details.html', context, context_instance=request_context)
+
+    def post(self, request, group_slug, event_id):
+        context = {}
+        event = Event.objects.get(id=event_id)
+        request_context = RequestContext(request, processors=[global_context])
+        if request.POST['type'] == 'lockin':
+            lockin_form = LockInForm(event, request.POST)
+
+            if lockin_form.is_valid():
+                movie = lockin_form.cleaned_data['movie']
+                event.lockin(request.user.pk, movie.imdb_id)
+                context['success'] = 'Your movie has been locken in'
+                return HttpResponseRedirect(reverse(
+                    'event_details', args=[group_slug, event_id]))
+            context['errors'] = form.errors
+            return render_to_response(
+                'event_details.html', context,
+                context_instance=request_context)
+        elif request.POST['type'] == 'delete':
+            movie = request.POST['movie']
+            event.lockin_remove(request.user.pk, movie)
+            context['success'] = 'Your movie has been locken in'
+            return HttpResponseRedirect(reverse(
+                    'event_details', args=[group_slug, event_id]))
+            context['errors'] = form.errors
+            return render_to_response(
+                'event_details.html', context,
+                context_instance=request_context)
 
 
 # don't know if uses model functions

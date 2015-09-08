@@ -2,7 +2,17 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-sm-offset-2 col-sm-8">
+            <div class="col-sm-2">
+                {% if lockins %}
+                    <h4>Locked in movies:</h4>
+                    {% for lockin in lockins %}
+                        <p>{{lockin.movie}} {% if user == creator %}
+                        <span><button class="glyphicon glyphicon-remove btn-danger delete-lockin" data-lockin-id="{{lockin.id}}" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}" data-movie-id="{{lockin.movie.imdb_id}}"></button></span>{% endif %}</p>
+                    {% endfor %}
+                {% endif %}
+                
+            </div>
+            <div class="col-sm-8">
                 <h2><center>{{event.name}}</center></h2>
                 <p><center>{{event.description}}</center></p>
                 <br>
@@ -18,6 +28,16 @@
                 {% else %}
                     <button class="btn btn-success pull-right join-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Join Event</button>
                 {% endif %}
+                {% if user == creator %}
+                    <form action="" method="post" id="lockin-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="type" value="lockin">
+                        {{lockin_form.as_p}}
+                        <button class="btn btn-default" type="submit">Lock In</button>
+                    </form>
+                {% endif %}
+                <p>{{errors}}</p>
+                <p>{{success}}</p>
             </div>
         </div>
         <div class="row">

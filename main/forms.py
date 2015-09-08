@@ -2,7 +2,7 @@ from datetimewidget.widgets import DateTimeWidget
 from django import forms
 from django.contrib.auth.models import User
 
-from main.models import Movie, Event, Group, Location
+from main.models import Movie, Event, Group, Location, LockIn
 
 
 class MovieSearchForm(forms.Form):
@@ -147,3 +147,15 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class LockInForm(forms.ModelForm):
+
+    class Meta:
+        model = LockIn
+        fields = ('movie', )
+
+    def __init__(self, event, *args, **kwargs):
+        super(LockInForm, self).__init__(*args, **kwargs)
+        self.fields['movie'] = forms.ModelChoiceField(
+            queryset=event.movie_pool())
