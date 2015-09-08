@@ -19,6 +19,7 @@ import user_auth
 import re
 
 
+# don't know if uses model functions
 def global_context(request):
     '''
     This is the function to add context variables to all views
@@ -34,6 +35,7 @@ def global_context(request):
         return {}
 
 
+# don't know if uses model functions
 def front(request):
     context = {}
     context['rooms'] = Group.objects.all()
@@ -43,6 +45,7 @@ def front(request):
         context_instance=RequestContext(request, processors=[global_context]))
 
 
+# don't know if uses model functions
 def movies(request):
     context = {}
 
@@ -97,6 +100,7 @@ def all_groups(request):
         context_instance=RequestContext(request, processors=[global_context]))
 
 
+# don't know if uses model functions
 def user_movies(request):
     user_qs = User.objects.filter(pk=request.user.pk)
     context = {}
@@ -124,10 +128,12 @@ def delete_vote(request):
 def movie_details(request, imdb_id):
     context = {}
     request_context = RequestContext(request, processors=[global_context])
-
     context['movie'] = Movie.objects.get(imdb_id=imdb_id)
     return render_to_response(
-            'movie_details.html', context, context_instance=request_context)
+        'movie_details.html',
+        context,
+        context_instance=request_context
+    )
 
 
 @login_required
@@ -171,6 +177,7 @@ def create_group(request):
     )
 
 
+# don't know if uses model functions
 class CreateEvent(View):
 
     def post(self, request):
@@ -231,24 +238,23 @@ class CreateEvent(View):
 
 def group_details(request, group_slug):
 
-    context = {}
     request_context = RequestContext(request, processors=[global_context])
 
     group = Group.objects.get(slug=group_slug)
-    group_members = group.users.all()
 
-    group_movies = Movie.objects.filter(voters__in=group_members)
-    group_movies = group_movies.annotate(num_votes=Count('voters'))
-    group_movies = group_movies.order_by('-num_votes').distinct()
-
+    context = {}
     context['group'] = group
-    context['users'] = group_members
-    context['movies'] = get_voted_movie_qs(group_members)
+    context['users'] = group.users.all()
+    context['movies'] = group.movie_pool().order_by('-num_votes').distinct()
 
     return render_to_response(
-            'group_details.html', context, context_instance=request_context)
+        'group_details.html',
+        context,
+        context_instance=request_context
+    )
 
 
+# don't know if uses model functions
 def all_events(request):
     context = {}
     request_context = RequestContext(request, processors=[global_context])
@@ -258,6 +264,7 @@ def all_events(request):
         'all_events.html', context, context_instance=request_context)
 
 
+# don't know if uses model functions
 class EventDetails(View):
 
     def get(self, request, group_slug, event_id):
@@ -274,6 +281,7 @@ class EventDetails(View):
             'event_details.html', context, context_instance=request_context)
 
 
+# don't know if uses model functions
 def join_group(request, group_slug):
     if request.user.is_authenticated():
         group = Group.objects.get(slug=request.POST.get('group_slug', None))
@@ -283,6 +291,7 @@ def join_group(request, group_slug):
         return HttpResponse(status=401)
 
 
+# don't know if uses model functions
 def leave_group(request, group_slug):
     if request.user.is_authenticated():
         group = Group.objects.get(slug=request.POST.get('group_slug', None))
@@ -292,6 +301,7 @@ def leave_group(request, group_slug):
         return HttpResponse(status=401)
 
 
+# don't know if uses model functions
 def join_event(request, group_slug, event_id):
     if request.user.is_authenticated():
         if Event.objects.filter(id=event_id).exists():
@@ -301,6 +311,7 @@ def join_event(request, group_slug, event_id):
     return HttpResponse(status=401)
 
 
+# don't know if uses model functions
 def leave_event(request, group_slug, event_id):
     if request.user.is_authenticated():
         if Event.objects.filter(id=event_id).exists():
