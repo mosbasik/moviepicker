@@ -404,6 +404,27 @@ class Viewing(models.Model):
                                      self.movie.title,
                                      self.date_and_time)
 
+    @staticmethod
+    def create(uid, imdb_id, event_id=None):
+        '''
+        Given a user id, an imdb id and optionally an event_id; creates a
+        Viewing object and removes that movie from that user's set of votes.
+        Fails if the user or movie id is invalid. Returns the new Viewing if
+        successful; returns None if unsuccessful.
+        '''
+        if User.objects.filter(pk=uid).exists():
+            if Movie.objects.filter(imdb_id=imdb_id).exists():
+                movie = Movie.objects.get(imdb_id=imdb_id)
+                user = User.objects.get(pk=uid)
+                viewing = Viewing()
+                viewing.user = user
+                viewing.movie = movie
+                if Event.objects.filter(pk=event_id).exists():
+                    viewing.event = Event.objects.get(pk=event_id)
+                viewing.save()
+                Movie.delete_vote(user.pk, movie.imdb_id)
+        return None
+
 
 class LockIn(models.Model):
     created = models.DateTimeField(auto_now_add=True)
