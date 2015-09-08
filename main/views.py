@@ -300,19 +300,17 @@ def leave_group(request, group_slug):
 
 def join_event(request, group_slug, event_id):
     if request.user.is_authenticated():
-        event = Event.objects.get(id=event_id)
-        event.users.add(request.user)
-        return HttpResponse(status=200)
-    else:
-        return HttpResponse(status=401)
+        if Event.objects.filter(id=event_id).exists():
+            event = Event.objects.get(id=event_id)
+            event.join(request.user.pk)
+            return HttpResponse(status=200)
+    return HttpResponse(status=401)
 
 
 def leave_event(request, group_slug, event_id):
     if request.user.is_authenticated():
-        # user = request.user
-        # user.events.remove(event_id)
-        event = Event.objects.get(id=event_id)
-        event.users.remove(request.user)
-        return HttpResponse(status=200)
-    else:
-        return HttpResponse(status=401)
+        if Event.objects.filter(id=event_id).exists():
+            event = Event.objects.get(id=event_id)
+            event.leave(request.user.pk)
+            return HttpResponse(status=200)
+    return HttpResponse(status=401)
