@@ -538,3 +538,48 @@ class EventTestCase(TestCase):
 
         assert(Viewing.objects.filter(event=e1, user=eve, movie=titanic).exists())
         assert(Viewing.objects.filter(event=e1, user=eve, movie=avatar).exists())
+
+# @skip
+class ViewingTestCase(TestCase):
+
+    def setUp(self):
+
+        # movie setup
+        trek_into_darkness = Movie.objects.create(
+            imdb_id='tt1408101',
+            title='Star Trek Into Darkness')
+        trek = Movie.objects.create(
+            imdb_id='tt0796366',
+            title='Star Trek')
+        star_wars = Movie.objects.create(
+            imdb_id='tt0076759',
+            title='Star Wars: Episode IV - A New Hope')
+
+        # user setup
+        alice = User.objects.create(username='alice')
+        bob = User.objects.create(username='bob')
+        eve = User.objects.create(username='eve')
+
+        # vote setup
+        alice.votes.add(trek_into_darkness)
+        alice.votes.add(trek)
+
+        bob.votes.add(trek_into_darkness)
+        bob.votes.add(trek)
+
+        eve.votes.add(star_wars)
+        eve.votes.add(trek)
+
+
+    def test_viewing_create_deletes_votes(self):
+        '''viewing creation deletes the vote for that movie for that user.'''
+
+        alice = User.objects.get(username='alice')
+        bob = User.objects.get(username='bob')
+        trek = Movie.objects.get(title='Star Trek')
+
+        assert(trek in alice.votes.all())
+        assert(trek in bob.votes.all())
+        Viewing.create(alice.pk, trek.imdb_id)
+        assert(trek not in alice.votes.all())
+        assert(trek in bob.votes.all())
