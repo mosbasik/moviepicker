@@ -283,24 +283,26 @@ def event_details(request, group_slug, event_id):
     )
 
 
-# don't know if uses model functions
+@login_required
 def join_group(request, group_slug):
-    if request.user.is_authenticated():
-        group = Group.objects.get(slug=request.POST.get('group_slug', None))
-        group.users.add(request.user)
-        return HttpResponse(status=200)
-    else:
-        return HttpResponse(status=401)
+    if request.method == 'POST':
+        slug = request.POST.get('group_slug', None)
+        if Group.objects.filter(slug=slug).exists():
+            group = Group.objects.get(slug=slug)
+            group.join(request.user.pk)
+            return HttpResponse(status=200)
+    return redirect('group_details', group_slug=group_slug)
 
 
-# don't know if uses model functions
+@login_required
 def leave_group(request, group_slug):
-    if request.user.is_authenticated():
-        group = Group.objects.get(slug=request.POST.get('group_slug', None))
-        group.users.remove(request.user)
-        return HttpResponse(status=200)
-    else:
-        return HttpResponse(status=401)
+    if request.method == 'POST':
+        slug = request.POST.get('group_slug', None)
+        if Group.objects.filter(slug=slug).exists():
+            group = Group.objects.get(slug=None)
+            group.leave(request.user.pk)
+            return HttpResponse(status=200)
+    return redirect('group_details', group_slug=group_slug)
 
 
 # don't know if uses model functions
