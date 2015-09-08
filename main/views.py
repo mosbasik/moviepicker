@@ -178,7 +178,7 @@ class CreateEvent(View):
         request_context = RequestContext(request, processors=[global_context])
 
         if request.method == 'POST' and request.user.is_authenticated():
-            form = EventForm(request.POST)
+            form = EventForm(request.user, request.POST)
             location_form = LocationForm(request.POST)
             context['form'] = form
             context['location'] = location_form
@@ -187,7 +187,7 @@ class CreateEvent(View):
                 location, created = Location.objects.get_or_create(
                     text=location_form.cleaned_data['text'],
                     group=form.cleaned_data['group'])
-
+                print form.cleaned_data['date_and_time']
                 name = form.cleaned_data['name']
                 date_and_time = form.cleaned_data['date_and_time']
                 description = form.cleaned_data['description']

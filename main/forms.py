@@ -56,6 +56,7 @@ class EventForm(forms.Form):
     date_and_time = forms.DateTimeField(
         required=True,
         widget=DateTimeWidget(
+            usel10n=True,
             options={'showMeridian': True},
             attrs={'class': 'form-control'},
             bootstrap_version=3,
