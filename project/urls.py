@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-from main.views import CreateEvent, EventDetails
+from main.views import CreateEvent
 
 urlpatterns = [
     # administrative site url
@@ -42,14 +42,13 @@ urlpatterns = [
     url(r'^group/(?P<group_slug>[-\w]+)/$', 'main.views.group_details', name='group_details'),
     url(r'^group/(?P<group_slug>[-\w]+)/join/$', 'main.views.join_group', name='join_group'),
     url(r'^group/(?P<group_slug>[-\w]+)/leave/$', 'main.views.leave_group', name='leave_group'),
-    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/$', EventDetails.as_view(), name='event_details'),
-    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/join/$', 'main.views.join_event', name='join_event'),
-    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/leave/$', 'main.views.leave_event', name='leave_event'),
 
     # events
+    url(r'^events/$', 'main.views.event_list', name='event_list'),
     url(r'^events/add/$', CreateEvent.as_view(), name='create_event'),
-    url(r'^events/all/$', 'main.views.all_events', name='all_events'),
-
+    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/$', 'main.views.event_details', name='event_details'),
+    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/join/$', 'main.views.join_event', name='join_event'),
+    url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/leave/$', 'main.views.leave_event', name='leave_event'),
 
     # login and logout
     url(r'^login/$', 'main.user_auth.login', name='login'),

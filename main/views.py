@@ -254,7 +254,7 @@ def group_details(request, group_slug):
     )
 
 
-def all_events(request):
+def event_list(request):
     context = {}
     request_context = RequestContext(request, processors=[global_context])
     context['events'] = Event.objects.all()
@@ -266,21 +266,21 @@ def all_events(request):
     )
 
 
-# don't know if uses model functions
-class EventDetails(View):
+def event_details(request, group_slug, event_id):
+    request_context = RequestContext(request, processors=[global_context])
 
-    def get(self, request, group_slug, event_id):
-        context = {}
-        request_context = RequestContext(request, processors=[global_context])
+    event = Event.objects.get(id=event_id)
 
-        event = Event.objects.get(id=event_id)
-        event_members = event.users.all()
+    context = {}
+    context['event'] = event
+    context['users'] = event.users.all()
+    context['movies'] = event.movie_pool().order_by('-num_votes').distinct()
 
-        context['event'] = event
-        context['users'] = event_members
-        context['movies'] = get_voted_movie_qs(event_members)
-        return render_to_response(
-            'event_details.html', context, context_instance=request_context)
+    return render_to_response(
+        'event_details.html',
+        context,
+        context_instance=request_context
+    )
 
 
 # don't know if uses model functions
