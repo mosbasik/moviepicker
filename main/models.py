@@ -186,7 +186,7 @@ class Group(models.Model):
         success message.  If unsuccessful, returns None and an error message.
         '''
         if User.objects.filter(pk=uid).exists():
-            if not Group.objects.filter(name=name).exists():
+            if not Group.objects.filter(name__iexact=name).exists():
                 user = User.objects.get(pk=uid)
                 group = Group()
                 group.creator = user
@@ -194,6 +194,7 @@ class Group(models.Model):
                 if description is not None:
                     group.description = description
                 group.save()
+                group.join(uid)
                 return group, 'Group "%s" created successfully.' % group.name
             return None, 'Group name already exists.'
         return None, 'Only registered users can create groups.'
