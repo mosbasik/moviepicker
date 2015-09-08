@@ -238,7 +238,6 @@ class CreateEvent(View):
 
 
 def group_details(request, group_slug):
-
     request_context = RequestContext(request, processors=[global_context])
 
     group = Group.objects.get(slug=group_slug)
@@ -255,14 +254,16 @@ def group_details(request, group_slug):
     )
 
 
-# don't know if uses model functions
 def all_events(request):
     context = {}
     request_context = RequestContext(request, processors=[global_context])
     context['events'] = Event.objects.all()
 
     return render_to_response(
-        'all_events.html', context, context_instance=request_context)
+        'all_events.html',
+        context,
+        context_instance=request_context
+    )
 
 
 # don't know if uses model functions
