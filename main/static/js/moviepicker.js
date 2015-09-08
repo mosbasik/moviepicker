@@ -188,7 +188,6 @@ $('.delete-lockin').click(function(){
     var event_id = $(this).attr('data-event-id')
     var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
     var movie = $(this).attr('data-movie-id')
-    console.log(lockin, group_slug, event_id, movie)
     if (confirm('Are you sure you want to remove this Locked in movie?')){
         $.ajax({
             url: event_url,
