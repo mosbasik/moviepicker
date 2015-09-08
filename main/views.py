@@ -130,50 +130,45 @@ def movie_details(request, imdb_id):
             'movie_details.html', context, context_instance=request_context)
 
 
+@login_required
 def create_group(request):
 
     context = {}
+    context['form'] = GroupForm()
     request_context = RequestContext(request, processors=[global_context])
 
-    if request.method == 'POST' and request.user.is_authenticated():
+    # if the view was called with a POST
+    if request.method == 'POST':
+
+        # get the filled form object from the request
         form = GroupForm(request.POST)
+
+        # save it into the context so it can be reused if it doesn't validate
         context['form'] = form
 
+        # if the submitted form validates
         if form.is_valid():
-            group_exists = Group.objects.filter(
-                name__iexact=form.cleaned_data['name']).exists()
 
-            if not group_exists:
-                group = Group()
-                group.name = form.cleaned_data['name']
-                group.description = form.cleaned_data['description']
-                group.creator = request.user
+            # attempt to create the new group
+            group, context['message'] = Group.create_group(
+                request.user.pk,
+                form.cleaned_data['name'],
+                form.cleaned_data['description'],
+            )
 
-                group.save()
-                context['group'] = group
+            # if the group was created, redirect new owner to its details page
+            if group is not None:
+                return redirect('group_details', group_slug=group.slug)
 
-                context['message'] = "Group created successfully."
-                return render_to_response(
-                    'add_group.html', context,
-                    context_instance=request_context)
-
-            else:   # group exists
-                context['message'] = 'Group name already exists'
-                return render_to_response(
-                    'add_group.html', context,
-                    context_instance=request_context)
-
+        # if the submitted form does not pass all validation
         else:
-            context['message'] = "Group name cannot be blank"
-            return render_to_response(
-                'add_group.html', context, context_instance=request_context)
+            context['message'] = "Group name cannot be blank."
 
-    else:
-        form = GroupForm()
-        context['form'] = form
-
-        return render_to_response(
-            'add_group.html', context, context_instance=request_context)
+    return render_to_response(
+        'add_group.html',
+        context,
+        context_instance=request_context
+    )
 
 
 class CreateEvent(View):
