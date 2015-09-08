@@ -36,7 +36,6 @@ def global_context(request):
 
 def front(request):
     context = {}
-
     context['rooms'] = Group.objects.all()
 
     return render(
