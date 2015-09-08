@@ -2,7 +2,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext, loader
 from django.utils.text import slugify
@@ -89,15 +89,6 @@ def add_movie(request):
 
         return redirect('movie_details', submitted_movie.imdb_id)
     return HttpResponse(status=400)
-
-
-def all_groups(request):
-    context = {}
-    context['page_title'] = 'List of all groups'
-    context['groups'] = Group.objects.exclude(name='World')
-    return render(
-        request, 'all_groups.html', context,
-        context_instance=RequestContext(request, processors=[global_context]))
 
 
 # don't know if uses model functions
@@ -237,23 +228,6 @@ class CreateEvent(View):
             'add_event.html', context, context_instance=request_context)
 
 
-def group_details(request, group_slug):
-    request_context = RequestContext(request, processors=[global_context])
-
-    group = Group.objects.get(slug=group_slug)
-
-    context = {}
-    context['group'] = group
-    context['users'] = group.users.all()
-    context['movies'] = group.movie_pool().order_by('-num_votes').distinct()
-
-    return render_to_response(
-        'group_details.html',
-        context,
-        context_instance=request_context
-    )
-
-
 def event_list(request):
     context = {}
     request_context = RequestContext(request, processors=[global_context])
@@ -281,6 +255,73 @@ def event_details(request, group_slug, event_id):
         context,
         context_instance=request_context
     )
+
+
+class GroupPost(View):
+
+    def post(self, request, group_slug=None):
+
+        # if user is authenticated
+        if request.user.is_authenticated():
+            action = request.POST.get('action', None)
+            slug = request.POST.get('group_slug', None)
+            if Group.objects.filter(slug=slug).exists():
+                group = Group.objects.get(slug=slug)
+                if action == 'join':
+                    group.join(request.user.pk)
+                elif action == 'leave':
+                    group.leave(request.user.pk)
+                else:
+                    # bad request; invalid action recieved
+                    return HttpResponse(status=400)
+
+                # successful operation
+                return HttpResponse(status=200)
+
+            # bad request; invalid group recieved
+            return HttpResponse(status=400)
+
+        # if user is not authenticated
+        else:
+            # redirect to login page (saving referral URL to get back)
+            temp_resp = redirect('login')
+            redirect_url = temp_resp['location'] + '?next=%s' % request.path
+            return JsonResponse({'redirect': redirect_url})
+
+
+class GroupList(GroupPost):
+
+    def get(self, request):
+        request_context = RequestContext(request, processors=[global_context])
+
+        context = {}
+        context['page_title'] = 'List of all groups'
+        context['groups'] = Group.objects.exclude(name='World')
+
+        return render_to_response(
+            'group_list.html',
+            context,
+            context_instance=request_context
+        )
+
+
+class GroupDetails(GroupPost):
+
+    def get(self, request, group_slug):
+        request_context = RequestContext(request, processors=[global_context])
+
+        group = Group.objects.get(slug=group_slug)
+
+        context = {}
+        context['group'] = group
+        context['users'] = group.users.all()
+        context['movies'] = group.movie_pool().order_by('-num_votes').distinct()
+
+        return render_to_response(
+            'group_details.html',
+            context,
+            context_instance=request_context
+        )
 
 
 @login_required
