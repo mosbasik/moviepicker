@@ -1,0 +1,35 @@
+{% extends  'base.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+
+{% endblock css %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h1>{{ page_title }}</h1>
+            {% if request.user.is_authenticated %}
+                <h5>Click poster to vote.</h5>
+            {% else %}
+                <h5>Please log in to vote.</h5>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% include "movie_list.html" %}
+
+</div>
+
+{% endblock content %}
+
+
+{% block js %}
+
+{% endblock js %}

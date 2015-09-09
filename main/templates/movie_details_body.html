@@ -1,0 +1,56 @@
+{% load staticfiles %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h2>{{movie.title}}</h2>
+    </div>
+</div>
+<br>
+<div class="row">
+    {% if user.is_authenticated %}
+        {% if movie in votes %}
+            <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote liked">
+
+        {% else %}
+            <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote">
+        {% endif %}
+    {% else %}
+
+        <div id='{{ movie.imdb_id }}' class="col-md-3 movie-vote">
+    {% endif %}
+
+        
+        {% if movie.poster %}
+            
+            <a class='movie-image' href="#"><img src="{{ movie.poster.url }}"></a>
+
+        {% else %}
+
+            <a class='movie-image' href=""><img src="{% static 'img/default_image.jpg' %}" style='width: 100%'></a>
+
+        {% endif %}
+
+    </div>
+    <div class="col-sm-8 col-md-5 fade-border">
+        
+        <h4>Description</h4>
+        {{movie.description}}
+        
+    </div>
+    <div class="col-sm-12 col-md-4 fade-border">
+        <h4>Details</h4>
+        <span class='title-format'>Released: </span><span>{{ movie.year }}</span>
+        <br>
+        <span class='title-format'>IMDB Rating: </span><span>{{ movie.imdb_rating }}</span>
+        <br>
+        <span class='title-format'>Runtime: </span><span>{{ movie.runtime }} minutes</span>
+        <br>
+        <span class='title-format'>Genre: </span><span>{{ movie.genre }}</span>
+        {# <br> #}
+        {# <span class='title-format'>Starring: </span><span>{{ movie.starring }}</span> #}
+        {# <br> #}
+        {# <span class='title-format'>Writers: </span><span>{{ movie.written_by }}</span> #}
+        {# <br> #}
+        {# <span class='title-format'>Director: </span><span>{{ movie.directed_by }}</span> #}
+    </div>
+</div>

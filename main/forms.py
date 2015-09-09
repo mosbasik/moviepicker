@@ -2,7 +2,7 @@ from datetimewidget.widgets import DateTimeWidget
 from django import forms
 from django.contrib.auth.models import User
 
-from main.models import Movie, Event, Group, Location
+from main.models import Movie, Event, Group, Location, LockIn
 
 
 class MovieSearchForm(forms.Form):
@@ -56,6 +56,7 @@ class EventForm(forms.Form):
     date_and_time = forms.DateTimeField(
         required=True,
         widget=DateTimeWidget(
+            usel10n=True,
             options={'showMeridian': True},
             attrs={'class': 'form-control'},
             bootstrap_version=3,
@@ -72,15 +73,15 @@ class EventForm(forms.Form):
         )
     )
 
-    group = forms.ModelChoiceField(
-        queryset=Group.objects.all(),   # TODO - Filter this based on the user's groups
-        required=True, widget=forms.Select(attrs={'class': 'form-control'}))
-
-   
     class Meta:
         model = Event
         fields = ['name', 'date_and_time', 'description', 'group']
-    
+
+    def __init__(self, user, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        self.fields['group'] = forms.ModelChoiceField(
+            queryset=Group.objects.filter(users=user).exclude(name='World'))
+
 
 class LocationForm(forms.ModelForm):
 
@@ -146,3 +147,15 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class LockInForm(forms.ModelForm):
+
+    class Meta:
+        model = LockIn
+        fields = ('movie', )
+
+    def __init__(self, event, *args, **kwargs):
+        super(LockInForm, self).__init__(*args, **kwargs)
+        self.fields['movie'] = forms.ModelChoiceField(
+            queryset=event.movie_pool())

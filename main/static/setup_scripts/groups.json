@@ -3,32 +3,57 @@
         {
             "username": "batman",
             "email": "batman@batman.com",
-            "password1": "batman",
-            "password2": "batman"
+            "password": "batman"
         },
         {
-            "username": "alpha",
-            "email": "alpha@alpha.com",
-            "password1": "alpha",
-            "password2": "alpha"
+            "username": "andy",
+            "email": "andy@andy.com",
+            "password": "andy"
         },
         {
-            "username": "bravo",
-            "email": "bravo@bravo.com",
-            "password1": "bravo",
-            "password2": "bravo"
+            "username": "bob",
+            "email": "bob@bob.com",
+            "password": "bob"
         },
         {
             "username": "charlie",
             "email": "charlie@charlie.com",
-            "password1": "charlie",
-            "password2": "charlie"
+            "password": "charlie"
         },
         {
-            "username": "delta",
-            "email": "delta@delta.com",
-            "password1": "delta",
-            "password2": "delta"
+            "username": "dave",
+            "email": "dave@dave.com",
+            "password": "dave"
+        },
+        {
+            "username": "ed",
+            "email": "ed@ed.com",
+            "password": "ed"
+        },
+        {
+            "username": "fox",
+            "email": "fox@fox.com",
+            "password": "fox"
+        },
+        {
+            "username": "george",
+            "email": "george@george.com",
+            "password": "george"
+        },
+        {
+            "username": "harry",
+            "email": "harry@harry.com",
+            "password": "harry"
+        },
+        {
+            "username": "ike",
+            "email": "ike@ike.com",
+            "password": "ike"
+        },
+        {
+            "username": "kim",
+            "email": "kim@kim.com",
+            "password": "kim"
         }
     ],
     "groups": [
