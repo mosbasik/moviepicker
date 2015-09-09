@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 from main.views import (
+    Home,
     GroupList, GroupDetails,
     EventDetails, CreateEvent,
 )
@@ -28,14 +29,14 @@ urlpatterns = [
     # administrative site url
     url(r'^admin/', include(admin.site.urls)),
 
-    # root (currently landing page)
-    url(r'^$', 'main.views.front', name='front'),
+    # user
+    url(r'^$', Home.as_view(), name='root'),
+    url(r'^home/$', Home.as_view(), name='home'),
 
     # movies
     url(r'^movies/$', 'main.views.movies', name='movies'),
     url(r'^movies/(?P<imdb_id>tt\d+)/$', 'main.views.movie_details', name='movie_details'),
     url(r'^movies/add/$', 'main.views.add_movie', name='add_movie'),
-    url(r'^movies/liked/$', 'main.views.user_movies', name='user_movies'),
     url(r'^create-vote/$', 'main.views.create_vote', name='vote'),
     url(r'^delete-vote/$', 'main.views.delete_vote', name='unvote'),
 

@@ -12,12 +12,12 @@
         {% endif %}
     </div>
     <div class="row">
-        <div class="col-sm-12 col-md-12">
+        <div class="col-sm-12 col-md-12 movie-image-wrapper">
 
             {% if movie.poster %}
-                <a class='movie-image' href="#"><img src="{{ movie.poster.url }}"></a>
+                <a class="movie-image" href="#"><img src="{{ movie.poster.url }}"></a>
             {% else %}
-                <a class='movie-image' href="#"><img src="{% static 'img/default_image.jpg' %}"></a>
+                <a class="movie-image" href="#"><img src="{% static 'img/default_image.jpg' %}"></a>
             {% endif %}
 
         </div>
