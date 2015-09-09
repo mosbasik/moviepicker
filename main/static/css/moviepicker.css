@@ -212,9 +212,26 @@ p.event-summary {
     text-indent: 20px;
 }
 
-.owned-column {
-    border-left: 1px solid black;
+.row.vertical-divider{
+    overflow: hidden;
 }
+.row.vertical-divider > div[class^="col-"] {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+.row.vertical-divider div[class^="col-"]:first-child {
+    border-left: none;
+}
+.row.vertical-divider div[class^="col-"]:last-child {
+    border-right: none;
+}
+
+.joined-column {
+    right: -1px;
+}
+.owned-column {
+}
+
 
 /*div {
     border-width: 3px;

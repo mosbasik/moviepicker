@@ -11,13 +11,15 @@ from django.db.models import Count
 from django.conf import settings
 
 # external imports
-from lxml import etree
 from autoslug import AutoSlugField
+from lxml import etree
+from datetime import datetime, timedelta
 import re
 import requests
+import pytz
 import StringIO
-import urllib
 import time
+import urllib
 
 
 class Movie(models.Model):
@@ -286,9 +288,21 @@ class Event(models.Model):
     @property
     def is_locked(self):
         '''
-        Returns true if movies have been locked into this event; else False.
+        Returns True if movies have been locked into this event; else False.
         '''
         return True if self.lockins.all().count() > 0 else False
+
+    @property
+    def is_showing(self):
+        '''
+        Returns True if the designated start time has passed but the event has
+        not been set to inactive yet.
+        '''
+        if self.is_active:
+            now = datetime.utcnow().replace(tzinfo=pytz.utc)
+            if (now - self.date_and_time) > timedelta(seconds=0):
+                return True
+        return False
 
     def join(self, uid):
         '''
