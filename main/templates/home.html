@@ -18,13 +18,16 @@
                     <div class="col-sm-8">
                         <h4>Events Joined:</h4>
                         {% for event in events_joined %}
-                            <p><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a> ({{ event.date_and_time|timeuntil }})</p>
+                            <div class="event-summary-wrapper">
+                                <p class="event-summary"><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a><span class="pull-right">{{ event.date_and_time|timeuntil }}</span></p>
+                                <p class="event-summary body">{% if event.is_locked %}<span class="glyphicon glyphicon-lock pull-left"></span>{% else %}<span class="glyphicon glyphicon-arrow-up pull-left"></span>{% endif %} <a href="{% url 'movie_details' event.leader.imdb_id %}">{{ event.leader.title }} [{{ event.leader.year }}]</a></p>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
 
-            <div class="col-sm-6">
+            <div class="col-sm-6 owned-column">
                 <div class="row">
                     <div class="col-sm-4">
                         <h4>Groups Owned:</h4>
@@ -35,7 +38,10 @@
                     <div class="col-sm-8">
                         <h4>Events Owned:</h4>
                         {% for event in events_created %}
-                            <p><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a> ({{ event.date_and_time|timeuntil }})</p>
+                            <div class="event-summary-wrapper">
+                                <p class="event-summary"><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a><span class="pull-right">{{ event.date_and_time|timeuntil }}</span></p>
+                                <p class="event-summary body">{% if event.is_locked %}<span class="glyphicon glyphicon-lock pull-left"></span>{% else %}<span class="glyphicon glyphicon-arrow-up pull-left"></span>{% endif %} <a href="{% url 'movie_details' event.leader.imdb_id %}">{{ event.leader.title }} [{{ event.leader.year }}]</a></p>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
