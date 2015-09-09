@@ -6,7 +6,7 @@
                 {% if event.lockins.all.count > 0 %}
                     <h4>Locked in movies:</h4>
                     {% for lockin in event.lockins.all %}
-                        <p>{{ lockin.movie }} {% if user == creator %}<span><button class="glyphicon glyphicon-remove btn-danger delete-lockin" data-lockin-id="{{lockin.id}}" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}" data-movie-id="{{lockin.movie.imdb_id}}"></button></span>{% endif %}</p>
+                        <p>{{ lockin.movie }} {% if request.user == event.creator %}<span><button class="glyphicon glyphicon-remove btn-danger delete-lockin" data-lockin-id="{{lockin.id}}" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}" data-movie-id="{{lockin.movie.imdb_id}}"></button></span>{% endif %}</p>
                     {% endfor %}
                 {% endif %}
             </div>
