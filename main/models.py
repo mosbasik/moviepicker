@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.db.models import Count
 
 # local imports
-# from scripts import populate_movies as mov_in
+from django.conf import settings
 
 # external imports
 from lxml import etree
@@ -17,6 +17,7 @@ import re
 import requests
 import StringIO
 import urllib
+import time
 
 
 class Movie(models.Model):
@@ -93,37 +94,43 @@ class Movie(models.Model):
             # if the movie doesn't already exist locally
             else:
 
-                # hit the OMDB API to get information and start storing it
-                o_url = 'http://www.omdbapi.com/?i=%s&plot=full&r=json'
-                o_request = requests.get(o_url % imdb_id)
-                o_json = o_request.json()
+                # save the TMDB api key for local use
+                TMDB_KEY = settings.TMDB_KEY
 
-                #  continue if OMDB says the id is valid and belongs to a movie
-                if o_json['Response'] == 'True' and o_json['Type'] == 'movie':
+                # Search TMDB with the IMDB ID
+                t_payload = {'external_source': 'imdb_id', 'api_key': TMDB_KEY}
+                t_url = 'https://api.themoviedb.org/3/find/%s'
+                t_request = requests.get(t_url % imdb_id, params=t_payload)
+                t_json = t_request.json()
+                # print t_json
 
-                    # get the submitter's user object if it exists
-                    user = None if uid is None else User.objects.get(pk=uid)
+                # if that imdb_id is present in TMDB
+                if t_json['movie_results']:
+
+                    # Query TMDB with the newly-found TMDB ID
+                    tmdb_id = t_json['movie_results'][0]['id']
+                    t_payload = {'api_key': TMDB_KEY}
+                    t_url = 'https://api.themoviedb.org/3/movie/%s'
+                    t_request = requests.get(t_url % tmdb_id, params=t_payload)
+                    t_json = t_request.json()
 
                     # create the movie object
                     movie = Movie()
 
                     # populate with guaranteed information
-                    movie.submitter = user
+                    movie.submitter = None if uid is None else User.objects.get(pk=uid)
                     movie.imdb_id = imdb_id
-                    movie.title = o_json['Title']
-                    movie.year = o_json['Year']
-                    movie.runtime = o_json['Runtime']
-                    movie.genre = o_json['Genre']
-                    movie.description = o_json['Plot']
-                    movie.starring = o_json['Actors']
-                    movie.written_by = o_json['Writer']
-                    movie.directed_by = o_json['Director']
+                    movie.title = t_json['original_title']
+                    movie.year = t_json['release_date'][:4]
+                    movie.runtime = t_json['runtime']
+                    movie.description = t_json['overview']
+                    movie.imdb_rating = float(t_json['vote_average'])
 
-                    # movies not yet released do not have ratings;
-                    try:
-                        movie.imdb_rating = float(o_json['imdbRating'])
-                    except ValueError:
-                        pass
+                    # generate and store a string of genres
+                    genre_string = ''
+                    for genre in t_json['genres']:
+                        genre_string += ', %s' % genre['name']
+                    movie.genre = genre_string[2:]
 
                     # save the movie
                     movie.save()
@@ -134,6 +141,9 @@ class Movie(models.Model):
                     # queue the movie for return
                     result = movie
 
+                    # delay for a half second to make sure we stay under TMDB's
+                    # rate limit protocol (40 requests every 10 seconds)
+                    time.sleep(.5)
         return result
 
     def set_poster(self):
