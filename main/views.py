@@ -42,14 +42,20 @@ def global_context(request):
         return {}
 
 
-# don't know if uses model functions
-def front(request):
-    context = {}
-    context['rooms'] = Group.objects.all()
+class Home(View):
 
-    return render(
-        request, 'index.html', context,
-        context_instance=RequestContext(request, processors=[global_context]))
+    def get(self, request):
+        if request.user.is_authenticated():
+            request_context = RequestContext(request, processors=[global_context])
+            context = {}
+            context['movies'] = request.user.votes.all().order_by('truncated_title')
+            context['movies_label'] = 'Movies you\'ve voted for:'
+            return render(request, 'home.html', context, request_context)
+        else:
+            return redirect('movies')
+
+    def post(self, request):
+        pass
 
 
 # don't know if uses model functions
@@ -96,17 +102,6 @@ def add_movie(request):
 
         return redirect('movie_details', submitted_movie.imdb_id)
     return HttpResponse(status=400)
-
-
-# don't know if uses model functions
-def user_movies(request):
-    user_qs = User.objects.filter(pk=request.user.pk)
-    context = {}
-    context['page_title'] = request.user.username.title() + "'s Movies"
-    context['movies'] = get_voted_movie_qs(user_qs, ['truncated_title'])
-    return render(
-        request, 'movies.html', context,
-        context_instance=RequestContext(request, processors=[global_context]))
 
 
 def create_vote(request):
@@ -246,23 +241,6 @@ def event_list(request):
     )
 
 
-# def event_details(request, group_slug, event_id):
-#     request_context = RequestContext(request, processors=[global_context])
-
-#     event = Event.objects.get(id=event_id)
-
-#     context = {}
-#     context['event'] = event
-#     context['users'] = event.users.all()
-#     context['movies'] = event.movie_pool().order_by('-num_votes').distinct()
-
-#     return render_to_response(
-#         'event_details.html',
-#         context,
-#         context_instance=request_context
-#     )
-
-
 class GroupPost(View):
 
     def post(self, request, group_slug=None):
@@ -321,6 +299,7 @@ class GroupDetails(GroupPost):
         context = {}
         context['group'] = group
         context['users'] = group.users.all()
+        context['movies_label'] = 'Movies that group members have voted for:'
         context['movies'] = group.movie_pool().order_by('-num_votes').distinct()
 
         return render_to_response(
@@ -342,6 +321,7 @@ class EventDetails(View):
         context = {}
         context['lockin_form'] = lockin_form
         context['event'] = event
+        context['movies_label'] = 'Movies that event attendees have voted for:'
         context['movies'] = event.movie_pool().order_by('-num_votes').distinct()
 
         return render_to_response(
