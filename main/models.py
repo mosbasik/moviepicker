@@ -31,9 +31,6 @@ class Movie(models.Model):
     runtime = models.CharField(max_length=40, null=True, blank=True)
     genre = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    # starring = models.TextField(null=True, blank=True)
-    # written_by = models.TextField(null=True, blank=True)
-    # directed_by = models.CharField(max_length=255, null=True, blank=True)
     poster = models.ImageField(upload_to='posters', null=True, blank=True)
     voters = models.ManyToManyField(User, related_name='votes')
     submitter = models.ForeignKey(User, blank=True, null=True, related_name='submitted_movies')
@@ -274,6 +271,25 @@ class Event(models.Model):
     def __unicode__(self):
         return self.name
 
+    @property
+    def leader(self):
+        '''
+        Returns the current representative movie for this event.  If movies
+        have been locked in, returns the most recently locked in movie.  If
+        nothing has been locked in yet, returns the highest-voted movie.
+        '''
+        if self.lockins.all().count() > 0:  # if lockins exist for this event
+            return self.lockins.all().order_by('-created')[:1].get().movie
+        else:  # if  nothing has been locked in yet for this event
+            return self.movie_pool()[:1].get()
+
+    @property
+    def is_locked(self):
+        '''
+        Returns true if movies have been locked into this event; else False.
+        '''
+        return True if self.lockins.all().count() > 0 else False
+
     def join(self, uid):
         '''
         Given any valid user id from the site, adds that user to the members of
@@ -337,7 +353,8 @@ class Event(models.Model):
         '''
         movies = Movie.objects.filter(
             voters__in=self.users.all()).annotate(
-            num_votes=Count('voters')).order_by('-num_votes')
+            num_votes=Count('voters')
+        ).order_by('-num_votes', '-imdb_rating')
         return movies
 
     def lockin(self, uid, imdb_id):

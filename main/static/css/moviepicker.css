@@ -197,3 +197,30 @@ html { /* sticks the footer to the bottom */
   height: 150px;
   width: auto;
 }
+
+.event-summary-wrapper {
+    margin-bottom: 25px;
+}
+p.event-summary {
+    line-height: 50%;
+}
+.event-summary .glyphicon {
+    font-size: 80%;
+    line-height: 50%;
+}
+.event-summary.body {
+    text-indent: 20px;
+}
+
+.owned-column {
+    border-left: 1px solid black;
+}
+
+/*div {
+    border-width: 3px;
+    -moz-border-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0), #000000, #000000, rgba(0, 0, 0, 0)) 1 100%;
+    -webkit-border-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(33.33333%, #000000), color-stop(66.66667%, #000000), color-stop(100%, rgba(0, 0, 0, 0))) 1 100%;
+    -webkit-border-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), #000000, #000000, rgba(0, 0, 0, 0)) 1 100%;
+    -o-border-image: -o-linear-gradient(top, rgba(0, 0, 0, 0), #000000, #000000, rgba(0, 0, 0, 0)) 1 100%;
+    border-image: linear-gradient(top, rgba(0, 0, 0, 0), #000000, #000000, rgba(0, 0, 0, 0)) 1 100%;
+}*/
