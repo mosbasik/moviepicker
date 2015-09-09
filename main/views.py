@@ -47,9 +47,14 @@ class Home(View):
     def get(self, request):
         if request.user.is_authenticated():
             request_context = RequestContext(request, processors=[global_context])
+            u = request.user
             context = {}
-            context['movies'] = request.user.votes.all().order_by('truncated_title')
+            context['movies'] = u.votes.all().order_by('truncated_title')
             context['movies_label'] = 'Movies you\'ve voted for:'
+            context['groups_joined'] = u.movie_groups.all().order_by('name')
+            context['events_joined'] = u.events.all().order_by('date_and_time')
+            context['groups_created'] = u.groups_created.all().order_by('name')
+            context['events_created'] = u.events_created.all().order_by('date_and_time')
             return render(request, 'home.html', context, request_context)
         else:
             return redirect('movies')

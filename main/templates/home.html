@@ -5,73 +5,43 @@
 {% block content %}
 
     <div class="container">
-        {# <div class="row"> #}
-
-            {# <div class="col-sm-12"> #}
-                {# <h1>Home</h1> #}
-            {# </div> #}
-
-        {# </div> #}
-
-
         <div class="row">
 
-            <div class="col-sm-3 text-center">
-                <h4>Groups Joined:</h4>
-                {% for group in request.user.movie_groups.all %}
-                    <p><a href="{% url 'group_details' group.slug %}">{{ group.name }}</a></p>
-                {% endfor %}
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h4>Groups Joined:</h4>
+                        {% for group in groups_joined %}
+                            <p><a href="{% url 'group_details' group.slug %}">{{ group.name }}</a></p>
+                        {% endfor %}
+                    </div>
+                    <div class="col-sm-8">
+                        <h4>Events Joined:</h4>
+                        {% for event in events_joined %}
+                            <p><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a> ({{ event.date_and_time|timeuntil }})</p>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-3 text-center">
-                <h4>Events Joined:</h4>
-                {% for event in request.user.events.all %}
-                    <p><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a></p>
-                {% endfor %}
-            </div>
-            <div class="col-sm-3 text-center">
-                <h4>Groups Owned:</h4>
-                {% for group in request.user.groups_created.all %}
-                    <p><a href="{% url 'group_details' group.slug %}">{{ group.name }}</a></p>
-                {% endfor %}
-            </div>
-            <div class="col-sm-3 text-center">
-                <h4>Events Owned:</h4>
-                {% for event in request.user.events_created.all %}
-                    <p><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a></p>
-                {% endfor %}
-            </div>
-            {# <div class="col-sm-12"> #}
-                {# <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true"> #}
-                    {# {% for group in user.movie_groups.all %} #}
 
-                        {# <div class="panel panel-default"> #}
-                            {# <div class="panel-heading" role="tab" id="group-{{ group.slug }}"> #}
-                                {# <h4 class="panel-title"> #}
-                                    {# <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{ group.slug }}" aria-expanded="false" aria-controls="collapse-{{ group.slug }}"> #}
-                                        {# {{ group.name }} {% if request.user == group.creator %}(You created this group){% endif %} #}
-                                    {# </a> #}
-                                {# </h4> #}
-                            {# </div> #}
-                            {# <div id="collapse-{{ group.slug }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="group-{{ group.slug }}"> #}
-                                {# <div class="panel-body"> #}
-                                    {# <h4>Users:</h4> #}
-                                    {# {% for user in group.users.all %} #}
-                                        {# {{ user.username }} / #}
-                                    {# {% endfor %} #}
-                                    {# <h4>Events:</h4> #}
-                                    {# {% for event in group.events.all %} #}
-                                        {# <p><a href="{% url 'event_details' group.slug event.pk %}">{{ event.name }}</a></p> #}
-                                    {# {% endfor %} #}
-                                {# </div> #}
-                            {# </div> #}
-                        {# </div> #}
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h4>Groups Owned:</h4>
+                        {% for group in groups_created %}
+                            <p><a href="{% url 'group_details' group.slug %}">{{ group.name }}</a></p>
+                        {% endfor %}
+                    </div>
+                    <div class="col-sm-8">
+                        <h4>Events Owned:</h4>
+                        {% for event in events_created %}
+                            <p><a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a> ({{ event.date_and_time|timeuntil }})</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
-                    {# {% endfor %} #}
-
-                {# </div> #}
-            {# </div> #}
         </div>
-
 
         {% include "movie_list.html" %}
 
