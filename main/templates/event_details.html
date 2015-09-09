@@ -3,25 +3,25 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-3">
-                {% if lockins %}
+                {% if event.lockins.all.count > 0 %}
                     <h4>Locked in movies:</h4>
-                    {% for lockin in lockins %}
-                        <p>{{lockin.movie}} {% if user == creator %}
-                        <span><button class="glyphicon glyphicon-remove btn-danger delete-lockin" data-lockin-id="{{lockin.id}}" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}" data-movie-id="{{lockin.movie.imdb_id}}"></button></span>{% endif %}</p>
+                    {% for lockin in event.lockins.all %}
+                        <p>{{ lockin.movie }} {% if user == creator %}<span><button class="glyphicon glyphicon-remove btn-danger delete-lockin" data-lockin-id="{{lockin.id}}" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}" data-movie-id="{{lockin.movie.imdb_id}}"></button></span>{% endif %}</p>
                     {% endfor %}
                 {% endif %}
-                
             </div>
+
             <div class="col-sm-6 event-info-container">
                 <h2><center>{{event.name}}</center></h2>
                 <p><center>{{event.description}}</center></p>
                 <br>
-                <p><center>Movie starts time: {{event.date_and_time}}</center></p>
+                <p><center>Movie start time: {{event.date_and_time}}</center></p>
             </div>
+
             <div class="col-sm-3">
                 <div class="row">
-                    {% if user.is_authenticated %}
-                        {% if event in user.events.all %}
+                    {% if request.user.is_authenticated %}
+                        {% if event in request.user.events.all %}
                             <button class="btn btn-danger pull-right leave-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Leave Event</button>
                         {% else %}
                             <button class="btn btn-success pull-right join-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Join Event</button>
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="row">
-                    {% if user == creator %}
+                    {% if request.user == event.creator %}
                         <form action="" method="post" id="lockin-form">
                             {% csrf_token %}
                             <input type="hidden" name="type" value="lockin">
@@ -42,14 +42,14 @@
                         </form>
                     {% endif %}
                 </div>
-                <p>{{errors}}</p>
-                <p>{{success}}</p>
+                {# <p>{{errors}}</p> #}
+                {# <p>{{success}}</p> #}
             </div>
         </div>
         <div class="row">
             <div class="col-sm-offset-2 col-sm-8">
                 <h3><center>Current Event Members</center></h3>
-                {% for user in users %}
+                {% for user in event.users.all %}
                     <div class="col-xs-3 col-sm-2">
                         <p>{{user.username}}</p>
                     </div>
