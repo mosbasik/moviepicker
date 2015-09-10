@@ -29,6 +29,9 @@ urlpatterns = [
     # administrative site url
     url(r'^admin/', include(admin.site.urls)),
 
+    # github deployment webhook
+    url(r'^hook/', include('github_hook.urls')),
+
     # user
     url(r'^$', Home.as_view(), name='root'),
     url(r'^home/$', Home.as_view(), name='home'),
