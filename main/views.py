@@ -327,7 +327,7 @@ class EventDetails(View):
         context['lockin_form'] = lockin_form
         context['event'] = event
         context['movies_label'] = 'Movies that event attendees have voted for:'
-        context['movies'] = event.movie_pool().order_by('-num_votes').distinct()
+        context['movies'] = event.movie_pool().order_by('-num_votes', '-imdb_rating').distinct()
 
         return render_to_response(
             'event_details.html',
