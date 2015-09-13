@@ -1,6 +1,14 @@
 {% load staticfiles %}
 
-<div id='{{ movie.imdb_id }}' class="col-xs-4 col-sm-3 col-md-2 movie-summary movie-vote {% if user.is_authenticated and movie in votes %}liked{% endif %}">
+<div id='{{ movie.imdb_id }}'
+     class="
+        grid-item
+        movie-summary
+        movie-vote
+        {% if user.is_authenticated and movie in votes %}liked{% endif %}"
+     data-rating="{{ movie.imdb_rating }}"
+     data-truncated-title="{{ movie.truncated_title }}"
+     data-year="{{ movie.year }}">
     <div class="row">
         <div class="col-xs-12">
             <a href="{% url 'movie_details' movie.imdb_id %}" title='{{ movie.title }}' data-toggle="tooltip">{{ movie.title|truncatechars:12 }} [{{ movie.year }}]</a>
@@ -13,13 +21,7 @@
     </div>
     <div class="row">
         <div class="col-sm-12 col-md-12 movie-image-wrapper">
-
-            {% if movie.poster %}
-                <a class="movie-image" href="#"><img src="{{ movie.poster.url }}"></a>
-            {% else %}
-                <a class="movie-image" href="#"><img src="{% static 'img/default_image.jpg' %}"></a>
-            {% endif %}
-
+            <a id="movie-{{ movie.imdb_id }}" class="movie-image" href="#"><img src="{% if movie.poster %}{{ movie.poster.url }}{% else %}{% static 'img/default_image.jpg' %}{% endif %}"></a>
         </div>
     </div>
 </div>
