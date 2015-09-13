@@ -36,7 +36,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'main',
     'datetimewidget',
-    'github_hook',
 )
 
 MIDDLEWARE_CLASSES = (
