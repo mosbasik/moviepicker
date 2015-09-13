@@ -1,10 +1,28 @@
+var $grid = $('.grid')
 
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip;
-});
+    $grid.isotope({
+        // options
+        itemSelector: '.grid-item',
 
+        layoutMode: 'fitRows',
 
-/***** ANIMATIONS FOR LOGIN PAGE *****/
+        getSortData: {
+            rating: '[data-rating]',
+            truncated_title: '[data-truncated-title]',
+            year: '[data-year]',
+        },
+        sortAscending: {
+            rating: false,
+            truncated_title: true,
+            year: false,
+        },
+    })
+})
+
+// ========== login page animations ==========
+
 $('#switch-to-create').click(function(e) {
     e.preventDefault()
     $('#user-login-form').fadeOut(function() {
@@ -17,6 +35,22 @@ $('#switch-to-login').click(function(e) {
     $('#user-create-form').fadeOut(function(){
         $('#user-login-form').fadeIn()
     })
+})
+
+// ========== isotope filter managment ==========
+
+// filter items on button click
+$('.filter-button-group').on( 'click', 'button', function() {
+    var filterValue = $(this).attr('data-filter')
+    $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+    $grid.isotope({ filter: filterValue })
+})
+
+// sort items on button click
+$('.sort-by-button-group').on( 'click', 'button', function() {
+    var sortByValue = $(this).attr('data-sort-by')
+    $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+    $grid.isotope({ sortBy: sortByValue })
 })
 
 
