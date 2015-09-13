@@ -11,13 +11,19 @@
      data-year="{{ movie.year }}">
     <div class="row">
         <div class="col-xs-12">
-            <a href="{% url 'movie_details' movie.imdb_id %}" title='{{ movie.title }}' data-toggle="tooltip">{{ movie.title|truncatechars:12 }} [{{ movie.year }}]</a>
-        </div>
-        {% if movie.num_votes %}
-            <div class="col-xs-12">
-                Votes: <span class="num-votes">{{ movie.num_votes }}</span>
+            <div class="row">
+                <div class="col-xs-12">
+                    <a href="{% url 'movie_details' movie.imdb_id %}" title='{{ movie.title }}' data-toggle="tooltip">{{ movie.title|truncatechars:12 }} [{{ movie.year }}]</a>
+                </div>
             </div>
-        {% endif %}
+            {% if movie.num_votes %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        Votes: <span class="num-votes">{{ movie.num_votes }}</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
     </div>
     <div class="row">
         <div class="col-sm-12 col-md-12 movie-image-wrapper">
