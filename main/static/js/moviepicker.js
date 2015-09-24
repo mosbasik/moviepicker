@@ -1,10 +1,28 @@
+var $grid = $('.grid')
 
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip;
-});
+    $grid.isotope({
+        // options
+        itemSelector: '.grid-item',
 
+        layoutMode: 'fitRows',
 
-/***** ANIMATIONS FOR LOGIN PAGE *****/
+        getSortData: {
+            rating: '[data-rating]',
+            truncated_title: '[data-truncated-title]',
+            year: '[data-year]',
+        },
+        sortAscending: {
+            rating: false,
+            truncated_title: true,
+            year: false,
+        },
+    })
+})
+
+// ========== login page animations ==========
+
 $('#switch-to-create').click(function(e) {
     e.preventDefault()
     $('#user-login-form').fadeOut(function() {
@@ -17,6 +35,22 @@ $('#switch-to-login').click(function(e) {
     $('#user-create-form').fadeOut(function(){
         $('#user-login-form').fadeIn()
     })
+})
+
+// ========== isotope filter managment ==========
+
+// filter items on button click
+$('.filter-button-group').on( 'click', 'button', function() {
+    var filterValue = $(this).attr('data-filter')
+    $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+    $grid.isotope({ filter: filterValue })
+})
+
+// sort items on button click
+$('.sort-by-button-group').on( 'click', 'button', function() {
+    var sortByValue = $(this).attr('data-sort-by')
+    $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+    $grid.isotope({ sortBy: sortByValue })
 })
 
 
@@ -72,60 +106,34 @@ function unvote(id) {
     })
 }
 
+// ========== Group Membership Mangement ==========
 
-/**
- *
- */
-$('#group-membership-button').click(function() {
-    var group_slug = $(this).attr('data-group-slug')
+$('.join-group-button, .leave-group-button').click(function(e){
+    e.preventDefault();
     var action = $(this).attr('data-group-action')
-    if (action === 'join') {
-        join_group(this, group_slug)
-    } else if (action === 'leave') {
-        leave_group(this, group_slug)
-    }
+    var group_slug = $(this).attr('data-group-slug')
+    $.ajax({
+        url: window.location.href,
+        method: 'POST',
+        data: {
+            action: action,
+            group_slug: group_slug,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function(data) {
+            if (data.redirect) {
+                window.location.replace(data.redirect)
+            } else {
+                location.reload()
+            }
+        },
+    })
 })
 
-function join_group(button, group_slug) {
-    var group_url = '/group/' + group_slug + '/'
-    $.ajax({
-        url: group_url + 'join/',
-        method: 'POST',
-        data: {
-            group_slug: group_slug,
-        },
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
-        },
-        success: function() {
-            location.reload()
-        },
-        error: function() {
-            window.location.replace('/login/?next=' + group_url)
-        }
-    })
-}
 
-function leave_group(button, group_slug) {
-    var group_url = '/group/' + group_slug + '/'
-    $.ajax({
-        url: group_url + 'leave/',
-        method: 'POST',
-        data: {
-            group_slug: group_slug,
-        },
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
-        },
-        success: function() {
-            location.reload()
-        },
-        error: function() {
-            window.location.replace('/login/?next=' + group_url)
-        }
-    })
-}
-
+// ========== Get CSRF Cookie ==========
 
 // get the cookie containing the CSRF token (needed for POSTing with ajax)
 function getCookie(name) {
@@ -134,24 +142,41 @@ function getCookie(name) {
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
 
-$('#event-membership-button').click(function(){
-    var event_id = $(this).attr('data-event-id')
-    var action = $(this).attr('data-event-action')
-    var group_slug = $(this).attr('event-group-slug')
-    console.log(this, action, group_slug)
+// ========== Event Membership Mangement ==========
 
-    if (action === 'join') {
-        join_event(group_slug, event_id)
-    } else if(action === 'leave') {
-        leave_event(group_slug, event_id)
-    }
+$('.join-event-button').click(function(e){
+    e.preventDefault();
+    var group_slug = $(this).attr('data-group-slug')
+    var event_id = $(this).attr('data-event-id')
+    var join_event_url = '/group/' + group_slug + '/event/' + event_id + '/join/'
+
+    $.ajax({
+        url: join_event_url,
+        method: 'POST',
+        data: {
+            group_slug: group_slug,
+            event_id: event_id
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        },
+        success: function() {
+            location.reload()
+        },
+        error: function() {
+            window.location.replace('/login/?next=' + join_event_url)
+        }
+    })
 })
 
-function join_event(group_slug, event_id) {
-    console.log('started Join function')
-    var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
+$('.leave-event-button').click(function(e){
+    e.preventDefault();
+    var group_slug = $(this).attr('data-group-slug')
+    var event_id = $(this).attr('data-event-id')
+    var leave_event_url = '/group/' + group_slug + '/event/' + event_id + '/leave/'
+
     $.ajax({
-        url: event_url + 'join/',
+        url: leave_event_url,
         method: 'POST',
         data: {
             group_slug: group_slug,
@@ -164,28 +189,33 @@ function join_event(group_slug, event_id) {
             location.reload()
         },
         error: function() {
-            window.location.replace('/login/?next=' + event_url)
+            window.location.replace('/login/?next=' + leave_event_url)
         }
     })
-}
-function leave_event(group_slug, event_id) {
-    console.log('started Leave function')
+})
+
+$('.delete-lockin').click(function(){
+    var lockin = $(this).attr('data-lockin-id')
+    var group_slug = $(this).attr('data-group-slug')
+    var event_id = $(this).attr('data-event-id')
     var event_url = '/group/' + group_slug + '/event/' + event_id + '/'
-    $.ajax({
-        url: event_url + 'leave/',
-        method: 'POST',
-        data: {
-            group_slug: group_slug,
-            event_id: event_id
-        },
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
-        },
-        success: function() {
-            location.reload()
-        },
-        error: function() {
-            window.location.replace('/login/?next=' + event_url)
-        }
-    })
-}
+    var movie = $(this).attr('data-movie-id')
+    if (confirm('Are you sure you want to remove this Locked in movie?')){
+        $.ajax({
+            url: event_url,
+            method: 'POST',
+            data: {
+                type: 'delete',
+                group_slug: group_slug,
+                event_id: event_id,
+                movie: movie,
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+            },
+            success: function() {
+                location.reload()
+            },
+        })
+    }
+})

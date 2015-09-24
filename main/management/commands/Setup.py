@@ -3,8 +3,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from main.models import Movie, Event, Group, Location
 
-from scripts import populate_movies as mov_in
+# from scripts import populate_movies as mov_in
 import json
+import re
 
 
 class Command(BaseCommand):
@@ -42,12 +43,16 @@ class Command(BaseCommand):
         for movie in data['movie']:
             print 'Importing: ' + movie['title']
 
-            result = mov_in.MovieToPick.make_movie(movie['url'], user)
+            # extract the IMDB id from the URL
+            imdb_id = None
+            r = r't{2}\d+'
+            match = re.search(r, movie['url'])
+            if match:
+                imdb_id = match.group()
 
-            if result == 'failed' or result == 'not a movie':
-                print 'FAILED'
-            else:
-                print 'Success!'
+            result = Movie.submit_movie(user.pk, imdb_id)
+
+            print 'Success!' if result is not None else 'FAILED.'
 
         print 'Finished'
 

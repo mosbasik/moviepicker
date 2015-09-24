@@ -79,10 +79,6 @@ def login(request):
                 # log the new user into the site
                 auth_login(request, user)
 
-                # get the "world" group and add the new user to it
-                group = Group.objects.get(name='World')
-                group.users.add(user)
-
                 # redirect user to the front page
                 return redirect(request.POST.get('next', '/'))
 
