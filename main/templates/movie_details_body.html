@@ -46,6 +46,10 @@
         <span class='title-format'>Runtime: </span><span>{{ movie.runtime }} minutes</span>
         <br>
         <span class='title-format'>Genre: </span><span>{{ movie.genre }}</span>
+        <br>
+        <span class='title-format'><a target="_blank" href="http://www.imdb.com/title/{{ movie.imdb_id }}">Read more on IMDB</a></span>
+        <br>
+        <span class='title-format'><a target="_blank" href="http://www.rottentomatoes.com/search/?{{ movie.rottentomato_search }}">Read more on Rotten Tomatoes</a></span>
         {# <br> #}
         {# <span class='title-format'>Starring: </span><span>{{ movie.starring }}</span> #}
         {# <br> #}
