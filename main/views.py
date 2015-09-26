@@ -1,14 +1,14 @@
 # django imports
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext, loader
 from django.utils.text import slugify
+from django.utils.timezone import activate
 from django.views.generic import View
-from django.db.models import Count
-from django.core.urlresolvers import reverse
 
 # local imports
 from main.forms import (
@@ -24,6 +24,7 @@ import user_auth
 
 # python imports
 import re
+import pytz
 
 
 # don't know if uses model functions
@@ -183,6 +184,7 @@ class CreateEvent(View):
         request_context = RequestContext(request, processors=[global_context])
 
         if request.method == 'POST' and request.user.is_authenticated():
+            activate(request.COOKIES['timezone'])
             form = EventForm(request.user, request.POST)
             location_form = LocationForm(request.POST)
             context['form'] = form
@@ -192,7 +194,6 @@ class CreateEvent(View):
                 location, created = Location.objects.get_or_create(
                     text=location_form.cleaned_data['text'],
                     group=form.cleaned_data['group'])
-                print form.cleaned_data['date_and_time']
                 name = form.cleaned_data['name']
                 date_and_time = form.cleaned_data['date_and_time']
                 description = form.cleaned_data['description']

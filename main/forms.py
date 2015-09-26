@@ -48,7 +48,7 @@ class EventForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Name this event. We double-dog dare you.'
+                'placeholder': 'Event name'
             }
         )
     )
@@ -68,7 +68,7 @@ class EventForm(forms.Form):
         widget=forms.Textarea(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Describe your event. Answer me!'
+                'placeholder': 'Event description'
             }
         )
     )
@@ -87,7 +87,7 @@ class LocationForm(forms.ModelForm):
 
     text = forms.CharField(required=True, widget=forms.TextInput(
         attrs={'class': 'form-control',
-               'placeholder': 'Type the location here'}))
+               'placeholder': 'Event location'}))
 
     class Meta:
         model = Location

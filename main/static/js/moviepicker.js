@@ -53,6 +53,24 @@ $('.sort-by-button-group').on( 'click', 'button', function() {
     $grid.isotope({ sortBy: sortByValue })
 })
 
+// ========== timezone cookie checks ==========
+
+// note: longterm solution should be to create one page that sets the timezone,
+// then check with django middleware if cookie is set.  if it's not set,
+// redirect to the view that sets it, then use javascript from there to
+// continue to the original destination when the cookie is set.  this allows
+// the server to continually be aware of a user's time zone.
+
+// try to get the timezone cookie
+var timezone = getCookie("timezone")
+
+// if the timezone cookie has not been set yet
+if (timezone == "") {
+    // create the timezone cookie and set to expire in seven days
+    jstzResponse = jstz.determine()
+    setCookie("timezone", jstzResponse.name(), 7)
+}
+
 
 /**
  * Triggers when clicking on a movie poster. A parent div of the movie poster
