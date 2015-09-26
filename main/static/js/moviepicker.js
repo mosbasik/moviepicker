@@ -1,6 +1,8 @@
 var $grid = $('.grid')
 
 $(document).ready(function(){
+    jQuery.timeago.settings.allowFuture = true;
+    jQuery("abbr.timeago").timeago();
     $('[data-toggle="tooltip"]').tooltip;
     $grid.isotope({
         // options
