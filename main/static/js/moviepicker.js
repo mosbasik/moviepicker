@@ -65,9 +65,10 @@ $('.sort-by-button-group').on( 'click', 'button', function() {
 
 // try to get the timezone cookie
 var timezone = getCookie("timezone")
+console.log(timezone)
 
 // if the timezone cookie has not been set yet
-if (timezone == "") {
+if ((typeof timezone === 'undefined') || (timezone === "")) {
     // create the timezone cookie and set to expire in seven days
     jstzResponse = jstz.determine()
     setCookie("timezone", jstzResponse.name(), 7)

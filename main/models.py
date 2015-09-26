@@ -263,6 +263,11 @@ class Group(models.Model):
             voters__in=self.users.all()).annotate(num_votes=Count('voters'))
         return movies
 
+    def upcoming_events(self):
+        '''
+        '''
+        return self.events.filter(is_active=True)
+
 
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
