@@ -21,7 +21,8 @@
                         {% if event.is_showing %}
                             Now active!
                         {% else %}
-                            <abbr class="timeago" title="{{ event.date_and_time|date:'c'}}">{{ event.date_and_time|timeuntil }}</abbr>
+                            {# <abbr class="timeago" title="{{ event.date_and_time|date:'c'}}">{{ event.date_and_time|timeuntil }}</abbr> #}
+                            {{ event.date_and_time }}
                         {% endif %}
                     </center>
                 </p>
