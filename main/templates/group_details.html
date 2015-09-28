@@ -33,7 +33,7 @@
 
         <div class="col-sm-5">
             <h2>Upcoming Events:</h2>
-            {% for event in group.events.all %}
+            {% for event in group.upcoming_events %}
                 <div class="event-summary-wrapper">
                     <p class="event-summary">
                         <a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a>
