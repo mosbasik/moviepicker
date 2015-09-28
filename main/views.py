@@ -319,6 +319,7 @@ class EventDetails(View):
 
     def get(self, request, group_slug, event_id):
         request_context = RequestContext(request, processors=[global_context])
+        activate(request.COOKIES['timezone'])
 
         event = Event.objects.get(id=event_id)
         event_members = event.users.all()
@@ -383,3 +384,8 @@ def leave_event(request, group_slug, event_id):
             event.leave(request.user.pk)
             return HttpResponse(status=200)
     return HttpResponse(status=401)
+
+
+def timezone(request):
+    '''Loads page whose only job is to set the user's timezone cookie.'''
+    return render(request, 'timezone.html')
