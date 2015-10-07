@@ -266,7 +266,7 @@ class Group(models.Model):
     def upcoming_events(self):
         '''
         '''
-        return self.events.filter(is_active=True)
+        return self.events.filter(is_active=True).order_by('date_and_time')
 
 
 class Event(models.Model):
