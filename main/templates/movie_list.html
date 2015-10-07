@@ -3,9 +3,43 @@
 {# used to display list of movies #}
 {# include in the desired file #}
 
-<hr class='movie-hr'>
-<h5>{{ movies_label }}</h5>
+{% if movies_label %}
+    <h5>{{ movies_label }}</h5>
+{% endif %}
+
+<br>
+
 <div class="row">
+    <div class="col-xs-1 text-right">
+        <label>Sort:</label>
+    </div>
+    <div class="col-xs-11">
+        <div class="btn-group sort-by-button-group">
+          <button class="btn btn-default btn-primary" data-sort-by="truncated_title">Alphabetical</button>
+          <button class="btn btn-default" data-sort-by="rating">Highest Rated</button>
+          <button class="btn btn-default" data-sort-by="year">Recent Release</button>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div class="row">
+    <div class="col-xs-1 text-right">
+        <label>Filter:</label>
+    </div>
+    <div class="col-xs-11">
+        <div class="btn-group filter-button-group">
+          <button class="btn btn-default btn-primary" data-filter="*">None</button>
+          <button class="btn btn-default" data-filter=".liked">Voted</button>
+          <button class="btn btn-default" data-filter=":not(.liked)">Unvoted</button>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div class="grid">
     {% for movie in movies %}
         {% include "movie_thumbnail.html" %}
     {% endfor %}

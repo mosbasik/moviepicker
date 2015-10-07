@@ -15,7 +15,17 @@
                 <h2><center>{{event.name}}</center></h2>
                 <p><center>{{event.description}}</center></p>
                 <br>
-                <p><center>Movie start time: {{event.date_and_time}}</center></p>
+                <p>
+                    <center>
+                        Movie start time:
+                        {% if event.is_showing %}
+                            Now active!
+                        {% else %}
+                            {# <abbr class="timeago" title="{{ event.date_and_time|date:'c'}}">{{ event.date_and_time|timeuntil }}</abbr> #}
+                            {{ event.date_and_time }}
+                        {% endif %}
+                    </center>
+                </p>
             </div>
 
             <div class="col-sm-3">

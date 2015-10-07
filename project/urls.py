@@ -52,6 +52,9 @@ urlpatterns = [
     url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/join/$', 'main.views.join_event', name='join_event'),
     url(r'^group/(?P<group_slug>[-\w]+)/event/(?P<event_id>[0-9]+)/leave/$', 'main.views.leave_event', name='leave_event'),
 
+    # local timezone cookie management
+    url(r'^timezone/$', 'main.views.timezone', name='timezone'),
+
     # login and logout
     url(r'^login/$', 'main.user_auth.login', name='login'),
     url(r'^logout/$', 'main.user_auth.logout', name='logout'),

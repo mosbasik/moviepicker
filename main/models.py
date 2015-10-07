@@ -166,6 +166,13 @@ class Movie(models.Model):
             poster_temp.write(poster_response)
             self.poster.save('%s.jpg' % self.title, File(poster_temp))
 
+    @property
+    def rottentomato_search(self):
+        search_string = self.title.encode('utf-8')
+        search_string += ' {}'.format(self.year)
+        param_dict = {'search': search_string}
+        return urllib.urlencode(param_dict)
+
 
 @receiver(post_delete, sender=Movie)
 def movie_post_delete_handler(sender, **kwargs):
@@ -255,6 +262,11 @@ class Group(models.Model):
         movies = Movie.objects.filter(
             voters__in=self.users.all()).annotate(num_votes=Count('voters'))
         return movies
+
+    def upcoming_events(self):
+        '''
+        '''
+        return self.events.filter(is_active=True)
 
 
 class Event(models.Model):

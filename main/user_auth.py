@@ -12,9 +12,9 @@ from main.forms import UserCreationForm
 
 def login(request):
 
-    # if a user is already logged in, redirect to the front page
+    # if a user is already logged in, redirect to the home page
     if request.user.is_authenticated():
-            return redirect('front')
+        return redirect('home')
 
     # load a blank registration form to context in case they want to register
     context = {}
@@ -36,7 +36,7 @@ def login(request):
                 # and if the user's account is active
                 if user.is_active:
 
-                    # then log the user in and redirect to front page
+                    # then log the user in and redirect to next page
                     auth_login(request, user)
                     if request.user.is_authenticated():
                         return redirect(request.POST.get('next', '/'))
@@ -79,11 +79,7 @@ def login(request):
                 # log the new user into the site
                 auth_login(request, user)
 
-                # get the "world" group and add the new user to it
-                group = Group.objects.get(name='World')
-                group.users.add(user)
-
-                # redirect user to the front page
+                # redirect user to the next page
                 return redirect(request.POST.get('next', '/'))
 
             # if the filled form is invalid

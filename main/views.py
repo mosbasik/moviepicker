@@ -1,14 +1,14 @@
 # django imports
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext, loader
 from django.utils.text import slugify
+from django.utils.timezone import activate
 from django.views.generic import View
-from django.db.models import Count
-from django.core.urlresolvers import reverse
 
 # local imports
 from main.forms import (
@@ -24,6 +24,7 @@ import user_auth
 
 # python imports
 import re
+import pytz
 
 
 # don't know if uses model functions
@@ -183,6 +184,7 @@ class CreateEvent(View):
         request_context = RequestContext(request, processors=[global_context])
 
         if request.method == 'POST' and request.user.is_authenticated():
+            activate(request.COOKIES['timezone'])
             form = EventForm(request.user, request.POST)
             location_form = LocationForm(request.POST)
             context['form'] = form
@@ -192,7 +194,6 @@ class CreateEvent(View):
                 location, created = Location.objects.get_or_create(
                     text=location_form.cleaned_data['text'],
                     group=form.cleaned_data['group'])
-                print form.cleaned_data['date_and_time']
                 name = form.cleaned_data['name']
                 date_and_time = form.cleaned_data['date_and_time']
                 description = form.cleaned_data['description']
@@ -318,6 +319,7 @@ class EventDetails(View):
 
     def get(self, request, group_slug, event_id):
         request_context = RequestContext(request, processors=[global_context])
+        activate(request.COOKIES['timezone'])
 
         event = Event.objects.get(id=event_id)
         event_members = event.users.all()
@@ -327,7 +329,7 @@ class EventDetails(View):
         context['lockin_form'] = lockin_form
         context['event'] = event
         context['movies_label'] = 'Movies that event attendees have voted for:'
-        context['movies'] = event.movie_pool().order_by('-num_votes').distinct()
+        context['movies'] = event.movie_pool().order_by('-num_votes', '-imdb_rating').distinct()
 
         return render_to_response(
             'event_details.html',
@@ -382,3 +384,8 @@ def leave_event(request, group_slug, event_id):
             event.leave(request.user.pk)
             return HttpResponse(status=200)
     return HttpResponse(status=401)
+
+
+def timezone(request):
+    '''Loads page whose only job is to set the user's timezone cookie.'''
+    return render(request, 'timezone.html')
