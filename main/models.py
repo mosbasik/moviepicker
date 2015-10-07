@@ -283,7 +283,12 @@ class Event(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
-        return self.name
+        if self.is_active:
+            return "Active: {} {}".format(self.name, self.date_and_time)
+        return "Inactive: {} {}".format(self.name, self.date_and_time)
+
+    class Meta:
+        ordering = ['-date_and_time']
 
     @property
     def leader(self):
