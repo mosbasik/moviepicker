@@ -60,6 +60,10 @@
                     <div class="col-sm-6">
                         {% with movie_pool=event.movie_pool movie_pool_count=event.movie_pool.count %}
                             {% if movie_pool_count > 0 %}
+
+                                <dt>Location:</dt>
+                                <dd><a href="http://{{ event.location }}" target="_blank">{{ event.location }}</a></dd>
+
                                 <dl>
                                     <dt>Top voted movies:</dt>
                                     <dd>
