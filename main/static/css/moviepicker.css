@@ -168,3 +168,49 @@ p.event-summary {
 }
 .owned-column {
 }
+
+/* ================== group details ================== */
+.group-event-panel {
+    overflow: hidden;
+}
+
+.panel-heading>a {
+    color: #fff;
+    font-weight: bold;
+}
+.panel-heading>a>abbr {
+    border-bottom: none;
+    cursor: inherit;
+}
+
+.panel-body dd {
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+.panel-body ul  {
+    padding-left: 0px;
+    list-style-type: none;
+}
+
+.group-event-panel-wrapper {
+}
+
+.group-event-panel-information-wrapper {
+    width: -moz-calc(100% - 165px);
+    width: -webkit-calc(100% - 165px);
+    width: calc(100% - 165px);
+    position: relative;
+    display: inline-block;
+    margin-right: 0px;
+    float:left;
+}
+
+.group-event-panel-poster-wrapper {
+    float: right;
+}
+
+.group-event-panel-poster-wrapper img {
+    width: 150px;
+    position: relative;
+}

@@ -1,0 +1,101 @@
+{% load staticfiles %}
+
+<div class="group-event-panel panel
+    {% if event.is_showing %}
+        panel-warning
+    {% elif request.user in event.users.all %}
+        panel-primary
+    {% else %}
+        panel-default
+    {% endif %}">
+    <div class="panel-heading">
+        <span class="pull-right">
+            {% if event.is_showing %}
+                Now showing!
+            {% elif request.user in event.users.all %}
+                You are planning to attend this event.
+            {% else %}
+                You are not planning to attend this event.
+            {% endif %}
+            &nbsp;
+            <div class="btn-group">
+                {% if user.is_authenticated %}
+                    {% if request.user in event.users.all %}
+                        <a href="#" class="btn btn-xs btn-danger pull-right leave-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Leave Event</a>
+                    {% else %}
+                        <a href="#" class="btn btn-xs btn-success pull-right join-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Join Event</a>
+                    {% endif %}
+                {% else %}
+                    <a href="#" class="btn btn-xs btn-success pull-right join-event-button" data-group-slug="{{ event.group.slug }}" data-event-id="{{event.id}}">Join Event</a>
+                {% endif %}
+            </div>
+        </span>
+        <a href="{% url 'event_details' event.group.slug event.pk %}">"{{ event.name }}" - <abbr class="timeago" title="{{ event.date_and_time|date:'c'}}"></abbr> ({{ event.creator.username }})</a>
+    </div>
+    <div class="panel-body">
+        <div class="group-event-panel-wrapper">
+            <div class="group-event-panel-information-wrapper">
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <dl>
+                            <dt>Showtime in your timezone:</dt>
+                            <dd>{{ event.date_and_time|date:"H:i \o\n l, M j" }}</dd>
+
+                            <dt>Description:</dt>
+                            <dd>{{ event.description }}</dd>
+
+                            <dt>Attending Members ({{ event.users.all.count }}):</dt>
+                            <dd>
+                                <ul>
+                                    {% for guest in event.users.all %}
+                                        <li>{{ guest }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </dd>
+                        </dl>
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        {% with movie_pool=event.movie_pool movie_pool_count=event.movie_pool.count %}
+                            {% if movie_pool_count > 0 %}
+                                <dl>
+                                    <dt>Top voted movies:</dt>
+                                    <dd>
+                                        <ol>
+                                            {% for movie in event.movie_pool|slice:":5" %}
+                                                <li><a href="{% url 'movie_details' movie.imdb_id %}" title="{{ movie.description }}">{{ movie.title }} [{{ movie.year}}]</a></li>
+                                            {% endfor %}
+                                        </ol>
+                                    </dd>
+                                </dl>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-event-panel-poster-wrapper">
+                {% if event.leader %}
+                    {% with event.leader as movie %}
+                        <div id='{{ movie.imdb_id }}'
+                             class="
+                                {# movie-summary #}
+                                movie-vote
+                                {% if user.is_authenticated and movie in votes %}
+                                    liked
+                                {% endif %}">
+                            <a id="movie-{{ movie.imdb_id }}" class="movie-image" href="#"><img src="{% if movie.poster %}{{ movie.poster.url }}{% else %}{% static 'img/default_image.jpg' %}{% endif %}"></a>
+                        </div>
+                    {% endwith %}
+                {% else %}
+                    No votes have been submitted yet.
+                {% endif %}
+            </div>
+            {# <div class="group-event-panel-button-wrapper"> #}
+                {# <p>lol</p> #}
+            {# </div> #}
+        </div>
+    </div>
+</div>

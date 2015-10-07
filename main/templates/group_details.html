@@ -21,44 +21,41 @@
         </div>
 
     </div>
+
     <div class="row">
-        <div class="col-sm-2">
-            <h2>Users:</h2>
-            <ul>
-                {% for user in users %}
-                    <li>{{ user.username }}</li>
-                {% endfor %}
+        <div class="col-sm-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active" role="upcoming"><a href="#upcoming" aria-controls="#upcoming" role="tab" data-toggle="tab">Upcoming Events</a></li>
+                <li role="register"><a href="#register" aria-controls="#register" role="tab" data-toggle="tab">Register Event</a></li>
+                <li role="users"><a href="#users" aria-controls="#users" role="tab" data-toggle="tab">Users</a></li>
             </ul>
-        </div>
 
-        <div class="col-sm-5">
-            <h2>Upcoming Events:</h2>
-            {% for event in group.upcoming_events %}
-                <div class="event-summary-wrapper">
-                    <p class="event-summary">
-                        <a href="{% url 'event_details' event.group.slug event.pk %}">{{ event.name }}</a>
-                        <span class="pull-right">
-                            {% if event.is_showing %}
-                                Now active!
-                            {% else %}
-                                <abbr class="timeago" title="{{ event.date_and_time|date:'c'}}">{{ event.date_and_time|timeuntil }}</abbr>
-                            {% endif %}
-                        </span>
-                    </p>
-                    {% if event.leader %}
-                        <p class="event-summary body">{% if event.is_locked %}<span class="glyphicon glyphicon-lock pull-left"></span>{% else %}<span class="glyphicon glyphicon-arrow-up pull-left"></span>{% endif %} <a href="{% url 'movie_details' event.leader.imdb_id %}">{{ event.leader.title }} [{{ event.leader.year }}]</a></p>
-                    {% else %}
-                        <p class="event-summary body">No votes have been submitted yet.</p>
-                    {% endif %}
+            <br>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="upcoming">
+                    {% for event in group.upcoming_events %}
+                        {% include "event_panel.html" %}
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        </div>
 
-        <div class="col-sm-5">
-            <h2><a href="{% url 'create_event' %}">Register New Event</a></h2>
-            <p>(The form is going to occupy this space soon.)</p>
+                <div role="tabpanel" class="tab-pane" id="register">
+                    <h2><a href="{% url 'create_event' %}">Register New Event</a></h2>
+                    <p>(The form is going to occupy this space soon.)</p>
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="users">
+                    <ul>
+                        {% for user in users %}
+                            <li>{{ user.username }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
+
+    <hr>
 
     <div class="row">
         {% include "movie_list.html" %}
