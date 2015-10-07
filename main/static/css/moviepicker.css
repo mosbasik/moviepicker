@@ -207,6 +207,7 @@ p.event-summary {
 }
 
 .group-event-panel-poster-wrapper {
+    width: 150px;
     float: right;
 }
 
